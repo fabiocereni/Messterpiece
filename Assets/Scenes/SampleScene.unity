@@ -710,10 +710,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a155b90655c8b4e3da330eea2009f744, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
-  speed: 5
-  mouseSensitivity: 50
-  jumpForce: 5
+  walkSpeed: 6
+  runSpeed: 9
+  jumpHeight: 2
   gravity: -9.81
+  cameraTransform: {fileID: 330585546}
+  mouseSensitivity: 50
+  maxVerticalAngle: 80
 --- !u!1 &1600403376
 GameObject:
   m_ObjectHideFlags: 0
