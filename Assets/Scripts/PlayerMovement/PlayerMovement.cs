@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;                   // per IEnumerator!
 
 // Richiede che il GameObject abbia un componente CharacterController
 [RequireComponent(typeof(CharacterController))]
@@ -8,23 +9,26 @@ public class PlayerMovement : MonoBehaviour
     public float runSpeed = 9f;
     public float jumpHeight = 2f;
     public float gravity = -20f;
-    // Riferimento al Transform della camera (deve essere assegnato nell'Inspector)
-    public Transform cameraTransform;
+    public Transform cameraTransform;       // Riferimento al Transform della camera (deve essere assegnato nell'Inspector)
     public float mouseSensitivity = 1000f;
-    // Limite massimo dell'angolo verticale della camera (per evitare capovolgimenti)
-    public float maxVerticalAngle = 80f;
-
+    public float maxVerticalAngle = 80f;    // Limite massimo dell'angolo verticale della camera (per evitare capovolgimenti)
     private CharacterController controller;
-    // Vettore per gestire la velocità (soprattutto per la gravità e il salto)
-    private Vector3 velocity;
-    // Indica se il giocatore è a contatto con il suolo
-    private bool isGrounded;
-    // Velocità corrente del giocatore (camminata o corsa)
-    private float currentSpeed;
-    // Angolo di rotazione verticale della camera
-    private float rotationX = 0f;
+    private Vector3 velocity;               // Vettore per gestire la velocità (soprattutto per la gravità e il salto)
+    private bool isGrounded;                // Indica se il giocatore è a contatto con il suolo
+    private float currentSpeed;             // Velocità corrente del giocatore (camminata o corsa)
+    private float rotationX = 0f;           // Angolo di rotazione verticale della camera
     private int jumpCount = 0;
     private int maxExtraJumps = 1;
+
+    // PER IL DASH
+    public float dashDistance = 8f;         // distanza o velocità dello scatto
+    public float dashDuration = 0.15f;      // durata dello scatto
+    public float doubleTapTime = 0.3f;      // tempo massimo per doppio tap
+    public float dashCooldown = 1f;         // tempo di recupero tra dash
+    private bool isDashing = false;
+    private float lastDashTime = -10f;
+    private Vector3 dashDirection;
+    private float lastTapW, lastTapA, lastTapS, lastTapD;
 
     void Start()
     {
@@ -38,6 +42,10 @@ public class PlayerMovement : MonoBehaviour
     {
         MovePlayer();
         RotateCamera();
+        if (!isDashing)
+        {
+            CheckDashInput();
+        }
     }
 
     void MovePlayer()
@@ -48,6 +56,7 @@ public class PlayerMovement : MonoBehaviour
         if (isGrounded && velocity.y < 0)
             velocity.y = -2f;
 
+        // Per usare le "freccette" della tastiera
         float moveX = Input.GetAxis("Horizontal");
         float moveZ = Input.GetAxis("Vertical");
 
@@ -97,5 +106,54 @@ public class PlayerMovement : MonoBehaviour
 
         // Applica la rotazione verticale alla camera (solo sull'asse X)
         cameraTransform.localRotation = Quaternion.Euler(rotationX, 0f, 0f);
+    }
+
+    void CheckDashInput()
+    {
+        float currentTime = Time.time;
+
+        if (Input.GetKeyDown(KeyCode.W))
+        {
+            if (currentTime - lastTapW < doubleTapTime && currentTime - lastDashTime > dashCooldown)
+                StartCoroutine(DoDash(transform.forward));
+            lastTapW = currentTime;
+        }
+
+        if (Input.GetKeyDown(KeyCode.S))
+        {
+            if (currentTime - lastTapS < doubleTapTime && currentTime - lastDashTime > dashCooldown)
+                StartCoroutine(DoDash(-transform.forward));
+            lastTapS = currentTime;
+        }
+
+        if (Input.GetKeyDown(KeyCode.A))
+        {
+            if (currentTime - lastTapA < doubleTapTime && currentTime - lastDashTime > dashCooldown)
+                StartCoroutine(DoDash(-transform.right));
+            lastTapA = currentTime;
+        }
+
+        if (Input.GetKeyDown(KeyCode.D))
+        {
+            if (currentTime - lastTapD < doubleTapTime && currentTime - lastDashTime > dashCooldown)
+                StartCoroutine(DoDash(transform.right));
+            lastTapD = currentTime;
+        }
+    }
+    
+    IEnumerator DoDash(Vector3 direction)
+    {
+        isDashing = true;
+        lastDashTime = Time.time;
+
+        float startTime = Time.time;
+
+        while (Time.time < startTime + dashDuration)
+        {
+            controller.Move(direction.normalized * (dashDistance / dashDuration) * Time.deltaTime);
+            yield return null;
+        }
+
+        isDashing = false;
     }
 }
