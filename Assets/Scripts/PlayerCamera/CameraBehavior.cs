@@ -14,6 +14,11 @@ public class CameraBehavior : MonoBehaviour
     public Camera firstPersonCamera;
     public Camera thirdPersonCamera;
     public bool isFirstPerson;
+    
+    //var per third person orbitale (vedere sotto) 
+    public Transform thirdPersonPivot; // il punto attorno al quale far ruotare la camera
+    public float distanceFromPivot = 5f; // distanza della camera dal pivot
+    
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -58,7 +63,20 @@ public class CameraBehavior : MonoBehaviour
         if(isFirstPerson)
             cameraTransformerFirstPerson.localRotation = Quaternion.Euler(rotationX, 0f, 0f);
         else
-            cameraTransformerThirdPerson.localRotation = Quaternion.Euler(rotationX, 0f, 0f);
-        
+        {
+            if (thirdPersonPivot == null || cameraTransformerThirdPerson == null)
+                return;
+
+            // Calcola la rotazione della camera in base al mouse
+            rotationX = Mathf.Clamp(rotationX, -maxVerticalAngle, maxVerticalAngle);
+            Quaternion rotation = Quaternion.Euler(rotationX, transform.eulerAngles.y, 0f);
+
+            // Posizione orbitale intorno al pivot
+            Vector3 offset = rotation * new Vector3(0f, 0f, -distanceFromPivot);
+            cameraTransformerThirdPerson.position = thirdPersonPivot.position + offset;
+
+            // Guarda sempre il pivot
+            cameraTransformerThirdPerson.LookAt(thirdPersonPivot.position);
+        }
     }
 }
