@@ -71,7 +71,7 @@ public class Launcher : MonoBehaviour
             );
 
             //convertire da screen a world
-            transform.position = activeCamera.ScreenToWorldPoint(screenPos);
+            transform.position = cameraBehavior.firstPersonCamera.ScreenToWorldPoint(screenPos);
         }
 
         if (_cooldownTimer <= 0f)
