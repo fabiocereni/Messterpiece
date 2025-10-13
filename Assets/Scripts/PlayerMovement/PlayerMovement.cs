@@ -7,7 +7,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float walkSpeed = 6f;
     [SerializeField] private float runSpeed = 9f;
     [SerializeField] private float jumpHeight = 2f;
-    [SerializeField] private float gravity = -20f;
+    [SerializeField] private float gravity = -9.81f;
     [SerializeField] private int maxExtraJumps = 1;
 
     private CharacterController controller;
@@ -34,7 +34,7 @@ public class PlayerMovement : MonoBehaviour
         // Resetta la velocità verticale se a terra
         if (isGrounded && velocity.y < 0)
         {
-            velocity.y = -2f;
+            velocity.y = -1f;
             jumpCount = 0;
         }
 
