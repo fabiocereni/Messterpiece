@@ -1,72 +1,77 @@
 using UnityEngine;
 using System.Collections;
 
-[RequireComponent(typeof(PlayerMovement))]
+[RequireComponent(typeof(Rigidbody))]
 public class PlayerDash : MonoBehaviour
 {
     [Header("Dash Settings")]
-    [SerializeField] private float dashDistance = 8f;
-    [SerializeField] private float dashDuration = 0.15f;
-    [SerializeField] private float doubleTapTime = 0.3f;
-    [SerializeField] private float dashCooldown = 1f;
+    public float dashForce = 50f;            // intensità dello scatto
+    public float dashDuration = 0.3f;        // durata in secondi
+    public float dashCooldown = 1.0f;        // tempo di ricarica
+    public KeyCode dashKey = KeyCode.E;      // tasto per dash
 
-    private PlayerMovement playerMovement;
-    private bool isDashing;
-    private float lastDashTime = -10f;
-    private float lastTapTime = -Mathf.Infinity;
-    private Vector3 lastInputDirection;
+    [Header("References")]
+    public PlayerCamera cameraController;    // direzione basata sulla camera
 
-    private void Awake()
+    private Rigidbody rb;
+    private bool canDash = true;
+    private bool isDashing = false;
+
+    private Vector3 dashDirection;
+
+    void Start()
     {
-        playerMovement = GetComponent<PlayerMovement>();
+        rb = GetComponent<Rigidbody>();
+
+        if (cameraController == null)
+            cameraController = GetComponentInChildren<PlayerCamera>();
     }
 
-    private void Update()
+    void Update()
     {
-        if (!isDashing)
+        if (Input.GetKeyDown(dashKey) && canDash)
         {
-            CheckDashInput();
+            StartCoroutine(PerformDash());
         }
     }
 
-    private void CheckDashInput()
+    private IEnumerator PerformDash()
     {
-        float currentTime = Time.time;
-        Vector3 inputDirection = GetInputDirection();
-        if (inputDirection != Vector3.zero && Input.anyKeyDown)
-        {
-            // Se è un doppio tap e il cooldown è finito
-            if (currentTime - lastTapTime < doubleTapTime && currentTime - lastDashTime > dashCooldown)
-            {
-                StartCoroutine(DoDash(lastInputDirection));
-            }
-            lastTapTime = currentTime;
-            lastInputDirection = inputDirection;
-        }
-    }
-
-    // Rileva input per qualsiasi tasto di movimento e ne ricava la direzione in cui si sta muovendo il player
-    private Vector3 GetInputDirection()
-    {
-        // Calcola la direzione basata sull'input attuale e l'orientamento del giocatore
-        float moveX = Input.GetAxisRaw("Horizontal");
-        float moveZ = Input.GetAxisRaw("Vertical");
-        Vector3 direction = transform.right * moveX + transform.forward * moveZ;
-        return direction.normalized;
-    }
-
-    private IEnumerator DoDash(Vector3 direction)
-    {
+        canDash = false;
         isDashing = true;
-        lastDashTime = Time.time;
-        float startTime = Time.time;
 
-        while (Time.time < startTime + dashDuration)
+        // Calcola direzione del dash (basata sulla camera)
+        // Se y = 0 (colpa di unity) --> dal padre (il Player), Unity spesso restituisce la direzione già “compensata” dal vincolo locale, risultando piatta
+        dashDirection = cameraController.playerCamera.transform.forward;
+        Debug.Log("Dash direction: " + dashDirection);
+
+        // Disattiva momentaneamente la gravità (facoltativo)
+        rb.useGravity = false;
+
+        float elapsed = 0f;
+
+        // Applica forza costante per tutta la durata del dash
+        while (elapsed < dashDuration)
         {
-            playerMovement.ApplyDash(direction.normalized * (dashDistance / dashDuration));
+            rb.linearVelocity = Vector3.zero; // reset per evitare accumulo
+            rb.AddForce(dashDirection * dashForce, ForceMode.Acceleration);
+
+            elapsed += Time.deltaTime;
             yield return null;
         }
 
+        // Riattiva gravità
+        rb.useGravity = true;
+
         isDashing = false;
+
+        // Cooldown
+        yield return new WaitForSeconds(dashCooldown);
+        canDash = true;
+    }
+
+    public bool IsDashing()
+    {
+        return isDashing;
     }
 }

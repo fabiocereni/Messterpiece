@@ -2,36 +2,95 @@ using UnityEngine;
 
 public class PlayerCamera : MonoBehaviour
 {
-    [Header("Camera Settings")]
-    [SerializeField] private Transform cameraTransform;
-    [SerializeField] private float mouseSensitivity = 1000f;
-    [SerializeField] private float maxVerticalAngle = 80f;
+    [Header("Sensibilità mouse")]
+    public float mouseSensitivity = 1000f;
 
-    private float rotationX;
+    [Header("Limiti pitch")]
+    public float minPitch = -90f;
+    public float maxPitch = 90f;
 
-    private void Start()
+    [Header("Riferimenti")]
+    public Camera playerCamera; 
+
+    [Header("Smoothing (Lerp)")]
+    [Range(1f, 50f)] public float smoothSpeed = 15f;
+
+    float pitch;
+    float targetPitch;
+    float yaw;
+    float targetYaw;
+
+    Rigidbody rb;
+    bool cursorLocked = true;
+
+    public float getYaw()
     {
-        // Blocca il cursore
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        return yaw;
     }
 
-    private void Update()
+    void Start()
     {
-        RotateCamera();
+        LockCursor(true);
+
+        if (playerCamera == null)
+            playerCamera = GetComponentInChildren<Camera>();
+
+        rb = GetComponent<Rigidbody>();
+
+        yaw = targetYaw = transform.eulerAngles.y;
+        pitch = targetPitch = playerCamera.transform.localEulerAngles.x;
     }
 
-    private void RotateCamera()
+    void Update()
     {
-        float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
-        float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
+        HandleCursorLock();
 
-        // Rotazione orizzontale del giocatore
-        transform.Rotate(Vector3.up * mouseX);
+        if (!cursorLocked)
+            return;
 
-        // Rotazione verticale della camera
-        rotationX -= mouseY;
-        rotationX = Mathf.Clamp(rotationX, -maxVerticalAngle, maxVerticalAngle);
-        cameraTransform.localRotation = Quaternion.Euler(rotationX, 0f, 0f);
+        // Input
+        float mouseX = Input.GetAxisRaw("Mouse X") * mouseSensitivity * Time.deltaTime;
+        float mouseY = Input.GetAxisRaw("Mouse Y") * mouseSensitivity * Time.deltaTime;
+
+        // Aggiorna target
+        targetYaw += mouseX;
+        targetPitch -= mouseY;
+        targetPitch = Mathf.Clamp(targetPitch, minPitch, maxPitch);
+    }
+
+    void LateUpdate()
+    {
+        if (!cursorLocked)
+            return;
+
+        // Interpola verso i target (usando Lerp esponenziale)
+        yaw = Mathf.LerpAngle(yaw, targetYaw, Time.deltaTime * smoothSpeed);
+        pitch = Mathf.LerpAngle(pitch, targetPitch, Time.deltaTime * smoothSpeed);
+
+        // Applica rotazioni
+        Quaternion yawRotation = Quaternion.Euler(0f, yaw, 0f);
+        Quaternion pitchRotation = Quaternion.Euler(pitch, 0f, 0f);
+
+        if (rb != null)
+            rb.MoveRotation(yawRotation);
+        else
+            transform.rotation = yawRotation;
+
+        playerCamera.transform.localRotation = pitchRotation;
+    }
+
+    void LockCursor(bool locked)
+    {
+        cursorLocked = locked;
+        Cursor.visible = !locked;
+        Cursor.lockState = locked ? CursorLockMode.Locked : CursorLockMode.None;
+    }
+
+    void HandleCursorLock()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+            LockCursor(false);
+        else if (Input.GetMouseButtonDown(0) && !cursorLocked)
+            LockCursor(true);
     }
 }
