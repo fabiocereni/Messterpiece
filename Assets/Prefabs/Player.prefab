@@ -13,9 +13,10 @@ GameObject:
   - component: {fileID: 5732026476546908368}
   - component: {fileID: 7389258750654649912}
   - component: {fileID: 2659500223907378673}
-  - component: {fileID: 6304314968360466318}
-  - component: {fileID: 3869065131302246488}
-  - component: {fileID: 4842708432921589968}
+  - component: {fileID: 6593764605931797716}
+  - component: {fileID: 5301641980020550725}
+  - component: {fileID: 6254915689759871041}
+  - component: {fileID: 8778664249477688358}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -143,7 +144,34 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &6304314968360466318
+--- !u!54 &6593764605931797716
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1114878503275122273}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!114 &5301641980020550725
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -155,12 +183,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a155b90655c8b4e3da330eea2009f744, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
-  walkSpeed: 6
-  runSpeed: 9
-  jumpHeight: 2
-  gravity: -20
-  maxExtraJumps: 1
---- !u!114 &3869065131302246488
+  moveSpeed: 7
+  groundDrag: 2
+  jumpForce: 5
+  jumpCooldown: 1
+  airMultiplier: 1
+  playerHeight: 2
+  whatIsGround:
+    serializedVersion: 2
+    m_Bits: 1024
+  jumpKey: 32
+  sprintSpeed: 10
+  sprintKey: 304
+  maxSlopeAngle: 45
+  cameraController: {fileID: 0}
+--- !u!114 &6254915689759871041
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -172,10 +209,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8d9e793de73ae4d30b21c6a6fbbf3300, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerCamera
-  cameraTransform: {fileID: 55883221069509454}
   mouseSensitivity: 1000
-  maxVerticalAngle: 80
---- !u!114 &4842708432921589968
+  minPitch: -90
+  maxPitch: 90
+  playerCamera: {fileID: 0}
+  smoothSpeed: 15
+--- !u!114 &8778664249477688358
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -187,10 +226,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 618953ec025ef4551b6db49500ad09f1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerDash
-  dashDistance: 8
-  dashDuration: 0.25
-  doubleTapTime: 0.3
+  dashForce: 50
+  dashDuration: 0.3
   dashCooldown: 1
+  dashKey: 101
+  cameraController: {fileID: 0}
 --- !u!1 &5759250978957833725
 GameObject:
   m_ObjectHideFlags: 0
