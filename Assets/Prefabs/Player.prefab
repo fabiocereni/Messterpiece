@@ -14,7 +14,6 @@ GameObject:
   - component: {fileID: 7389258750654649912}
   - component: {fileID: 2659500223907378673}
   - component: {fileID: 6304314968360466318}
-  - component: {fileID: 3869065131302246488}
   - component: {fileID: 4842708432921589968}
   m_Layer: 0
   m_Name: Player
@@ -160,21 +159,6 @@ MonoBehaviour:
   jumpHeight: 2
   gravity: -20
   maxExtraJumps: 1
---- !u!114 &3869065131302246488
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1114878503275122273}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8d9e793de73ae4d30b21c6a6fbbf3300, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerCamera
-  cameraTransform: {fileID: 55883221069509454}
-  mouseSensitivity: 1000
-  maxVerticalAngle: 80
 --- !u!114 &4842708432921589968
 MonoBehaviour:
   m_ObjectHideFlags: 0
