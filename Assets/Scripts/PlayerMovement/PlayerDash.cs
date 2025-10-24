@@ -1,77 +1,70 @@
+using System.Collections; // Necessario per IEnumerator
 using UnityEngine;
-using System.Collections;
 
 [RequireComponent(typeof(Rigidbody))]
 public class PlayerDash : MonoBehaviour
 {
-    [Header("Dash Settings")]
-    public float dashForce = 50f;            // intensità dello scatto
-    public float dashDuration = 0.3f;        // durata in secondi
-    public float dashCooldown = 1.0f;        // tempo di ricarica
-    public KeyCode dashKey = KeyCode.E;      // tasto per dash
-
-    [Header("References")]
-    public PlayerCamera cameraController;    // direzione basata sulla camera
+    [Header("Dashing")]
+    public float dashForce = 15f;
+    public float dashDuration = 0.2f; // Durata in secondi del dash
+    public float dashCooldown = 1f;
+    public Transform cameraTransform; // <-- ASSEGNA LA MAIN CAMERA QUI
 
     private Rigidbody rb;
-    private bool canDash = true;
-    private bool isDashing = false;
+    private bool dashRequested;
+    private float nextDashTime = 0f;
 
-    private Vector3 dashDirection;
+    // Proprietà pubblica per far sapere agli altri script se stiamo scattando
+    public bool IsDashing { get; private set; }
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-
-        if (cameraController == null)
-            cameraController = GetComponentInChildren<PlayerCamera>();
+        if (cameraTransform == null)
+        {
+            Debug.LogError("Camera Transform non assegnato su PlayerDash script! Assegnare la Main Camera dall'Inspector.");
+        }
     }
 
     void Update()
     {
-        if (Input.GetKeyDown(dashKey) && canDash)
+        if (Input.GetKeyDown(KeyCode.E) && Time.time >= nextDashTime)
         {
-            StartCoroutine(PerformDash());
+            dashRequested = true;
+            nextDashTime = Time.time + dashCooldown;
         }
     }
 
-    private IEnumerator PerformDash()
+    void FixedUpdate()
     {
-        canDash = false;
-        isDashing = true;
-
-        // Calcola direzione del dash (basata sulla camera)
-        // Se y = 0 (colpa di unity) --> dal padre (il Player), Unity spesso restituisce la direzione già “compensata” dal vincolo locale, risultando piatta
-        dashDirection = cameraController.playerCamera.transform.forward;
-        Debug.Log("Dash direction: " + dashDirection);
-
-        // Disattiva momentaneamente la gravità (facoltativo)
-        rb.useGravity = false;
-
-        float elapsed = 0f;
-
-        // Applica forza costante per tutta la durata del dash
-        while (elapsed < dashDuration)
+        if (dashRequested)
         {
-            rb.linearVelocity = Vector3.zero; // reset per evitare accumulo
-            rb.AddForce(dashDirection * dashForce, ForceMode.Acceleration);
-
-            elapsed += Time.deltaTime;
-            yield return null;
+            HandleDash();
+            dashRequested = false;
         }
-
-        // Riattiva gravità
-        rb.useGravity = true;
-
-        isDashing = false;
-
-        // Cooldown
-        yield return new WaitForSeconds(dashCooldown);
-        canDash = true;
     }
 
-    public bool IsDashing()
+    private void HandleDash()
     {
-        return isDashing;
+        if (cameraTransform != null)
+        {
+            // Imposta lo stato di dash
+            IsDashing = true;
+
+            // Applica l'impulso
+            rb.AddForce(cameraTransform.forward * dashForce, ForceMode.Impulse);
+
+            // Avvia la coroutine per resettare lo stato dopo 'dashDuration'
+            StartCoroutine(StopDash());
+        }
+    }
+
+    private IEnumerator StopDash()
+    {
+        // Attendi la fine della durata del dash
+        yield return new WaitForSeconds(dashDuration);
+        
+        // Resetta lo stato
+        IsDashing = false;
     }
 }
