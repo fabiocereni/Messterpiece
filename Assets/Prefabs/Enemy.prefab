@@ -196,25 +196,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 4261118608247567085}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 836b486e5d98446ec8b013c292ee68f7, type: 3}
+  m_Script: {fileID: 11500000, guid: 71b9093aa96e141cbbad43a8105ecdd0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAI_NavMesh
   playerTransform: {fileID: 0}
-  patrolPoints:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  detectionRadius: 20
-  fieldOfViewAngle: 180
+  patrolPoints: []
+  detectionRadius: 15
+  fieldOfViewAngle: 90
   playerLayer:
     serializedVersion: 2
-    m_Bits: 128
+    m_Bits: 0
   obstacleLayer:
     serializedVersion: 2
-    m_Bits: 256
+    m_Bits: 0
