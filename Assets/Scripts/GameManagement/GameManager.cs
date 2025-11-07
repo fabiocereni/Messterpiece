@@ -7,6 +7,7 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
     public GameState currentState = GameState.Menu;
+    private int killCount = 0;
 
     private void Awake()
     {
@@ -43,5 +44,11 @@ public class GameManager : MonoBehaviour
     {
         Application.Quit();
         Debug.Log("Gioco chiuso.");
+    }
+
+    public void AddKill()
+    {
+        killCount++;
+        Debug.Log($"Uccisioni totali: {killCount}");
     }
 }
