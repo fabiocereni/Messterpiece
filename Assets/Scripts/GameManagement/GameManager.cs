@@ -19,12 +19,18 @@ public class GameManager : MonoBehaviour
         }
         Instance = this;
         DontDestroyOnLoad(gameObject);
+        Debug.Log("GameManager Awake() invoked");
     }
 
     private void Start()
     {
+        Debug.Log("GameManager Start() invoked");
         // All'avvio mostra il menu
-        UIManager.Instance.ShowMainMenu();
+        // UIManager.Instance.ShowMainMenu();
+
+        // PER ADESSO VADO AD ISTANZIARE SUBITO LA SCENA CHE VOGLIO IO PER PROVARE
+        // QUANDO AVREMO IL CANVA CON IL PULSANTE PER STARTARE FARA' TUTTO QUELLO
+        StartGame();
     }
 
     public void StartGame()
@@ -32,7 +38,7 @@ public class GameManager : MonoBehaviour
         currentState = GameState.Playing;
         // QUA CARICO LA MAPPA, che è presente in una scena
         // magari abbiamo una lista di mappe e randomicamente ne viene scelta una
-        // SceneManager.LoadScene("Scena1");
+        SceneManager.LoadSceneAsync("PlayerMovementTestScene");
     }
 
     public void OpenOptions()
