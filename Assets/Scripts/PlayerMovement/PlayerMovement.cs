@@ -17,6 +17,10 @@ public class PlayerMovement : MonoBehaviour
     public float playerHeight = 2.0f;
     public LayerMask whatIsGround;
 
+    [Header("Wall Settings")]
+    public LayerMask whatIsWall;
+    public float wallCheckDistance = 0.6f;
+
     [Header("Slope Settings")]
     public float maxSlopeAngle = 45f;
     private RaycastHit slopeHit;
@@ -61,6 +65,7 @@ public class PlayerMovement : MonoBehaviour
     void FixedUpdate()
     {
         MovePlayer();
+        CheckWallSlide();
     }
 
     private void MyInput()
@@ -81,19 +86,35 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    void MovePlayer()
+    void CheckWallSlide()
     {
-        // Se il giocatore sta scattando, non applicare il movimento normale
-        // Questo permette all'impulso del dash di non essere cancellato
+        // Se stai facendo il dash, non fare nulla
         if (playerDash != null && playerDash.IsDashing)
         {
-            return; // Salta il resto della funzione
+            return;
         }
 
-        // Calcola la direzione di movimento
-        moveDirection = orientation.forward * verticalInput + orientation.right * horizontalInput;
+        // Controlla se c'è un muro davanti/dietro/laterale
+        bool touchingWall = Physics.Raycast(transform.position, orientation.forward, wallCheckDistance, whatIsWall) ||
+                            Physics.Raycast(transform.position, -orientation.forward, wallCheckDistance, whatIsWall) ||
+                            Physics.Raycast(transform.position, orientation.right, wallCheckDistance, whatIsWall) ||
+                            Physics.Raycast(transform.position, -orientation.right, wallCheckDistance, whatIsWall);
+        // Se tocchi un muro e non sei a terra, rimuovi friction simulando slide
+        if (touchingWall && !grounded)
+        {
+            // Forza verso il basso per far scivolare il player
+            rb.AddForce(Vector3.down * 15f, ForceMode.Force);
+        }
+    }
 
-        // Controlla se siamo su una pendenza
+    void MovePlayer()
+    {
+        if (playerDash != null && playerDash.IsDashing)
+        {
+            return;
+        }
+
+        moveDirection = orientation.forward * verticalInput + orientation.right * horizontalInput;
         onSlope = CheckOnSlope();
 
         if (onSlope)
@@ -105,10 +126,20 @@ public class PlayerMovement : MonoBehaviour
                 Vector3 slopeMoveDir = Vector3.ProjectOnPlane(moveDirection, slopeHit.normal).normalized;
                 rb.AddForce(slopeMoveDir * currentMoveSpeed * 10f, ForceMode.Force);
 
-                // Forza per tenere il player "incollato" alla pendenza
-                rb.AddForce(-slopeHit.normal * 80f, ForceMode.Force);
+                // Applica forza verso il basso SOLO se il player si sta muovendo
+                // E riduci la forza in discesa
+                if (moveDirection.magnitude > 0.1f)
+                {
+                    // Calcola se stiamo salendo o scendendo
+                    float slopeDirection = Vector3.Dot(moveDirection.normalized, -slopeHit.normal);
+
+                    // Se stiamo salendo (slopeDirection > 0), usa forza piena
+                    // Se stiamo scendendo (slopeDirection < 0), riduci forza
+                    float slopeForceMultiplier = slopeDirection > 0 ? 1f : 0.3f;
+                    rb.AddForce(-slopeHit.normal * 80f * slopeForceMultiplier, ForceMode.Force);
+                }
             }
-            else // Pendenza troppo ripida (scivola)
+            else // Pendenza troppo ripida
             {
                 Vector3 slideDir = Vector3.ProjectOnPlane(Vector3.down, slopeHit.normal).normalized;
                 rb.AddForce(slideDir * 50f, ForceMode.Force);
@@ -152,10 +183,10 @@ public class PlayerMovement : MonoBehaviour
     // Per controllare le pendenze
     private bool CheckOnSlope()
     {
-        if (Physics.Raycast(transform.position, Vector3.down, out slopeHit, playerHeight * 0.5f + 0.5f))
+        if (Physics.Raycast(transform.position, Vector3.down, out slopeHit, playerHeight * 0.5f + 0.5f, whatIsGround))
         {
             float angle = Vector3.Angle(Vector3.up, slopeHit.normal);
-            return angle > 0; // È su una pendenza se l'angolo è maggiore di 0
+            return angle > 0.1f && angle <= maxSlopeAngle; // Evita false positive su terreno piatto
         }
         return false;
     }

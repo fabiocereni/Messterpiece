@@ -2904,7 +2904,7 @@ GameObject:
   - component: {fileID: 1146637626}
   - component: {fileID: 1146637625}
   - component: {fileID: 1146637624}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Wall_Spawn_Left
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3364,7 +3364,7 @@ GameObject:
   - component: {fileID: 1336577737}
   - component: {fileID: 1336577736}
   - component: {fileID: 1336577735}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Wall_Spawn_Right
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3793,6 +3793,51 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 1.5, z: 56}
   m_LocalScale: {x: 4, y: 0.5, z: 4}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1359413447
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1359413449}
+  - component: {fileID: 1359413448}
+  m_Layer: 0
+  m_Name: GroundCheckVisualizer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1359413448
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1359413447}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d1a7304974bbe4fbba20c9433d8aee2c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GroundCheckVisualizer
+  playerMovement: {fileID: 1530019760}
+--- !u!4 &1359413449
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1359413447}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -4294,6 +4339,17 @@ MonoBehaviour:
   targetCounter: {fileID: 0}
   destroyEffect: {fileID: 0}
   destroySound: {fileID: 0}
+--- !u!114 &1530019760 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8781029760345209980, guid: e9ce68c878357476d8781580e5e38489, type: 3}
+  m_PrefabInstance: {fileID: 1640287582}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a155b90655c8b4e3da330eea2009f744, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
 --- !u!1 &1533240748
 GameObject:
   m_ObjectHideFlags: 0
@@ -9906,6 +9962,10 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 8
       objectReference: {fileID: 0}
+    - target: {fileID: 8781029760345209980, guid: e9ce68c878357476d8781580e5e38489, type: 3}
+      propertyPath: whatIsGround.m_Bits
+      value: 3072
+      objectReference: {fileID: 0}
     - target: {fileID: 8791089015280372602, guid: e9ce68c878357476d8781580e5e38489, type: 3}
       propertyPath: m_Layer
       value: 8
@@ -10870,7 +10930,7 @@ GameObject:
   - component: {fileID: 2037767590}
   - component: {fileID: 2037767589}
   - component: {fileID: 2037767588}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Wall_Spawn_Back
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -11162,3 +11222,4 @@ SceneRoots:
   - {fileID: 1713490449}
   - {fileID: 1640287582}
   - {fileID: 1551786455}
+  - {fileID: 1359413449}
