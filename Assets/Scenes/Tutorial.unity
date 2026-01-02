@@ -355,7 +355,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TutorialTarget
   health: 50
-  targetCounter: {fileID: 0}
+  targetCounter: {fileID: 1396724653}
   destroyEffect: {fileID: 0}
   destroySound: {fileID: 0}
 --- !u!1 &59579611
@@ -1143,7 +1143,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 507274645774320612, guid: 7be2fca7cbf904f5fb76a63dde809e94, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 97.59593
+      value: 112.895935
       objectReference: {fileID: 0}
     - target: {fileID: 507274645774320612, guid: 7be2fca7cbf904f5fb76a63dde809e94, type: 3}
       propertyPath: m_LocalRotation.w
@@ -1662,7 +1662,7 @@ Transform:
   m_GameObject: {fileID: 574998363}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 95}
+  m_LocalPosition: {x: 0, y: 0, z: 110.3}
   m_LocalScale: {x: 20, y: 0.2, z: 20}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1773,7 +1773,7 @@ Transform:
   m_GameObject: {fileID: 604608418}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 2, z: 110}
+  m_LocalPosition: {x: 0, y: 2, z: 121.14}
   m_LocalScale: {x: 3, y: 4, z: 0.5}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2132,7 +2132,7 @@ Transform:
   m_GameObject: {fileID: 822960725}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 5.45, y: 0.5, z: 92.08}
+  m_LocalPosition: {x: 5.45, y: 0.5, z: 107.380005}
   m_LocalScale: {x: 2, y: 1, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2243,8 +2243,8 @@ Transform:
   m_GameObject: {fileID: 845546890}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.5, z: 80}
-  m_LocalScale: {x: 8, y: 3, z: 0.5}
+  m_LocalPosition: {x: 0, y: 0, z: 90.47}
+  m_LocalScale: {x: 8, y: 0.2, z: 21}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -2675,7 +2675,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TutorialTarget
   health: 50
-  targetCounter: {fileID: 0}
+  targetCounter: {fileID: 1396724653}
   destroyEffect: {fileID: 0}
   destroySound: {fileID: 0}
 --- !u!1 &1086117306
@@ -3235,7 +3235,7 @@ Transform:
   m_GameObject: {fileID: 1220884041}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -4.47, y: 0.5, z: 88.77537}
+  m_LocalPosition: {x: -4.47, y: 0.5, z: 104.07537}
   m_LocalScale: {x: 2, y: 1, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4205,7 +4205,7 @@ Transform:
   m_GameObject: {fileID: 1471075274}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -4.05, y: 0.5, z: 100}
+  m_LocalPosition: {x: -4.05, y: 0.5, z: 115.3}
   m_LocalScale: {x: 2, y: 1, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4336,7 +4336,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TutorialTarget
   health: 50
-  targetCounter: {fileID: 0}
+  targetCounter: {fileID: 1396724653}
   destroyEffect: {fileID: 0}
   destroySound: {fileID: 0}
 --- !u!114 &1530019760 stripped
@@ -4701,7 +4701,7 @@ Transform:
   m_GameObject: {fileID: 1617345735}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0.68}
   m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -10252,7 +10252,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 507274645774320612, guid: 7be2fca7cbf904f5fb76a63dde809e94, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.03
+      value: -7.15
       objectReference: {fileID: 0}
     - target: {fileID: 507274645774320612, guid: 7be2fca7cbf904f5fb76a63dde809e94, type: 3}
       propertyPath: m_LocalPosition.y
@@ -10260,7 +10260,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 507274645774320612, guid: 7be2fca7cbf904f5fb76a63dde809e94, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 99.5
+      value: 109.64
       objectReference: {fileID: 0}
     - target: {fileID: 507274645774320612, guid: 7be2fca7cbf904f5fb76a63dde809e94, type: 3}
       propertyPath: m_LocalRotation.w
@@ -10432,7 +10432,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TutorialTarget
   health: 50
-  targetCounter: {fileID: 0}
+  targetCounter: {fileID: 1396724653}
   destroyEffect: {fileID: 0}
   destroySound: {fileID: 0}
 --- !u!1 &1946667812
@@ -10560,7 +10560,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TutorialTarget
   health: 50
-  targetCounter: {fileID: 0}
+  targetCounter: {fileID: 1396724653}
   destroyEffect: {fileID: 0}
   destroySound: {fileID: 0}
 --- !u!20 &1973815102 stripped
@@ -10673,7 +10673,7 @@ Transform:
   m_GameObject: {fileID: 2013273540}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: 95}
+  m_LocalPosition: {x: 0, y: 1, z: 110.3}
   m_LocalScale: {x: 4, y: 2, z: 4}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -10915,7 +10915,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TutorialTarget
   health: 50
-  targetCounter: {fileID: 0}
+  targetCounter: {fileID: 1396724653}
   destroyEffect: {fileID: 0}
   destroySound: {fileID: 0}
 --- !u!1 &2037767587

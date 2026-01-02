@@ -19,30 +19,45 @@ public class Projectile : MonoBehaviour
     }
 
     void OnTriggerEnter(Collider other)
-  {
-      // IGNORA trigger zones logici
-      if (other.gameObject.layer == LayerMask.NameToLayer("TriggerZone"))
-      {
-          return; // Non distruggere il proiettile
-      }
+    {
+        // IGNORA trigger zones logici
+        if (other.gameObject.layer == LayerMask.NameToLayer("TriggerZone"))
+        {
+            return; // Non distruggere il proiettile
+        }
 
-      // Controlla se l'oggetto colpito ha l'interfaccia IDamagable 
-      IDamagable target = other.GetComponent<IDamagable>();
-      if (target != null)
-      {
-        // Applica il danno al bersaglio
-        target.Damage(damage);
-      }
+        // IGNORA SphereCollider dei nemici (detection radius per AI, non hitbox)
+        // La hitbox vera è la CapsuleCollider
+        if (other is SphereCollider)
+        {
+            // Verifica se questo GameObject o il parent ha un TutorialEnemy/EnemyAI script
+            // Se sì, è la detection sphere, quindi ignora
+            if (other.GetComponent<TutorialEnemy>() != null ||
+                other.GetComponentInParent<TutorialEnemy>() != null ||
+                other.GetComponent<EnemyAI_NavMesh>() != null ||
+                other.GetComponentInParent<EnemyAI_NavMesh>() != null)
+            {
+                return; // Passa attraverso la detection sphere del nemico
+            }
+        }
 
-      // Distrugge il proiettile SOLO se colpisce qualcosa di solido
-      // (non TriggerZone o altri triggers logici)
-      if (other.isTrigger && target == null)
-      {
-        return; // Non distruggere se è un trigger senza IDamagable
-      }
+        // Controlla se l'oggetto colpito ha l'interfaccia IDamagable
+        IDamagable target = other.GetComponent<IDamagable>();
+        if (target != null)
+        {
+            // Applica il danno al bersaglio
+            target.Damage(damage);
+        }
 
-      Destroy(this.gameObject);
-  }
+        // Distrugge il proiettile SOLO se colpisce qualcosa di solido
+        // (non TriggerZone o altri triggers logici)
+        if (other.isTrigger && target == null)
+        {
+            return; // Non distruggere se è un trigger senza IDamagable
+        }
+
+        Destroy(this.gameObject);
+    }
 
     // attende un tempo specifico e poi distrugge l'oggetto
     private IEnumerator DestroyAfterTime(float time)

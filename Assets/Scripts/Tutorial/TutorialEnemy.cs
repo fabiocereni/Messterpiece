@@ -28,8 +28,16 @@ public class TutorialEnemy : MonoBehaviour, IDamagable
 
             if (enemyCounter == null)
             {
-                Debug.LogWarning($"EnemyCounter non trovato! Il nemico {gameObject.name} non notificherà la morte.");
+                Debug.LogWarning($"[TutorialEnemy] {gameObject.name}: EnemyCounter NON trovato nella scena!");
             }
+            else
+            {
+                Debug.Log($"[TutorialEnemy] {gameObject.name}: Trovato EnemyCounter su {enemyCounter.gameObject.name}");
+            }
+        }
+        else
+        {
+            Debug.Log($"[TutorialEnemy] {gameObject.name}: EnemyCounter assegnato manualmente: {enemyCounter.gameObject.name}");
         }
     }
 
