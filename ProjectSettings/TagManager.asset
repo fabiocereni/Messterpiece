@@ -12,12 +12,12 @@ TagManager:
   - Water
   - UI
   - 
-  - 
+  - TriggerZone
   - Player
+  - Enemy
   - Obstacle
   - Ground
-  - 
-  - 
+  - Projectile
   - 
   - 
   - 
