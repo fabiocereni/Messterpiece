@@ -5468,6 +5468,12 @@ MonoBehaviour:
   muzzleFlash: {fileID: 8152550229222783706}
   projectilePrefab: {fileID: 5681445846808584737, guid: 9d438c03a21a24321b999d478310dab7, type: 3}
   firePoint: {fileID: 502819074283372091}
+  ignoreLayerMask:
+    serializedVersion: 2
+    m_Bits: 4480
+  minHitDistance: 0.5
+  maxRaycastDistance: 500
+  debugMode: 1
 --- !u!4 &3869255238170207720 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8001263763418150136, guid: 945b62c9bdfdbd7459e6bc27f2f23094, type: 3}

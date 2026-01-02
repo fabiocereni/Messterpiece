@@ -23,11 +23,12 @@ public class TutorialTarget : MonoBehaviour, IDamagable
         // Se non è stato assegnato manualmente, cerca il TargetCounter nella scena
         if (targetCounter == null)
         {
-            targetCounter = FindFirstObjectByType<TargetCounter>();
+            // Usa FindObjectOfType invece di FindFirstObjectByType per evitare memory leak
+            targetCounter = FindAnyObjectByType<TargetCounter>();
 
             if (targetCounter == null)
             {
-                Debug.LogWarning($"TargetCounter non trovato nella scena! Il target {gameObject.name} non potrà notificare la distruzione.");
+                Debug.LogWarning($"[TutorialTarget] {gameObject.name}: TargetCounter non trovato nella scena!");
             }
         }
     }

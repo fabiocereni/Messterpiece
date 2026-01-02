@@ -24,7 +24,8 @@ public class TutorialEnemy : MonoBehaviour, IDamagable
         // Se non assegnato, cerca l'EnemyCounter nella scena
         if (enemyCounter == null)
         {
-            enemyCounter = FindFirstObjectByType<EnemyCounter>();
+            // Usa FindAnyObjectByType invece di FindFirstObjectByType per evitare memory leak
+            enemyCounter = FindAnyObjectByType<EnemyCounter>();
 
             if (enemyCounter == null)
             {
