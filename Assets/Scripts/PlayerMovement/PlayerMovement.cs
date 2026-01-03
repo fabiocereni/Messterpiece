@@ -29,6 +29,7 @@ public class PlayerMovement : MonoBehaviour
     [Header("References")]
     public Transform orientation;
     public PlayerDash playerDash;
+    public ParticleSystem walkingDustEffect;
 
     // Variabili private
     private Rigidbody rb;
@@ -38,6 +39,7 @@ public class PlayerMovement : MonoBehaviour
     private float verticalInput;
     private Vector3 moveDirection;
     private float currentMoveSpeed;
+    private bool isPlayingDust = false;
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -60,6 +62,8 @@ public class PlayerMovement : MonoBehaviour
         SpeedControl();
 
         rb.linearDamping = grounded ? groundDrag : 0;
+
+        HandleDustEffect();
     }
 
     void FixedUpdate()
@@ -189,5 +193,40 @@ public class PlayerMovement : MonoBehaviour
             return angle > 0.1f && angle <= maxSlopeAngle; // Evita false positive su terreno piatto
         }
         return false;
+    }
+
+    private void HandleDustEffect()
+    {
+        // Controlla se il player sta camminando
+        bool isMoving = horizontalInput != 0 || verticalInput != 0;
+
+        // Condizioni per attivare la polvere:
+        // 1. Deve essere a terra (grounded)
+        // 2. Deve muoversi (isMoving)
+        // 3. NON deve essere in dash
+        bool shouldPlayDust = grounded && isMoving;
+
+        if (playerDash != null && playerDash.IsDashing)
+        {
+            shouldPlayDust = false; // Disattiva durante dash
+        }
+
+        // Play/Stop in base alla condizione
+        if (shouldPlayDust && !isPlayingDust)
+        {
+            if (walkingDustEffect != null)
+            {
+                walkingDustEffect.Play();
+                isPlayingDust = true;
+            }
+        }
+        else if (!shouldPlayDust && isPlayingDust)
+        {
+            if (walkingDustEffect != null)
+            {
+                walkingDustEffect.Stop();
+                isPlayingDust = false;
+            }
+        }
     }
 }
