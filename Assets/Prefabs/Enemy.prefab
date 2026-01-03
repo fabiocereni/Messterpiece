@@ -200,16 +200,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 71b9093aa96e141cbbad43a8105ecdd0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAI_NavMesh
-  playerTransform: {fileID: 0}
+  playerTransform: {fileID: 5638210106189490797, guid: e9ce68c878357476d8781580e5e38489, type: 3}
   patrolPoints: []
   detectionRadius: 15
   fieldOfViewAngle: 90
   playerLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 256
   obstacleLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 3072
 --- !u!1001 &7703386861307647593
 PrefabInstance:
   m_ObjectHideFlags: 0
