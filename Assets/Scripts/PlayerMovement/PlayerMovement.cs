@@ -30,6 +30,7 @@ public class PlayerMovement : MonoBehaviour
     public Transform orientation;
     public PlayerDash playerDash;
     public ParticleSystem walkingDustEffect;
+    public Animator playerAnimator;
 
     // Variabili private
     private Rigidbody rb;
@@ -63,7 +64,7 @@ public class PlayerMovement : MonoBehaviour
 
         rb.linearDamping = grounded ? groundDrag : 0;
 
-        HandleDustEffect();
+        HandleMovementEffects();
     }
 
     void FixedUpdate()
@@ -195,24 +196,21 @@ public class PlayerMovement : MonoBehaviour
         return false;
     }
 
-    private void HandleDustEffect()
+    private void HandleMovementEffects() // ← Rinominato
     {
         // Controlla se il player sta camminando
         bool isMoving = horizontalInput != 0 || verticalInput != 0;
 
-        // Condizioni per attivare la polvere:
-        // 1. Deve essere a terra (grounded)
-        // 2. Deve muoversi (isMoving)
-        // 3. NON deve essere in dash
-        bool shouldPlayDust = grounded && isMoving;
+        // Condizioni per attivare effetti
+        bool shouldPlayEffects = grounded && isMoving;
 
         if (playerDash != null && playerDash.IsDashing)
         {
-            shouldPlayDust = false; // Disattiva durante dash
+            shouldPlayEffects = false;
         }
 
-        // Play/Stop in base alla condizione
-        if (shouldPlayDust && !isPlayingDust)
+        // Effetto polvere
+        if (shouldPlayEffects && !isPlayingDust)
         {
             if (walkingDustEffect != null)
             {
@@ -220,13 +218,19 @@ public class PlayerMovement : MonoBehaviour
                 isPlayingDust = true;
             }
         }
-        else if (!shouldPlayDust && isPlayingDust)
+        else if (!shouldPlayEffects && isPlayingDust)
         {
             if (walkingDustEffect != null)
             {
                 walkingDustEffect.Stop();
                 isPlayingDust = false;
             }
+        }
+
+        // Animation
+        if (playerAnimator != null)
+        {
+            playerAnimator.SetBool("isWalking", shouldPlayEffects);
         }
     }
 }
