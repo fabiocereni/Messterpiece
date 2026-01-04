@@ -13329,13 +13329,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2386cb2f8ed4841a9b179d80269f7cf8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Gun
+  fireRate: 600
   fpsCam: {fileID: 321838283031119619}
   muzzleFlash: {fileID: 8152550229222783706}
   projectilePrefab: {fileID: 5681445846808584737, guid: 9d438c03a21a24321b999d478310dab7, type: 3}
   firePoint: {fileID: 502819074283372091}
-  ignoreLayerMask:
+  aimingIgnoreMask:
     serializedVersion: 2
     m_Bits: 4992
+  damageLayerMask:
+    serializedVersion: 2
+    m_Bits: 512
   minHitDistance: 0.5
   maxRaycastDistance: 500
   debugMode: 1
