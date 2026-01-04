@@ -13345,6 +13345,8 @@ MonoBehaviour:
   weaponTransform: {fileID: 3869255238170207720}
   fpsCam: {fileID: 321838283031119619}
   muzzleFlash: {fileID: 8152550229222783706}
+  enemyHitVfxPrefab: {fileID: 1885720184163909335, guid: 104ce5032a69d4c89bd12616c77ef5f2, type: 3}
+  enemyKillVfxPrefab: {fileID: 0}
   projectilePrefab: {fileID: 5681445846808584737, guid: 9d438c03a21a24321b999d478310dab7, type: 3}
   firePoint: {fileID: 502819074283372091}
   aimingIgnoreMask:

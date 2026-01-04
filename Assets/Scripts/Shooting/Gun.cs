@@ -26,6 +26,12 @@ public class Gun : MonoBehaviour
     public Camera fpsCam;
     public ParticleSystem muzzleFlash;
 
+    [Header("Impact VFX")]
+    [Tooltip("Prefab paint explosion quando colpisci enemy (cyan spheres burst)")]
+    public GameObject enemyHitVfxPrefab;
+    [Tooltip("Prefab kill effect (skull + numero)")]
+    public GameObject enemyKillVfxPrefab;
+
     // riferimento al prefab del proiettile
     [SerializeField] private GameObject projectilePrefab;
 
@@ -235,23 +241,33 @@ public class Gun : MonoBehaviour
 
     /// <summary>
     /// Applies instant damage (Hitscan) to the hit target
-    /// STEP 1: Debug placeholder - full damage system in Step 4
     /// </summary>
     private void ApplyDamage(RaycastHit hit)
     {
-        // ═══════════════════════════════════════════════════════
-        // STEP 1 PLACEHOLDER: Debug feedback only
-        // In Step 4 we'll add real damage + VFX + audio
-        // ═══════════════════════════════════════════════════════
-
         // Check if we hit an enemy (layer "Enemy")
         if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Enemy"))
         {
             Debug.Log($"[Gun] 🎯 ENEMY HIT! Target: {hit.collider.name} at distance {hit.distance:F2}m");
 
-            // TODO (Step 4): Apply real damage to enemy health component
-            // TODO (Step 4): Spawn impact VFX (cyan paint cloud)
-            // TODO (Step 4): Play hitmarker audio (splash sound)
+            // ═══════════════════════════════════════════════════════
+            // ENEMY HIT VFX - Spawn paint explosion (cyan spheres)
+            // ═══════════════════════════════════════════════════════
+            if (enemyHitVfxPrefab != null)
+            {
+                // Spawn VFX at impact point
+                GameObject hitVfx = Instantiate(enemyHitVfxPrefab, hit.point, Quaternion.identity);
+
+                // Auto-destroy after particle lifetime
+                Destroy(hitVfx, 2f);
+
+                if (debugMode)
+                {
+                    Debug.Log($"[Gun] Enemy hit VFX spawned at {hit.point}");
+                }
+            }
+
+            // TODO: Apply real damage to enemy health component
+            // If enemy dies → spawn enemyKillVfxPrefab (skull + number)
         }
         else
         {
