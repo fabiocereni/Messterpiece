@@ -8,6 +8,21 @@ public class Gun : MonoBehaviour
     private float fireInterval;        // Calculated in Start()
     private float nextTimeToFire = 0f;
 
+    [Header("Weapon Shake Settings")]
+    [Tooltip("Weapon shake intensity (position offset)")]
+    public float weaponShakeAmount = 0.02f;
+    [Tooltip("Weapon rotation kick on shot (degrees)")]
+    public float weaponKickRotation = 2f;
+    [Tooltip("How fast weapon returns to origin")]
+    public float weaponReturnSpeed = 15f;
+    [Tooltip("Reference to weapon transform (gun model)")]
+    public Transform weaponTransform;
+
+    private Vector3 weaponOriginalPosition;
+    private Quaternion weaponOriginalRotation;
+    private Vector3 weaponCurrentOffset = Vector3.zero;
+    private Quaternion weaponCurrentRotationOffset = Quaternion.identity;
+
     public Camera fpsCam;
     public ParticleSystem muzzleFlash;
 
@@ -39,6 +54,13 @@ public class Gun : MonoBehaviour
         // Calculate fire interval from RPM
         fireInterval = 60f / fireRate;  // 600 RPM → 0.1 seconds
 
+        // Save weapon original position/rotation for shake
+        if (weaponTransform != null)
+        {
+            weaponOriginalPosition = weaponTransform.localPosition;
+            weaponOriginalRotation = weaponTransform.localRotation;
+        }
+
         if (debugMode)
         {
             Debug.Log($"[Gun] Fire Rate: {fireRate} RPM, Interval: {fireInterval:F3}s ({1f/fireInterval:F1} rounds/sec)");
@@ -57,14 +79,27 @@ public class Gun : MonoBehaviour
             nextTimeToFire = Time.time + fireInterval;
             Shoot();
         }
+
+        // ═══════════════════════════════════════════════════════
+        // WEAPON SHAKE RECOVERY - Return weapon to original position
+        // ═══════════════════════════════════════════════════════
+        RecoverWeaponPosition();
     }
 
     void Shoot()
     {
+        // ═══════════════════════════════════════════════════════
+        // MUZZLE FLASH (Cyan Cloud)
+        // ═══════════════════════════════════════════════════════
         if (muzzleFlash != null)
         {
-            muzzleFlash?.Play();
+            muzzleFlash.Play();
         }
+
+        // ═══════════════════════════════════════════════════════
+        // WEAPON SHAKE - Vibrate gun on shot
+        // ═══════════════════════════════════════════════════════
+        ApplyWeaponShake();
 
         // Crea un raggio dal centro esatto della telecamera
         Ray ray = fpsCam.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
@@ -175,12 +210,10 @@ public class Gun : MonoBehaviour
         Quaternion projectileRotation = Quaternion.LookRotation(direction);
 
         // ═══════════════════════════════════════════════════════
-        // STEP 2: Visual Tracer (Temporarily commented out)
-        // We'll re-enable this in Step 2 as a "fake bullet" visual
-        // that travels while the raycast handles instant damage
+        // STEP 2: Visual Tracer (ENABLED)
+        // Spawn "fake bullet" that travels visually
+        // Damage is already applied by raycast above!
         // ═══════════════════════════════════════════════════════
-        /*
-        // Istanzia il proiettile
         if (projectilePrefab != null && firePoint != null)
         {
             GameObject projectile = Instantiate(
@@ -188,12 +221,16 @@ public class Gun : MonoBehaviour
                 firePoint.position,
                 projectileRotation
             ) as GameObject;
+
+            if (debugMode)
+            {
+                Debug.Log($"[Gun] Visual tracer spawned at {firePoint.position}, direction: {direction}");
+            }
         }
         else
         {
             Debug.LogWarning("[Gun] Projectile Prefab o Fire Point non assegnati.");
         }
-        */
     }
 
     /// <summary>
@@ -224,5 +261,50 @@ public class Gun : MonoBehaviour
                 Debug.Log($"[Gun] Hit surface: {hit.collider.name} (layer: {LayerMask.LayerToName(hit.collider.gameObject.layer)})");
             }
         }
+    }
+
+    /// <summary>
+    /// Apply weapon shake (vibration) on shot
+    /// Weapon "pumps" back and rotates slightly
+    /// </summary>
+    private void ApplyWeaponShake()
+    {
+        if (weaponTransform == null) return;
+
+        // Random position offset (vibration effect)
+        float randomX = Random.Range(-weaponShakeAmount, weaponShakeAmount);
+        float randomY = Random.Range(-weaponShakeAmount, weaponShakeAmount);
+        float randomZ = Random.Range(-weaponShakeAmount * 2f, 0f); // Backward "pump"
+
+        weaponCurrentOffset = new Vector3(randomX, randomY, randomZ);
+
+        // Rotation kick (slight upward tilt)
+        float kickX = Random.Range(-weaponKickRotation, weaponKickRotation * 0.5f); // Mostly up
+        float kickY = Random.Range(-weaponKickRotation * 0.3f, weaponKickRotation * 0.3f); // Slight horizontal
+        float kickZ = Random.Range(-weaponKickRotation * 0.2f, weaponKickRotation * 0.2f); // Slight roll
+
+        weaponCurrentRotationOffset = Quaternion.Euler(kickX, kickY, kickZ);
+
+        if (debugMode)
+        {
+            Debug.Log($"[Gun] Weapon shake: offset {weaponCurrentOffset}, rotation {kickX:F1}° X");
+        }
+    }
+
+    /// <summary>
+    /// Smoothly return weapon to original position
+    /// Creates smooth "pump" animation
+    /// </summary>
+    private void RecoverWeaponPosition()
+    {
+        if (weaponTransform == null) return;
+
+        // Smoothly lerp back to original position
+        weaponCurrentOffset = Vector3.Lerp(weaponCurrentOffset, Vector3.zero, Time.deltaTime * weaponReturnSpeed);
+        weaponCurrentRotationOffset = Quaternion.Slerp(weaponCurrentRotationOffset, Quaternion.identity, Time.deltaTime * weaponReturnSpeed);
+
+        // Apply to weapon transform
+        weaponTransform.localPosition = weaponOriginalPosition + weaponCurrentOffset;
+        weaponTransform.localRotation = weaponOriginalRotation * weaponCurrentRotationOffset;
     }
 }

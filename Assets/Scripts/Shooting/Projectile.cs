@@ -1,65 +1,90 @@
 using System.Collections;
 using UnityEngine;
 
+/// <summary>
+/// VISUAL TRACER ONLY
+/// This projectile is PURELY VISUAL!
+/// Damage is applied instantly by raycast in Gun.cs
+/// </summary>
 public class Projectile : MonoBehaviour
 {
-    public float speed = 15f;
-    public float damage = 10f; // Danno che il proiettile infligge
+    [Header("Visual Tracer Settings")]
+    [Tooltip("Speed of the visual tracer (very fast for instant feel: 200+ m/s)")]
+    public float speed = 250f;
+
+    [Tooltip("Lifetime before auto-destroy (short for instant effect)")]
+    public float lifetime = 0.5f;
+
+    [Header("VFX")]
+    [Tooltip("Should destroy on impact with walls? (Optional visual feedback)")]
+    public bool destroyOnWallHit = true;
+
+    [Tooltip("Hide the projectile mesh? (Only show trail)")]
+    public bool hideProjectileMesh = true;
 
     void Start()
     {
-        // Avvia una Coroutine per distruggere l'oggetto dopo 3 secondi
-        StartCoroutine(DestroyAfterTime(3.0f));
+        // Hide the sphere mesh (only trail visible)
+        if (hideProjectileMesh)
+        {
+            MeshRenderer meshRenderer = GetComponent<MeshRenderer>();
+            if (meshRenderer != null)
+            {
+                meshRenderer.enabled = false;
+            }
+        }
+
+        // Auto-destroy after lifetime
+        StartCoroutine(DestroyAfterTime(lifetime));
     }
 
     void Update()
     {
-        // Muove il proiettile in avanti (nella sua direzione locale)
+        // Move forward (visual only)
         transform.Translate(0, 0, speed * Time.deltaTime);
     }
 
     void OnTriggerEnter(Collider other)
     {
-        // IGNORA trigger zones logici
+        // ═══════════════════════════════════════════════════════
+        // IMPORTANT: This projectile does NOT apply damage!
+        // Damage is handled by instant raycast in Gun.cs
+        // This is ONLY for visual feedback
+        // ═══════════════════════════════════════════════════════
+
+        // Ignore trigger zones
         if (other.gameObject.layer == LayerMask.NameToLayer("TriggerZone"))
         {
-            return; // Non distruggere il proiettile
+            return;
         }
 
-        // IGNORA SphereCollider dei nemici (detection radius per AI, non hitbox)
-        // La hitbox vera è la CapsuleCollider
-        if (other is SphereCollider)
+        // Ignore other projectiles
+        if (other.gameObject.layer == LayerMask.NameToLayer("Projectile"))
         {
-            // Verifica se questo GameObject o il parent ha un TutorialEnemy/EnemyAI script
-            // Se sì, è la detection sphere, quindi ignora
-            if (other.GetComponent<TutorialEnemy>() != null ||
-                other.GetComponentInParent<TutorialEnemy>() != null ||
-                other.GetComponent<EnemyAI_NavMesh>() != null ||
-                other.GetComponentInParent<EnemyAI_NavMesh>() != null)
-            {
-                return; // Passa attraverso la detection sphere del nemico
-            }
+            return;
         }
 
-        // Controlla se l'oggetto colpito ha l'interfaccia IDamagable
-        IDamagable target = other.GetComponent<IDamagable>();
-        if (target != null)
+        // Ignore player (self)
+        if (other.gameObject.layer == LayerMask.NameToLayer("Player"))
         {
-            // Applica il danno al bersaglio
-            target.Damage(damage);
+            return;
         }
 
-        // Distrugge il proiettile SOLO se colpisce qualcosa di solido
-        // (non TriggerZone o altri triggers logici)
-        if (other.isTrigger && target == null)
+        // Pass through enemies (damage already applied by raycast!)
+        if (other.gameObject.layer == LayerMask.NameToLayer("Enemy"))
         {
-            return; // Non distruggere se è un trigger senza IDamagable
+            // Optional: Spawn impact VFX here
+            return; // Don't destroy, pass through
         }
 
-        Destroy(this.gameObject);
+        // Hit a wall/obstacle/ground → Destroy for visual feedback
+        if (destroyOnWallHit)
+        {
+            // Optional: Spawn wall splatter VFX here
+            Destroy(this.gameObject);
+        }
     }
 
-    // attende un tempo specifico e poi distrugge l'oggetto
     private IEnumerator DestroyAfterTime(float time)
     {
         yield return new WaitForSeconds(time);
