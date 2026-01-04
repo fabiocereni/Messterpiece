@@ -2,7 +2,12 @@ using UnityEngine;
 
 public class Gun : MonoBehaviour
 {
-    // public float fireRate = 1f;
+    [Header("Fire Rate")]
+    [Tooltip("Rounds Per Minute (600 = AK-47 style full-auto)")]
+    public float fireRate = 600f;
+    private float fireInterval;        // Calculated in Start()
+    private float nextTimeToFire = 0f;
+
     public Camera fpsCam;
     public ParticleSystem muzzleFlash;
 
@@ -13,8 +18,11 @@ public class Gun : MonoBehaviour
     public Transform firePoint;
 
     [Header("Raycast Settings")]
-    [Tooltip("Layer che il raycast di mira DEVE IGNORARE (Player, TriggerZone, etc.)")]
-    public LayerMask ignoreLayerMask;
+    [Tooltip("Layer per il raycast di AIMING (ignora Enemy per evitare bug di mira su collider curvi)")]
+    public LayerMask aimingIgnoreMask;
+
+    [Tooltip("Layer per il raycast di DAMAGE (cosa può essere danneggiato)")]
+    public LayerMask damageLayerMask;
 
     [Tooltip("Distanza minima valida per un hit. Se colpisce più vicino, usa fallback.")]
     public float minHitDistance = 2.5f;
@@ -26,13 +34,27 @@ public class Gun : MonoBehaviour
     [Tooltip("Mostra log dettagliati dello shooting in Console")]
     public bool debugMode = false;
 
-    // private float nextTimeToFire = 0f;
+    void Start()
+    {
+        // Calculate fire interval from RPM
+        fireInterval = 60f / fireRate;  // 600 RPM → 0.1 seconds
+
+        if (debugMode)
+        {
+            Debug.Log($"[Gun] Fire Rate: {fireRate} RPM, Interval: {fireInterval:F3}s ({1f/fireInterval:F1} rounds/sec)");
+        }
+    }
 
     void Update()
     {
-        if (Input.GetButtonDown("Fire1"))
+        // ═══════════════════════════════════════════════════════
+        // SEMI-AUTO + FULL-AUTO INPUT
+        // GetButton (not GetButtonDown) → Allows hold for full-auto
+        // Fire rate cooldown prevents too-fast spam
+        // ═══════════════════════════════════════════════════════
+        if (Input.GetButton("Fire1") && Time.time >= nextTimeToFire)
         {
-            // nextTimeToFire = Time.time + 1f / fireRate;
+            nextTimeToFire = Time.time + fireInterval;
             Shoot();
         }
     }
@@ -46,11 +68,14 @@ public class Gun : MonoBehaviour
 
         // Crea un raggio dal centro esatto della telecamera
         Ray ray = fpsCam.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
-        RaycastHit hit;
+        RaycastHit aimHit;
+        RaycastHit damageHit;
         Vector3 targetPoint;
 
-        // IMPORTANTE: Inverte il LayerMask per ignorare i layer specificati
-        int layerMask = ~ignoreLayerMask.value;
+        // ═══════════════════════════════════════════════════════
+        // RAYCAST 1: AIMING (Ignora Enemy per evitare bug visuali)
+        // ═══════════════════════════════════════════════════════
+        int aimLayerMask = ~aimingIgnoreMask.value;
 
         if (debugMode)
         {
@@ -58,26 +83,26 @@ public class Gun : MonoBehaviour
             Debug.Log($"[Gun] FirePoint Position: {firePoint.position}");
         }
 
-        // Controlla se il raggio colpisce qualcosa, IGNORANDO i layer specificati
-        if (Physics.Raycast(ray, out hit, maxRaycastDistance, layerMask))
+        // Raycast per calcolare targetPoint (direzione visuale)
+        if (Physics.Raycast(ray, out aimHit, maxRaycastDistance, aimLayerMask))
         {
             if (debugMode)
             {
-                Debug.Log($"[Gun] Raycast HIT: {hit.collider.name} a distanza {hit.distance}m, point: {hit.point}, layer: {LayerMask.LayerToName(hit.collider.gameObject.layer)}");
+                Debug.Log($"[Gun] AIM Raycast HIT: {aimHit.collider.name} a distanza {aimHit.distance}m, layer: {LayerMask.LayerToName(aimHit.collider.gameObject.layer)}");
             }
 
             // FAIL-SAFE: Se colpisce qualcosa troppo vicino (< minHitDistance),
             // probabilmente è il proprio collider o un trigger, quindi IGNORA
-            if (hit.distance >= minHitDistance)
+            if (aimHit.distance >= minHitDistance)
             {
                 // Hit valido: usa il punto d'impatto
-                targetPoint = hit.point;
+                targetPoint = aimHit.point;
             }
             else
             {
                 // Hit troppo vicino: usa il fallback (spara dritto in avanti)
                 targetPoint = ray.GetPoint(100);
-                Debug.LogWarning($"[Gun] Hit troppo vicino ({hit.distance:F2}m su {hit.collider.name}). Usando fallback.");
+                Debug.LogWarning($"[Gun] Aim hit troppo vicino ({aimHit.distance:F2}m su {aimHit.collider.name}). Usando fallback.");
             }
         }
         else
@@ -88,7 +113,31 @@ public class Gun : MonoBehaviour
 
             if (debugMode)
             {
-                Debug.Log($"[Gun] Raycast NO HIT. Usando fallback targetPoint: {targetPoint}");
+                Debug.Log($"[Gun] AIM Raycast NO HIT. Usando fallback targetPoint: {targetPoint}");
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════
+        // RAYCAST 2: DAMAGE (Include Enemy per applicare danno)
+        // ═══════════════════════════════════════════════════════
+        if (Physics.Raycast(ray, out damageHit, maxRaycastDistance, damageLayerMask))
+        {
+            if (debugMode)
+            {
+                Debug.Log($"[Gun] DAMAGE Raycast HIT: {damageHit.collider.name} a distanza {damageHit.distance}m, layer: {LayerMask.LayerToName(damageHit.collider.gameObject.layer)}");
+            }
+
+            if (damageHit.distance >= minHitDistance)
+            {
+                // Applica danno istantaneo
+                ApplyDamage(damageHit);
+            }
+        }
+        else
+        {
+            if (debugMode)
+            {
+                Debug.Log($"[Gun] DAMAGE Raycast NO HIT (shot into the void)");
             }
         }
 
@@ -125,6 +174,12 @@ public class Gun : MonoBehaviour
         // Calcola la rotazione necessaria per far sì che il proiettile guardi in quella direzione
         Quaternion projectileRotation = Quaternion.LookRotation(direction);
 
+        // ═══════════════════════════════════════════════════════
+        // STEP 2: Visual Tracer (Temporarily commented out)
+        // We'll re-enable this in Step 2 as a "fake bullet" visual
+        // that travels while the raycast handles instant damage
+        // ═══════════════════════════════════════════════════════
+        /*
         // Istanzia il proiettile
         if (projectilePrefab != null && firePoint != null)
         {
@@ -137,6 +192,37 @@ public class Gun : MonoBehaviour
         else
         {
             Debug.LogWarning("[Gun] Projectile Prefab o Fire Point non assegnati.");
+        }
+        */
+    }
+
+    /// <summary>
+    /// Applies instant damage (Hitscan) to the hit target
+    /// STEP 1: Debug placeholder - full damage system in Step 4
+    /// </summary>
+    private void ApplyDamage(RaycastHit hit)
+    {
+        // ═══════════════════════════════════════════════════════
+        // STEP 1 PLACEHOLDER: Debug feedback only
+        // In Step 4 we'll add real damage + VFX + audio
+        // ═══════════════════════════════════════════════════════
+
+        // Check if we hit an enemy (layer "Enemy")
+        if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Enemy"))
+        {
+            Debug.Log($"[Gun] 🎯 ENEMY HIT! Target: {hit.collider.name} at distance {hit.distance:F2}m");
+
+            // TODO (Step 4): Apply real damage to enemy health component
+            // TODO (Step 4): Spawn impact VFX (cyan paint cloud)
+            // TODO (Step 4): Play hitmarker audio (splash sound)
+        }
+        else
+        {
+            // Hit something else (wall, obstacle)
+            if (debugMode)
+            {
+                Debug.Log($"[Gun] Hit surface: {hit.collider.name} (layer: {LayerMask.LayerToName(hit.collider.gameObject.layer)})");
+            }
         }
     }
 }
