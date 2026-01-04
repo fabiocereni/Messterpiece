@@ -13335,7 +13335,7 @@ MonoBehaviour:
   firePoint: {fileID: 502819074283372091}
   ignoreLayerMask:
     serializedVersion: 2
-    m_Bits: 4480
+    m_Bits: 4992
   minHitDistance: 0.5
   maxRaycastDistance: 500
   debugMode: 1
