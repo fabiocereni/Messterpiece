@@ -12,16 +12,20 @@ public class PlayerLook : MonoBehaviour
     private float xRot;
     private float yRot;
 
+    private float sensitivityMult = 1.0f;
+
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+
+        sensitivityMult = PlayerPrefs.GetFloat("Sensitivity", 1.0f);
     }
 
     void LateUpdate()
     {
-        float mouseX = Input.GetAxis("Mouse X") * sensX * Time.deltaTime;
-        float mouseY = Input.GetAxis("Mouse Y") * sensY * Time.deltaTime;
+        float mouseX = Input.GetAxis("Mouse X") * sensX * sensitivityMult * Time.deltaTime;
+        float mouseY = Input.GetAxis("Mouse Y") * sensY * sensitivityMult * Time.deltaTime;
 
         yRot += mouseX;
         xRot -= mouseY;
