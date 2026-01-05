@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 3237111769945097154}
   - component: {fileID: 8300375664063427600}
   - component: {fileID: 2749479739090371605}
+  - component: {fileID: 5407813543907383614}
   m_Layer: 9
   m_Name: Enemy
   m_TagString: Untagged
@@ -210,6 +211,23 @@ MonoBehaviour:
   obstacleLayer:
     serializedVersion: 2
     m_Bits: 3072
+--- !u!114 &5407813543907383614
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4261118608247567085}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a20c52f2bceeb4b799648cf1121ca27b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyHealth
+  maxHealth: 100
+  damageNumberPrefab: {fileID: 4271825771633104368, guid: ac0a12c21551b49989802c05dfd0c689, type: 3}
+  damageNumberOffsetY: 2
+  killVfxPrefab: {fileID: 2526250184653296495, guid: 2d26c13b2f2934fb3969ad0fc744578c, type: 3}
+  destroyDelay: 3
 --- !u!1001 &7703386861307647593
 PrefabInstance:
   m_ObjectHideFlags: 0
