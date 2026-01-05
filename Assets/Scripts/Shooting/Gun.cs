@@ -160,25 +160,52 @@ public class Gun : MonoBehaviour
 
         // ═══════════════════════════════════════════════════════
         // RAYCAST 2: DAMAGE (Include Enemy per applicare danno)
+        // IMPORTANT: Filter out SphereColliders (AI detection radius)
+        // Only hit CapsuleColliders (true hitbox)
         // ═══════════════════════════════════════════════════════
-        if (Physics.Raycast(ray, out damageHit, maxRaycastDistance, damageLayerMask))
+        RaycastHit[] allHits = Physics.RaycastAll(ray, maxRaycastDistance, damageLayerMask);
+
+        // Filter: Find first valid hit (CapsuleCollider, not SphereCollider)
+        RaycastHit validDamageHit = new RaycastHit();
+        bool foundValidHit = false;
+
+        foreach (RaycastHit potentialHit in allHits)
+        {
+            // Skip if too close
+            if (potentialHit.distance < minHitDistance)
+                continue;
+
+            // Skip if it's a SphereCollider (AI detection, not hitbox)
+            if (potentialHit.collider is SphereCollider)
+            {
+                if (debugMode)
+                {
+                    Debug.Log($"[Gun] Skipping SphereCollider on {potentialHit.collider.name} (AI detection radius)");
+                }
+                continue;
+            }
+
+            // Valid hit found (CapsuleCollider or other solid collider)
+            validDamageHit = potentialHit;
+            foundValidHit = true;
+            break;
+        }
+
+        if (foundValidHit)
         {
             if (debugMode)
             {
-                Debug.Log($"[Gun] DAMAGE Raycast HIT: {damageHit.collider.name} a distanza {damageHit.distance}m, layer: {LayerMask.LayerToName(damageHit.collider.gameObject.layer)}");
+                Debug.Log($"[Gun] DAMAGE Raycast HIT: {validDamageHit.collider.name} (Type: {validDamageHit.collider.GetType().Name}) a distanza {validDamageHit.distance}m");
             }
 
-            if (damageHit.distance >= minHitDistance)
-            {
-                // Applica danno istantaneo
-                ApplyDamage(damageHit);
-            }
+            // Applica danno al collider VERO (CapsuleCollider)
+            ApplyDamage(validDamageHit);
         }
         else
         {
             if (debugMode)
             {
-                Debug.Log($"[Gun] DAMAGE Raycast NO HIT (shot into the void)");
+                Debug.Log($"[Gun] DAMAGE Raycast NO HIT (shot into the void or only hit detection spheres)");
             }
         }
 
