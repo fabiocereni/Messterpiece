@@ -102,7 +102,7 @@ public class EnemyHealth : MonoBehaviour
         // Spawn kill VFX AL CENTRO del nemico (Y+1.0 per capsule height 2)
         if (killVfxPrefab != null)
         {
-            GameObject killVfx = Instantiate(killVfxPrefab, transform.position + Vector3.up * 1.0f, Quaternion.identity);
+            GameObject killVfx = Instantiate(killVfxPrefab, transform.position, Quaternion.identity);
             Destroy(killVfx, killVfxDuration);
         }
 
