@@ -657,6 +657,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: TerrainVertex
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 624c08bf729cf46788243c2c3e7cf3b5, type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
+    - target: {fileID: 8164078558771037576, guid: 624c08bf729cf46788243c2c3e7cf3b5, type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1211,6 +1219,14 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 624c08bf729cf46788243c2c3e7cf3b5, type: 3}
       propertyPath: m_Name
       value: TerrainVertex (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 624c08bf729cf46788243c2c3e7cf3b5, type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
+    - target: {fileID: 8164078558771037576, guid: 624c08bf729cf46788243c2c3e7cf3b5, type: 3}
+      propertyPath: m_Layer
+      value: 11
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
