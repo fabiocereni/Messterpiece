@@ -2,6 +2,9 @@ using UnityEngine;
 
 public class Gun : MonoBehaviour
 {
+    public AudioSource audioSource;
+    public AudioClip fireSound;     // file audio (.wav o .mp3)
+    
     [Header("Fire Rate")]
     [Tooltip("Rounds Per Minute (600 = AK-47 style full-auto)")]
     public float fireRate = 600f;
@@ -160,6 +163,16 @@ public class Gun : MonoBehaviour
                 Debug.Log($"[Gun] AIM Raycast NO HIT. Usando fallback targetPoint: {targetPoint}");
             }
         }
+        
+        // ═══════════════════════════════════════════════════════
+        // AUDIO: play sound effect
+        // ═══════════════════════════════════════════════════════
+        
+        if (audioSource != null && fireSound != null)
+        {
+            audioSource.PlayOneShot(fireSound);
+        }
+        
 
         // ═══════════════════════════════════════════════════════
         // RAYCAST 2: DAMAGE (Include Enemy per applicare danno)
