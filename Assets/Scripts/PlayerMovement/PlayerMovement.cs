@@ -3,6 +3,9 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
 public class PlayerMovement : MonoBehaviour
 {
+    public AudioSource audioSource;
+    public AudioClip jumpSound;     // file audio (.wav o .mp3)
+    
     [Header("Movement")]
     public float moveSpeed = 6f;
     public float sprintSpeed = 10f;
@@ -177,6 +180,9 @@ public class PlayerMovement : MonoBehaviour
         // Resetta la velocità y per un salto consistente
         rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
         rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+        
+        // Sounds
+        audioSource.PlayOneShot(jumpSound);
     }
 
     // Funzione per il cooldown del salto

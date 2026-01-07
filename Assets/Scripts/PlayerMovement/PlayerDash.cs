@@ -4,6 +4,9 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
 public class PlayerDash : MonoBehaviour
 {
+    public AudioSource audioSource;
+    public AudioClip dashSound;     // file audio (.wav o .mp3)
+    
     [Header("Dashing")]
     public float dashForce = 15f;
     public float dashDuration = 0.2f; // Durata in secondi del dash
@@ -53,6 +56,9 @@ public class PlayerDash : MonoBehaviour
 
             // Applica l'impulso
             rb.AddForce(cameraTransform.forward * dashForce, ForceMode.Impulse);
+            
+            // Riproduci l'audio
+            audioSource.PlayOneShot(dashSound);
 
             // Avvia la coroutine per resettare lo stato dopo 'dashDuration'
             StartCoroutine(StopDash());
