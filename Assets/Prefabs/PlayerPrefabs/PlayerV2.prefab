@@ -14746,7 +14746,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Gun
   audioSource: {fileID: 4406395718911559954}
-  fireSound: {fileID: 8300000, guid: e824a525c2c894f20813e780ce0b510e, type: 3}
+  fireSound: {fileID: 8300000, guid: 0856b9672d5184efe9c1f8e044f5b3ea, type: 3}
   fireRate: 600
   weaponShakeAmount: 0.02
   weaponKickRotation: 2
