@@ -6,7 +6,9 @@ public class MainMenuScript : MonoBehaviour
     //Public method to start the game
     public void PlayGame()
     {
-        SceneManager.LoadScene(1);
+        int randomLevelIndex = Random.Range(1, 5); // get a random level index between 1 and 4
+        Debug.Log("Loading Level numero: " + randomLevelIndex);
+        SceneManager.LoadScene(randomLevelIndex);
     }
 
     //Public method to start the tutorial
