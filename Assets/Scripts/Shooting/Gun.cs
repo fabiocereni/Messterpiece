@@ -32,6 +32,10 @@ public class Gun : MonoBehaviour
     [Tooltip("Reference to weapon transform (gun model)")]
     public Transform weaponTransform;
 
+    [Header("Animation")]
+    [Tooltip("Animator component for reload animation (on Paintball_Maker)")]
+    public Animator weaponAnimator;
+
     private Vector3 weaponOriginalPosition;
     private Quaternion weaponOriginalRotation;
     private Vector3 weaponCurrentOffset = Vector3.zero;
@@ -86,6 +90,12 @@ public class Gun : MonoBehaviour
         {
             weaponOriginalPosition = weaponTransform.localPosition;
             weaponOriginalRotation = weaponTransform.localRotation;
+        }
+
+        // Disable animator initially (only enable during reload)
+        if (weaponAnimator != null)
+        {
+            weaponAnimator.enabled = false;
         }
 
         if (debugMode)
@@ -430,12 +440,32 @@ public class Gun : MonoBehaviour
     {
         isReloading = true;
 
+        // Enable animator and force reload animation from start
+        if (weaponAnimator != null)
+        {
+            weaponAnimator.enabled = true;
+
+            // Force play animation from beginning (layer 0, normalized time 0)
+            weaponAnimator.Play("Gun_Reload", 0, 0f);
+        }
+
         if (debugMode)
         {
             Debug.Log($"[Gun] Reloading... ({reloadTime}s)");
         }
 
         yield return new WaitForSeconds(reloadTime);
+
+        // Return to Idle state before disabling
+        if (weaponAnimator != null)
+        {
+            weaponAnimator.Play("Idle", 0, 0f);
+
+            // Wait one frame for state to update
+            yield return null;
+
+            weaponAnimator.enabled = false;
+        }
 
         currentAmmo = maxAmmo;
         isReloading = false;

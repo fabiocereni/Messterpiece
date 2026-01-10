@@ -14963,6 +14963,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 8821762834127311646, guid: 945b62c9bdfdbd7459e6bc27f2f23094, type: 3}
       insertIndex: -1
       addedObject: {fileID: 9206088789272839408}
+    - targetCorrespondingSourceObject: {fileID: 8821762834127311646, guid: 945b62c9bdfdbd7459e6bc27f2f23094, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2350783075452971672}
   m_SourcePrefab: {fileID: 100100000, guid: 945b62c9bdfdbd7459e6bc27f2f23094, type: 3}
 --- !u!1 &2365896879674016270 stripped
 GameObject:
@@ -14991,6 +14994,7 @@ MonoBehaviour:
   weaponKickRotation: 2
   weaponReturnSpeed: 15
   weaponTransform: {fileID: 3869255238170207720}
+  weaponAnimator: {fileID: 2350783075452971672}
   fpsCam: {fileID: 321838283031119619}
   muzzleFlash: {fileID: 8152550229222783706}
   damagePerShot: 25
@@ -15007,6 +15011,28 @@ MonoBehaviour:
   minHitDistance: 0.5
   maxRaycastDistance: 500
   debugMode: 1
+--- !u!95 &2350783075452971672
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2365896879674016270}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: d4f8aeedde66c405eab3a8f03ea33a48, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!4 &3869255238170207720 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8001263763418150136, guid: 945b62c9bdfdbd7459e6bc27f2f23094, type: 3}
