@@ -3,7 +3,27 @@ using UnityEngine.SceneManagement;
 
 public class MainMenuScript : MonoBehaviour
 {
-    //Public method to start the game
+
+    public GameObject mainMenuPanel;
+    public GameObject selectionPanel;
+
+    public void OpenSelectionMenu()
+    {
+        mainMenuPanel.SetActive(false);
+        selectionPanel.SetActive(true);
+    }
+
+    public void QuitGame()
+    {
+        Application.Quit();
+    }
+
+
+    public void PlayTutorial()
+    {
+        SceneManager.LoadScene("Tutorial");
+    }
+
     public void PlayGame()
     {
         int randomLevelIndex = Random.Range(1, 5); // get a random level index between 1 and 4
@@ -11,14 +31,9 @@ public class MainMenuScript : MonoBehaviour
         SceneManager.LoadScene(randomLevelIndex);
     }
 
-    //Public method to start the tutorial
-    public void PlayTutorial()
+    public void BackToMainMenu()
     {
-        SceneManager.LoadScene("Tutorial");
-    }
-
-    public void QuitGame()
-    {
-        Application.Quit();
+        selectionPanel.SetActive(false);
+        mainMenuPanel.SetActive(true);
     }
 }
