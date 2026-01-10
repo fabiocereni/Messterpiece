@@ -1,15 +1,26 @@
 using UnityEngine;
+using System.Collections;
 
 public class Gun : MonoBehaviour
 {
     public AudioSource audioSource;
     public AudioClip fireSound;     // file audio (.wav o .mp3)
-    
+
     [Header("Fire Rate")]
     [Tooltip("Rounds Per Minute (600 = AK-47 style full-auto)")]
     public float fireRate = 600f;
     private float fireInterval;        // Calculated in Start()
     private float nextTimeToFire = 0f;
+
+    [Header("Ammo System")]
+    [Tooltip("Maximum ammo capacity")]
+    public int maxAmmo = 30;
+    [Tooltip("Current ammo in magazine")]
+    public int currentAmmo;
+    [Tooltip("Reload duration in seconds")]
+    public float reloadTime = 2f;
+    [Tooltip("Is the gun currently reloading?")]
+    private bool isReloading = false;
 
     [Header("Weapon Shake Settings")]
     [Tooltip("Weapon shake intensity (position offset)")]
@@ -67,6 +78,9 @@ public class Gun : MonoBehaviour
         // Calculate fire interval from RPM
         fireInterval = 60f / fireRate;  // 600 RPM → 0.1 seconds
 
+        // Initialize ammo
+        currentAmmo = maxAmmo;
+
         // Save weapon original position/rotation for shake
         if (weaponTransform != null)
         {
@@ -83,14 +97,34 @@ public class Gun : MonoBehaviour
     void Update()
     {
         // ═══════════════════════════════════════════════════════
+        // RELOAD INPUT - Press R to reload manually
+        // ═══════════════════════════════════════════════════════
+        if (Input.GetKeyDown(KeyCode.R) && !isReloading && currentAmmo < maxAmmo)
+        {
+            StartCoroutine(Reload());
+        }
+
+        // ═══════════════════════════════════════════════════════
         // SEMI-AUTO + FULL-AUTO INPUT
         // GetButton (not GetButtonDown) → Allows hold for full-auto
         // Fire rate cooldown prevents too-fast spam
+        // ADDED: Check ammo and reloading status
         // ═══════════════════════════════════════════════════════
-        if (Input.GetButton("Fire1") && Time.time >= nextTimeToFire)
+        if (Input.GetButton("Fire1") && Time.time >= nextTimeToFire && !isReloading)
         {
-            nextTimeToFire = Time.time + fireInterval;
-            Shoot();
+            if (currentAmmo > 0)
+            {
+                nextTimeToFire = Time.time + fireInterval;
+                Shoot();
+            }
+            else
+            {
+                // Auto-reload when empty
+                if (!isReloading)
+                {
+                    StartCoroutine(Reload());
+                }
+            }
         }
 
         // ═══════════════════════════════════════════════════════
@@ -101,6 +135,11 @@ public class Gun : MonoBehaviour
 
     void Shoot()
     {
+        // ═══════════════════════════════════════════════════════
+        // AMMO CHECK - Decrease ammo count
+        // ═══════════════════════════════════════════════════════
+        currentAmmo--;
+
         // ═══════════════════════════════════════════════════════
         // MUZZLE FLASH (Cyan Cloud)
         // ═══════════════════════════════════════════════════════
@@ -381,5 +420,45 @@ public class Gun : MonoBehaviour
         // Apply to weapon transform
         weaponTransform.localPosition = weaponOriginalPosition + weaponCurrentOffset;
         weaponTransform.localRotation = weaponOriginalRotation * weaponCurrentRotationOffset;
+    }
+
+    /// <summary>
+    /// Reload coroutine - refills ammo over time
+    /// Blocks shooting during reload animation
+    /// </summary>
+    IEnumerator Reload()
+    {
+        isReloading = true;
+
+        if (debugMode)
+        {
+            Debug.Log($"[Gun] Reloading... ({reloadTime}s)");
+        }
+
+        yield return new WaitForSeconds(reloadTime);
+
+        currentAmmo = maxAmmo;
+        isReloading = false;
+
+        if (debugMode)
+        {
+            Debug.Log($"[Gun] Reload complete! Ammo: {currentAmmo}/{maxAmmo}");
+        }
+    }
+
+    /// <summary>
+    /// Public getter for UI - returns normalized ammo (0-1)
+    /// </summary>
+    public float GetAmmoFillAmount()
+    {
+        return (float)currentAmmo / maxAmmo;
+    }
+
+    /// <summary>
+    /// Public getter for UI - returns reload progress (0-1)
+    /// </summary>
+    public bool IsReloading()
+    {
+        return isReloading;
     }
 }
