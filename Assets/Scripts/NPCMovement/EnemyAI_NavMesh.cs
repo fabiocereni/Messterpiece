@@ -33,7 +33,7 @@ public class EnemyAI_NavMesh : MonoBehaviour
         agent = GetComponent<NavMeshAgent>();
         if (playerTransform == null)
         {
-            playerTransform = GameObject.FindGameObjectWithTag("PlayerV2")?.transform;
+            playerTransform = GameObject.FindGameObjectWithTag("Player")?.transform;
         }
         currentState = AIState.PATROL;
         GotoNextPatrolPoint();
