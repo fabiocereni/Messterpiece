@@ -67,6 +67,10 @@ public class Gun : MonoBehaviour
     [Tooltip("Layer per il raycast di DAMAGE (cosa può essere danneggiato)")]
     public LayerMask damageLayerMask;
 
+    [Header("Kill Attribution")]
+    [Tooltip("Reference to the Player GameObject (for kill tracking). Leave empty to auto-detect.")]
+    public GameObject ownerPlayer;
+
     [Tooltip("Distanza minima valida per un hit. Se colpisce più vicino, usa fallback.")]
     public float minHitDistance = 2.5f;
 
@@ -96,6 +100,24 @@ public class Gun : MonoBehaviour
         if (weaponAnimator != null)
         {
             weaponAnimator.enabled = false;
+        }
+
+        // Auto-detect player if not assigned (find Player tag or parent)
+        if (ownerPlayer == null)
+        {
+            // Try to find Player tag
+            ownerPlayer = GameObject.FindGameObjectWithTag("Player");
+
+            // If not found, assume gun is child of player
+            if (ownerPlayer == null)
+            {
+                ownerPlayer = transform.root.gameObject; // Get root parent
+            }
+
+            if (debugMode)
+            {
+                Debug.Log($"[Gun] Auto-detected owner: {ownerPlayer.name}");
+            }
         }
 
         if (debugMode)
@@ -357,12 +379,12 @@ public class Gun : MonoBehaviour
             EnemyHealth enemyHealth = hit.collider.GetComponent<EnemyHealth>();
             if (enemyHealth != null)
             {
-                // Apply damage (this will also spawn damage number)
-                enemyHealth.TakeDamage(damagePerShot, hit.point);
+                // Apply damage AND pass the owner (player) for kill attribution
+                enemyHealth.TakeDamage(damagePerShot, hit.point, ownerPlayer);
 
                 if (debugMode)
                 {
-                    Debug.Log($"[Gun] Applied {damagePerShot} damage to {hit.collider.name}");
+                    Debug.Log($"[Gun] Applied {damagePerShot} damage to {hit.collider.name} (attacker: {ownerPlayer.name})");
                 }
             }
             else

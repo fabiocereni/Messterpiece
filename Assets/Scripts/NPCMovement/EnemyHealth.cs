@@ -10,6 +10,9 @@ public class EnemyHealth : MonoBehaviour
     [Tooltip("Vita corrente")]
     private float currentHealth;
 
+    // Track who dealt the last damage (for kill attribution)
+    private GameObject lastAttacker = null;
+
     [Header("Damage Feedback")]
     [Tooltip("Prefab del numero danno (WorldSpace UI)")]
     public GameObject damageNumberPrefab;
@@ -37,13 +40,22 @@ public class EnemyHealth : MonoBehaviour
     /// <summary>
     /// Applica danno al nemico
     /// </summary>
-    public void TakeDamage(float damage, Vector3 hitPoint)
+    /// <param name="damage">Amount of damage</param>
+    /// <param name="hitPoint">World position where hit occurred</param>
+    /// <param name="attacker">GameObject that dealt the damage (for kill attribution)</param>
+    public void TakeDamage(float damage, Vector3 hitPoint, GameObject attacker = null)
     {
         if (isDead) return;
 
         currentHealth -= damage;
-        
-        Debug.Log($"[EnemyHealth] {gameObject.name} took {damage} damage. Health: {currentHealth}/{maxHealth}");
+
+        // Track who attacked (for kill credit)
+        if (attacker != null)
+        {
+            lastAttacker = attacker;
+        }
+
+        Debug.Log($"[EnemyHealth] {gameObject.name} took {damage} damage from {(attacker != null ? attacker.name : "unknown")}. Health: {currentHealth}/{maxHealth}");
 
         // Spawn damage number popup
         SpawnDamageNumber(damage, hitPoint);
@@ -83,7 +95,19 @@ public class EnemyHealth : MonoBehaviour
         if (isDead) return;
         isDead = true;
 
-        Debug.Log($"[EnemyHealth] {gameObject.name} KILLED!");
+        Debug.Log($"[EnemyHealth] {gameObject.name} KILLED by {(lastAttacker != null ? lastAttacker.name : "unknown")}!");
+
+        // ═══════════════════════════════════════════════════════
+        // REGISTER KILL WITH MATCH MANAGER
+        // ═══════════════════════════════════════════════════════
+        if (MatchManager.Instance != null)
+        {
+            MatchManager.Instance.RegisterKill(lastAttacker, gameObject);
+        }
+        else
+        {
+            Debug.LogWarning("[EnemyHealth] MatchManager not found! Kill not registered.");
+        }
 
         // NASCONDI IMMEDIATAMENTE il mesh del nemico (così la sfera VFX lo copre)
         MeshRenderer meshRenderer = GetComponent<MeshRenderer>();
