@@ -12,6 +12,12 @@ public class RayShooter : MonoBehaviour
 
     void Update()
     {
+        // Disable shooting during warmup
+        if (MatchFlowManager.Instance != null && !MatchFlowManager.Instance.CanPlayerMove())
+        {
+            return;
+        }
+
         // Creates a Ray from the center of the viewport
         if (Input.GetMouseButtonDown(0))
         {

@@ -31,6 +31,12 @@ public class PlayerDash : MonoBehaviour
 
     void Update()
     {
+        // Disable dashing during warmup
+        if (MatchFlowManager.Instance != null && !MatchFlowManager.Instance.CanPlayerMove())
+        {
+            return;
+        }
+
         if (Input.GetKeyDown(KeyCode.E) && Time.time >= nextDashTime)
         {
             dashRequested = true;

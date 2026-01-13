@@ -78,6 +78,14 @@ public class PlayerMovement : MonoBehaviour
 
     private void MyInput()
     {
+        // Check if warmup is active - if so, disable all player input
+        if (MatchFlowManager.Instance != null && !MatchFlowManager.Instance.CanPlayerMove())
+        {
+            horizontalInput = 0f;
+            verticalInput = 0f;
+            return;
+        }
+
         horizontalInput = Input.GetAxisRaw("Horizontal");
         verticalInput = Input.GetAxisRaw("Vertical");
 

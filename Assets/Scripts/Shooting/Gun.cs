@@ -107,6 +107,16 @@ public class Gun : MonoBehaviour
     void Update()
     {
         // ═══════════════════════════════════════════════════════
+        // WARMUP CHECK - Disable shooting during pre-match countdown
+        // ═══════════════════════════════════════════════════════
+        if (MatchFlowManager.Instance != null && !MatchFlowManager.Instance.CanPlayerMove())
+        {
+            // Still allow weapon shake recovery during warmup
+            RecoverWeaponPosition();
+            return;
+        }
+
+        // ═══════════════════════════════════════════════════════
         // RELOAD INPUT - Press R to reload manually
         // ═══════════════════════════════════════════════════════
         if (Input.GetKeyDown(KeyCode.R) && !isReloading && currentAmmo < maxAmmo)

@@ -24,6 +24,12 @@ public class PlayerLook : MonoBehaviour
 
     void LateUpdate()
     {
+        // Disable camera movement during warmup
+        if (MatchFlowManager.Instance != null && !MatchFlowManager.Instance.CanPlayerMove())
+        {
+            return;
+        }
+
         float mouseX = Input.GetAxis("Mouse X") * sensX * sensitivityMult * Time.deltaTime;
         float mouseY = Input.GetAxis("Mouse Y") * sensY * sensitivityMult * Time.deltaTime;
 
@@ -35,14 +41,14 @@ public class PlayerLook : MonoBehaviour
         Quaternion targetCamRotation = Quaternion.Euler(xRot, 0, 0);
 
         transform.rotation = Quaternion.Lerp(
-            transform.rotation, 
-            targetPlayerRotation, 
+            transform.rotation,
+            targetPlayerRotation,
             smoothSpeed
         );
 
         cam.localRotation = Quaternion.Lerp(
-            cam.localRotation, 
-            targetCamRotation, 
+            cam.localRotation,
+            targetCamRotation,
             smoothSpeed
         );
     }
