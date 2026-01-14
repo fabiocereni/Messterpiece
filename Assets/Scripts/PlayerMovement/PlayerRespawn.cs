@@ -200,7 +200,7 @@ public class PlayerRespawn : MonoBehaviour
 
         
         // Riabilita controlli
-        EnablePlayerControls();
+        EnablePlayerControls(spawnPoint);
         
         isRespawning = false;
         isDead = false;
@@ -339,13 +339,17 @@ public class PlayerRespawn : MonoBehaviour
     /// <summary>
     /// Riabilita i controlli del giocatore
     /// </summary>
-    private void EnablePlayerControls()
+    private void EnablePlayerControls(Transform spawnPoint)
     {
         if (playerMovement != null)
             playerMovement.enabled = true;
         
         if (playerLook != null)
+        {
             playerLook.enabled = true;
+            // Resetta la rotazione della camera per matchare lo spawn point
+            ResetPlayerRotation(spawnPoint);
+        }
         
         if (playerGun != null)
             playerGun.enabled = true;
@@ -415,6 +419,18 @@ public class PlayerRespawn : MonoBehaviour
             
             if (showDebugLogs)
                 Debug.Log($"[PlayerRespawn] Rimosso spawn point: {spawnPoint.name}");
+        }
+    }
+    
+    /// <summary>
+    /// Resetta la rotazione del giocatore e della camera per matchare lo spawn point
+    /// </summary>
+    private void ResetPlayerRotation(Transform spawnPoint)
+    {
+        if (playerLook != null && spawnPoint != null)
+        {
+            // Usa il nuovo metodo per resettare la rotazione verso la direzione dello spawn point
+            playerLook.ResetRotation(spawnPoint.forward);
         }
     }
     

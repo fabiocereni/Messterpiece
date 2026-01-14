@@ -14,6 +14,23 @@ public class PlayerLook : MonoBehaviour
 
     private float sensitivityMult = 1.0f;
 
+    /// <summary>
+    /// Resetta la rotazione del giocatore per guardare in una direzione specifica
+    /// </summary>
+    public void ResetRotation(Vector3 forwardDirection)
+    {
+        // Calcola la rotazione Y dall'forward direction
+        yRot = Mathf.Atan2(forwardDirection.x, forwardDirection.z) * Mathf.Rad2Deg;
+        xRot = 0f; // Resetta la rotazione verticale
+        
+        // Applica immediatamente la rotazione
+        transform.rotation = Quaternion.Euler(0, yRot, 0);
+        if (cam != null)
+        {
+            cam.localRotation = Quaternion.Euler(xRot, 0, 0);
+        }
+    }
+
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
