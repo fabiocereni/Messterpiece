@@ -8,6 +8,14 @@ public class EnemyAI_NavMesh : MonoBehaviour
     [Tooltip("Riferimento al transform del giocatore (opzionale, può trovarlo da solo)")]
     public Transform playerTransform;
     private NavMeshAgent agent;
+    
+    [Header("Combattimento")]
+    public EnemyGun enemyGun; 
+    public float fireRate = 1.0f; // Un colpo ogni secondo
+    private float nextFireTime = 0f;
+    
+    [Tooltip("Altezza rispetto ai piedi del player dove il nemico mira")]
+    public float aimVerticalOffset = 0.8f;
 
     [Header("Pattugliamento (Patrol)")]
     [Tooltip("Un array di punti (Transforms) tra cui il nemico si muoverà")]
@@ -42,6 +50,7 @@ public class EnemyAI_NavMesh : MonoBehaviour
     void Update()
     {
         CheckForPlayer();
+    
         switch (currentState)
         {
             case AIState.PATROL:
@@ -49,7 +58,32 @@ public class EnemyAI_NavMesh : MonoBehaviour
                 break;
             case AIState.CHASE:
                 DoChase();
+                // Se il giocatore è visibile e il tempo è scaduto, spara
+                if (playerIsInSight && Time.time >= nextFireTime)
+                {
+                    Attack();
+                    nextFireTime = Time.time + fireRate;
+                }
                 break;
+        }
+    }
+    
+    void Attack()
+    {
+        if (enemyGun != null && playerTransform != null)
+        {
+            // Usiamo la variabile per regolare l'altezza in tempo reale
+            Vector3 targetPoint = playerTransform.position + Vector3.up * aimVerticalOffset;
+
+            // Calcoliamo la direzione dal FirePoint dell'arma verso il punto target
+            Vector3 fireDirection = (targetPoint - enemyGun.firePoint.position).normalized;
+
+            // Rotazione del corpo del nemico (solo asse Y)
+            Vector3 lookPos = playerTransform.position - transform.position;
+            lookPos.y = 0;
+            transform.rotation = Quaternion.LookRotation(lookPos);
+
+            enemyGun.Shoot(fireDirection);
         }
     }
 
