@@ -19,8 +19,7 @@ public class PlayerRespawn : MonoBehaviour
     public bool useAutoSpawnPoints = true;
     
     [Header("Respawn Settings")]
-    [Tooltip("Delay prima del respawn in secondi")]
-    public float respawnDelay = 2f;
+
     
     [Tooltip("Salute dopo il respawn")]
     public float respawnHealth = 100f;
@@ -35,11 +34,7 @@ public class PlayerRespawn : MonoBehaviour
     [Tooltip("Resetta la velocità del Rigidbody al respawn")]
     public bool resetVelocity = true;
     
-    [Tooltip("Mostra messaggio di morte con countdown")]
-    public bool showDeathMessage = true;
-    
-    [Tooltip("Testo per messaggio di morte")]
-    public string deathMessageText = "SEI MORTO";
+
     
     [Header("Visual Effects")]
     [Tooltip("Effetto visivo durante il respawn")]
@@ -50,12 +45,7 @@ public class PlayerRespawn : MonoBehaviour
     
 
     
-    [Header("Death Message UI")]
-    [Tooltip("UI Text per mostrare messaggio di morte")]
-    public TextMeshProUGUI deathMessageTextUI;
-    
-    [Tooltip("UI Text per mostrare countdown respawn")]
-    public TextMeshProUGUI deathCountdownTextUI;
+
     
     [Header("Debug")]
     [Tooltip("Mostra log di debug")]
@@ -148,11 +138,8 @@ public class PlayerRespawn : MonoBehaviour
             DisablePlayerControls();
         }
         
-        // Mostra schermata di morte
-        if (showDeathMessage)
-        {
-            ShowDeathScreen();
-        }
+        // Mostra schermata di morte (DeathScreenUI gestisce il countdown)
+        ShowDeathScreen();
         
         // Resetta velocity per evitare animazioni strane
         if (resetVelocity)
@@ -160,20 +147,8 @@ public class PlayerRespawn : MonoBehaviour
             ResetPlayerVelocity(player);
         }
         
-        // Countdown per respawn
-        float countdown = respawnDelay;
-        while (countdown > 0)
-        {
-            UpdateDeathCountdown(countdown);
-            yield return new WaitForSeconds(1f);
-            countdown--;
-        }
-        
-        // Nascondi schermata di morte
-        if (showDeathMessage)
-        {
-            HideDeathScreen();
-        }
+        // Aspetta che DeathScreenUI finisca il countdown e chiami CompleteRespawn()
+        yield break; // Esce dalla coroutine e aspetta il callback
         
         // Trova spawn point
         Transform spawnPoint = GetBestSpawnPoint();
@@ -198,6 +173,42 @@ public class PlayerRespawn : MonoBehaviour
         PlayRespawnEffects();
         
 
+        
+        // Riabilita controlli
+        EnablePlayerControls(spawnPoint);
+        
+        isRespawning = false;
+        isDead = false;
+        
+        if (showDebugLogs)
+            Debug.Log($"[PlayerRespawn] Giocatore respawnato con successo a {spawnPoint.name}");
+    }
+    
+
+    
+    private System.Collections.IEnumerator CompleteRespawnCoroutine()
+    {
+        // Trova spawn point
+        Transform spawnPoint = GetBestSpawnPoint();
+        if (spawnPoint == null)
+        {
+            Debug.LogError("[PlayerRespawn] Nessuno spawn point disponibile!");
+            isRespawning = false;
+            isDead = false;
+            yield break;
+        }
+        
+        // Teletrasporta giocatore
+        TeleportPlayerToSpawn(gameObject, spawnPoint);
+        
+        // Ripristina salute
+        RestorePlayerHealth();
+        
+        // Ripristina munizioni
+        RestorePlayerAmmo();
+        
+        // Effetti visivi e sonori
+        PlayRespawnEffects();
         
         // Riabilita controlli
         EnablePlayerControls(spawnPoint);
@@ -374,7 +385,13 @@ public class PlayerRespawn : MonoBehaviour
         }
     }
     
-
+    /// <summary>
+    /// Completa il respawn dopo che DeathScreenUI ha finito il countdown
+    /// </summary>
+    public void CompleteRespawn()
+    {
+        StartCoroutine(CompleteRespawnCoroutine());
+    }
     
     /// <summary>
     /// Aggiunge uno spawn point alla lista
@@ -455,78 +472,10 @@ public class PlayerRespawn : MonoBehaviour
     /// </summary>
     private void ShowDeathScreen()
     {
-        // Usa DeathScreenUI se disponibile
+        // Usa DeathScreenUI per gestire tutto
         if (deathScreenUI != null)
         {
             deathScreenUI.ShowDeathScreen();
-            return;
-        }
-        
-        // Fallback alla UI base se DeathScreenUI non è disponibile
-        if (deathMessageTextUI != null)
-        {
-            deathMessageTextUI.text = deathMessageText;
-            deathMessageTextUI.gameObject.SetActive(true);
-        }
-        
-        if (deathCountdownTextUI != null)
-        {
-            deathCountdownTextUI.gameObject.SetActive(true);
-        }
-        
-        // Blocca il cursore se necessario
-        Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
-    }
-    
-    /// <summary>
-    /// Nasconde la schermata di morte
-    /// </summary>
-    private void HideDeathScreen()
-    {
-        // Usa DeathScreenUI se disponibile
-        if (deathScreenUI != null)
-        {
-            deathScreenUI.HideDeathScreen();
-            return;
-        }
-        
-        // Fallback alla UI base se DeathScreenUI non è disponibile
-        if (deathMessageTextUI != null)
-        {
-            deathMessageTextUI.gameObject.SetActive(false);
-        }
-        
-        if (deathCountdownTextUI != null)
-        {
-            deathCountdownTextUI.gameObject.SetActive(false);
-        }
-        
-        // Ripristina il cursore per il gioco
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
-    }
-    
-    /// <summary>
-    /// Aggiorna il countdown della morte
-    /// </summary>
-    private void UpdateDeathCountdown(float countdown)
-    {
-        // DeathScreenUI gestisce il suo propio countdown
-        if (deathScreenUI != null)
-        {
-            return; // DeathScreenUI gestisce il countdown automaticamente
-        }
-        
-        // Fallback alla UI base
-        if (deathCountdownTextUI != null)
-        {
-            int seconds = Mathf.CeilToInt(countdown);
-            deathCountdownTextUI.text = $"RESPAWN IN {seconds}...";
-            
-            // Effetto pulsante
-            float scale = 1f + (0.2f * Mathf.PingPong(Time.time * 2f, 1f));
-            deathCountdownTextUI.transform.localScale = Vector3.one * scale;
         }
     }
     
