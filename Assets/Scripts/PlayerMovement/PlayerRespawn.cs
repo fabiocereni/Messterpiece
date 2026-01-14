@@ -1,4 +1,6 @@
 using UnityEngine;
+using System.Collections;
+using TMPro;
 
 /// <summary>
 /// Sistema respawn migliorato per evitare game over alla morte del giocatore
@@ -26,6 +28,19 @@ public class PlayerRespawn : MonoBehaviour
     [Tooltip("Munizioni dopo il respawn")]
     public int respawnAmmo = 30;
     
+    [Header("Spawn Control")]
+    [Tooltip("Disabilita il giocatore durante il countdown morte")]
+    public bool disablePlayerOnDeath = true;
+    
+    [Tooltip("Resetta la velocità del Rigidbody al respawn")]
+    public bool resetVelocity = true;
+    
+    [Tooltip("Mostra messaggio di morte con countdown")]
+    public bool showDeathMessage = true;
+    
+    [Tooltip("Testo per messaggio di morte")]
+    public string deathMessageText = "SEI MORTO";
+    
     [Header("Visual Effects")]
     [Tooltip("Effetto visivo durante il respawn")]
     public GameObject respawnEffect;
@@ -33,12 +48,14 @@ public class PlayerRespawn : MonoBehaviour
     [Tooltip("Suono del respawn")]
     public AudioClip respawnSound;
     
-    [Tooltip("Camera shake durante respawn")]
-    public bool useCameraShake = true;
-    [Tooltip("Intensità camera shake")]
-    public float shakeIntensity = 2f;
-    [Tooltip("Durata camera shake")]
-    public float shakeDuration = 0.5f;
+
+    
+    [Header("Death Message UI")]
+    [Tooltip("UI Text per mostrare messaggio di morte")]
+    public TextMeshProUGUI deathMessageTextUI;
+    
+    [Tooltip("UI Text per mostrare countdown respawn")]
+    public TextMeshProUGUI deathCountdownTextUI;
     
     [Header("Debug")]
     [Tooltip("Mostra log di debug")]
@@ -51,15 +68,20 @@ public class PlayerRespawn : MonoBehaviour
     private PlayerLook playerLook;
     private Gun playerGun;
     private AmmoDisplay ammoDisplay;
+    private DeathScreenUI deathScreenUI;
     
     // Stato
     private bool isRespawning = false;
+    private bool isDead = false;
     private Transform originalSpawnPoint;
     
     private void Awake()
     {
         // Ottieni i componenti necessari
         GetRequiredComponents();
+        
+        // Trova DeathScreenUI
+        deathScreenUI = FindObjectOfType<DeathScreenUI>();
         
         // Salva lo spawn point originale
         if (transform != null)
@@ -118,12 +140,40 @@ public class PlayerRespawn : MonoBehaviour
     private System.Collections.IEnumerator RespawnCoroutine(GameObject player)
     {
         isRespawning = true;
+        isDead = true;
         
         // Disabilita controlli giocatore
-        DisablePlayerControls();
+        if (disablePlayerOnDeath)
+        {
+            DisablePlayerControls();
+        }
         
-        // Aspetta il delay
-        yield return new WaitForSeconds(respawnDelay);
+        // Mostra schermata di morte
+        if (showDeathMessage)
+        {
+            ShowDeathScreen();
+        }
+        
+        // Resetta velocity per evitare animazioni strane
+        if (resetVelocity)
+        {
+            ResetPlayerVelocity(player);
+        }
+        
+        // Countdown per respawn
+        float countdown = respawnDelay;
+        while (countdown > 0)
+        {
+            UpdateDeathCountdown(countdown);
+            yield return new WaitForSeconds(1f);
+            countdown--;
+        }
+        
+        // Nascondi schermata di morte
+        if (showDeathMessage)
+        {
+            HideDeathScreen();
+        }
         
         // Trova spawn point
         Transform spawnPoint = GetBestSpawnPoint();
@@ -131,6 +181,7 @@ public class PlayerRespawn : MonoBehaviour
         {
             Debug.LogError("[PlayerRespawn] Nessuno spawn point disponibile!");
             isRespawning = false;
+            isDead = false;
             yield break;
         }
         
@@ -146,16 +197,13 @@ public class PlayerRespawn : MonoBehaviour
         // Effetti visivi e sonori
         PlayRespawnEffects();
         
-        // Camera shake
-        if (useCameraShake)
-        {
-            TriggerCameraShake();
-        }
+
         
         // Riabilita controlli
         EnablePlayerControls();
         
         isRespawning = false;
+        isDead = false;
         
         if (showDebugLogs)
             Debug.Log($"[PlayerRespawn] Giocatore respawnato con successo a {spawnPoint.name}");
@@ -322,56 +370,7 @@ public class PlayerRespawn : MonoBehaviour
         }
     }
     
-    /// <summary>
-    /// Attiva camera shake
-    /// </summary>
-    private void TriggerCameraShake()
-    {
-        // Trova la camera principale
-        Camera mainCamera = Camera.main;
-        if (mainCamera != null)
-        {
-            // Cerca un componente camera shake o aggiungilo dinamicamente
-            var cameraShake = mainCamera.GetComponent("CameraShake");
-            if (cameraShake != null)
-            {
-                // Usa reflection per chiamare il metodo Shake se disponibile
-                var shakeMethod = cameraShake.GetType().GetMethod("Shake");
-                if (shakeMethod != null)
-                {
-                    shakeMethod.Invoke(cameraShake, new object[] { shakeIntensity, shakeDuration });
-                }
-            }
-            else
-            {
-                // Se non c'è CameraShake, usa il semplice shake posizione
-                StartCoroutine(SimpleCameraShake(mainCamera.transform));
-            }
-        }
-    }
-    
-    /// <summary>
-    /// Camera shake semplice senza componente dedicato
-    /// </summary>
-    private System.Collections.IEnumerator SimpleCameraShake(Transform cameraTransform)
-    {
-        Vector3 originalPosition = cameraTransform.localPosition;
-        float elapsed = 0f;
-        
-        while (elapsed < shakeDuration)
-        {
-            elapsed += Time.deltaTime;
-            
-            float x = Random.Range(-1f, 1f) * shakeIntensity;
-            float y = Random.Range(-1f, 1f) * shakeIntensity;
-            
-            cameraTransform.localPosition = originalPosition + new Vector3(x, y, 0);
-            
-            yield return null;
-        }
-        
-        cameraTransform.localPosition = originalPosition;
-    }
+
     
     /// <summary>
     /// Aggiunge uno spawn point alla lista
@@ -425,6 +424,117 @@ public class PlayerRespawn : MonoBehaviour
     public bool IsRespawning()
     {
         return isRespawning;
+    }
+    
+    /// <summary>
+    /// Controlla se il giocatore è morto
+    /// </summary>
+    public bool IsDead()
+    {
+        return isDead;
+    }
+    
+    /// <summary>
+    /// Mostra la schermata di morte
+    /// </summary>
+    private void ShowDeathScreen()
+    {
+        // Usa DeathScreenUI se disponibile
+        if (deathScreenUI != null)
+        {
+            deathScreenUI.ShowDeathScreen();
+            return;
+        }
+        
+        // Fallback alla UI base se DeathScreenUI non è disponibile
+        if (deathMessageTextUI != null)
+        {
+            deathMessageTextUI.text = deathMessageText;
+            deathMessageTextUI.gameObject.SetActive(true);
+        }
+        
+        if (deathCountdownTextUI != null)
+        {
+            deathCountdownTextUI.gameObject.SetActive(true);
+        }
+        
+        // Blocca il cursore se necessario
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+    }
+    
+    /// <summary>
+    /// Nasconde la schermata di morte
+    /// </summary>
+    private void HideDeathScreen()
+    {
+        // Usa DeathScreenUI se disponibile
+        if (deathScreenUI != null)
+        {
+            deathScreenUI.HideDeathScreen();
+            return;
+        }
+        
+        // Fallback alla UI base se DeathScreenUI non è disponibile
+        if (deathMessageTextUI != null)
+        {
+            deathMessageTextUI.gameObject.SetActive(false);
+        }
+        
+        if (deathCountdownTextUI != null)
+        {
+            deathCountdownTextUI.gameObject.SetActive(false);
+        }
+        
+        // Ripristina il cursore per il gioco
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+    }
+    
+    /// <summary>
+    /// Aggiorna il countdown della morte
+    /// </summary>
+    private void UpdateDeathCountdown(float countdown)
+    {
+        // DeathScreenUI gestisce il suo propio countdown
+        if (deathScreenUI != null)
+        {
+            return; // DeathScreenUI gestisce il countdown automaticamente
+        }
+        
+        // Fallback alla UI base
+        if (deathCountdownTextUI != null)
+        {
+            int seconds = Mathf.CeilToInt(countdown);
+            deathCountdownTextUI.text = $"RESPAWN IN {seconds}...";
+            
+            // Effetto pulsante
+            float scale = 1f + (0.2f * Mathf.PingPong(Time.time * 2f, 1f));
+            deathCountdownTextUI.transform.localScale = Vector3.one * scale;
+        }
+    }
+    
+    /// <summary>
+    /// Resetta la velocity del giocatore per evitare animazioni strane
+    /// </summary>
+    private IEnumerator ResetPlayerVelocity(GameObject player)
+    {
+        Rigidbody rb = player.GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+            rb.isKinematic = false;
+        }
+        
+        // Resetta anche animator se presente
+        Animator animator = player.GetComponent<Animator>();
+        if (animator != null)
+        {
+            animator.SetBool("IsDead", true);
+            yield return new WaitForSeconds(0.1f); // Breve delay
+            animator.SetBool("IsDead", false);
+        }
     }
     
     // Metodi per debug
