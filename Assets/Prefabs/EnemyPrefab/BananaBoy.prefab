@@ -13795,7 +13795,7 @@ GameObject:
   - component: {fileID: 5726766327316334074}
   m_Layer: 9
   m_Name: BananaBoy
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -13971,6 +13971,12 @@ MonoBehaviour:
   fireRate: 0.5
   walkSpeed: 2
   runSpeed: 5
+  fieldOfViewAngle: 90
+  detectionRadius: 15
+  obstacleLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  shootingAngleThreshold: 10
   patrolPoints:
   - {fileID: 0}
   - {fileID: 0}
