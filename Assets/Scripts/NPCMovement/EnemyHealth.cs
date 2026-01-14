@@ -95,49 +95,51 @@ public class EnemyHealth : MonoBehaviour
         if (isDead) return;
         isDead = true;
 
-        Debug.Log($"[EnemyHealth] {gameObject.name} KILLED by {(lastAttacker != null ? lastAttacker.name : "unknown")}!");
+        Debug.Log($"[EnemyHealth] {gameObject.name} KILLED!");
 
-        // ═══════════════════════════════════════════════════════
-        // REGISTER KILL WITH MATCH MANAGER
-        // ═══════════════════════════════════════════════════════
+        // 1. Registra la kill
         if (MatchManager.Instance != null)
         {
             MatchManager.Instance.RegisterKill(lastAttacker, gameObject);
         }
-        else
+
+        // 2. FERMA IL MOVIMENTO FISICO
+        var agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
+        if (agent != null)
         {
-            Debug.LogWarning("[EnemyHealth] MatchManager not found! Kill not registered.");
+            agent.isStopped = true; // Ordina all'agente di fermarsi immediatamente
+            agent.enabled = false;   // Disabilita il componente per sicurezza
         }
 
-        // NASCONDI IMMEDIATAMENTE il mesh del nemico (così la sfera VFX lo copre)
-        MeshRenderer meshRenderer = GetComponent<MeshRenderer>();
-        if (meshRenderer != null)
-        {
-            meshRenderer.enabled = false;
-        }
-
-        // Nascondi anche eventuali child meshes (es. arma del nemico)
-        MeshRenderer[] childRenderers = GetComponentsInChildren<MeshRenderer>();
-        foreach (MeshRenderer renderer in childRenderers)
-        {
-            renderer.enabled = false;
-        }
-
-        // Spawn kill VFX AL CENTRO del nemico (Y+1.0 per capsule height 2)
-        if (killVfxPrefab != null)
-        {
-            GameObject killVfx = Instantiate(killVfxPrefab, transform.position, Quaternion.identity);
-            Destroy(killVfx, killVfxDuration);
-        }
-
-        // Disabilita AI e collider
+        // 3. DISABILITA LOGICA IA
         var ai = GetComponent<EnemyAI_NavMesh>();
         if (ai != null) ai.enabled = false;
 
+        // 4. NASCONDI TUTTI I RENDERER (Inclusi quelli animati)
+        // Nascondi MeshRenderer standard
+        MeshRenderer[] meshRenderers = GetComponentsInChildren<MeshRenderer>();
+        foreach (MeshRenderer mr in meshRenderers) mr.enabled = false;
+
+        // NOVITÀ: Nascondi SkinnedMeshRenderer (quelli del corpo animato)
+        SkinnedMeshRenderer[] skinnedRenderers = GetComponentsInChildren<SkinnedMeshRenderer>();
+        foreach (SkinnedMeshRenderer smr in skinnedRenderers) smr.enabled = false;
+
+        // 5. DISABILITA COLLIDER E SPARO
         var capsuleCollider = GetComponent<CapsuleCollider>();
         if (capsuleCollider != null) capsuleCollider.enabled = false;
+    
+        // Se il nemico ha un'arma, assicurati che non possa più sparare
+        if (GetComponentInChildren<EnemyGun>() != null) 
+            GetComponentInChildren<EnemyGun>().enabled = false;
 
-        // Distruggi dopo delay (sincronizzato con durata VFX)
+        // 6. EFFETTI VISIVI
+        if (killVfxPrefab != null)
+        {
+            GameObject killVfx = Instantiate(killVfxPrefab, transform.position + Vector3.up, Quaternion.identity);
+            Destroy(killVfx, killVfxDuration);
+        }
+
+        // 7. DISTRUZIONE FINALE
         Destroy(gameObject, destroyDelay);
     }
 
