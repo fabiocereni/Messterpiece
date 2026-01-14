@@ -4,140 +4,67 @@ using UnityEngine.AI;
 [RequireComponent(typeof(NavMeshAgent))]
 public class EnemyAI_NavMesh : MonoBehaviour
 {
-    [Header("Riferimenti")]
-    [Tooltip("Riferimento al transform del giocatore (opzionale, può trovarlo da solo)")]
     public Transform playerTransform;
     private NavMeshAgent agent;
-    
-    [Header("Combattimento")]
-    public EnemyGun enemyGun; 
-    public float fireRate = 1.0f; // Un colpo ogni secondo
-    private float nextFireTime = 0f;
-    
-    [Tooltip("Altezza rispetto ai piedi del player dove il nemico mira")]
-    public float aimVerticalOffset = 0.8f;
+    private Animator animator;
 
-    [Header("Pattugliamento (Patrol)")]
-    [Tooltip("Un array di punti (Transforms) tra cui il nemico si muoverà")]
+    [Header("Impostazioni")]
+    public EnemyGun enemyGun;
+    public float fireRate = 1.0f;
+    private float nextFireTime = 0f;
+    public float walkSpeed = 2.0f;
+    public float runSpeed = 5.0f;
+
     public Transform[] patrolPoints;
     private int currentPatrolIndex = 0;
-
-    [Header("Rilevamento (Chase)")]
-    [Tooltip("Il raggio in cui il nemico 'sente' la presenza del giocatore")]
-    public float detectionRadius = 15f;
-    [Tooltip("L'angolo del cono visivo del nemico (in gradi)")]
-    public float fieldOfViewAngle = 90f;
-    [Tooltip("Layer che contiene SOLO il giocatore")]
-    public LayerMask playerLayer;
-    [Tooltip("Layer che contengono gli ostacoli (es. Muri, Ambiente)")]
-    public LayerMask obstacleLayer;
-
-    private enum AIState { PATROL, CHASE }
-    private AIState currentState;
-    private bool playerIsInSight = false;
 
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
+        animator = GetComponent<Animator>();
+
+        // L'agente comanda tutto: posizione e rotazione
+        agent.updatePosition = true;
+        agent.updateRotation = true;
+        agent.stoppingDistance = 0.5f;
+
         if (playerTransform == null)
-        {
             playerTransform = GameObject.FindGameObjectWithTag("Player")?.transform;
-        }
-        currentState = AIState.PATROL;
+
         GotoNextPatrolPoint();
     }
 
     void Update()
     {
-        CheckForPlayer();
-    
-        switch (currentState)
+        // Se insegue il player
+        float dist = Vector3.Distance(transform.position, playerTransform.position);
+        
+        if (dist < 15f) // Raggio di Chase
         {
-            case AIState.PATROL:
-                DoPatrol();
-                break;
-            case AIState.CHASE:
-                DoChase();
-                // Se il giocatore è visibile e il tempo è scaduto, spara
-                if (playerIsInSight && Time.time >= nextFireTime)
-                {
-                    Attack();
-                    nextFireTime = Time.time + fireRate;
-                }
-                break;
-        }
-    }
-    
-    void Attack()
-    {
-        if (enemyGun != null && playerTransform != null)
-        {
-            // Usiamo la variabile per regolare l'altezza in tempo reale
-            Vector3 targetPoint = playerTransform.position + Vector3.up * aimVerticalOffset;
-
-            // Calcoliamo la direzione dal FirePoint dell'arma verso il punto target
-            Vector3 fireDirection = (targetPoint - enemyGun.firePoint.position).normalized;
-
-            // Rotazione del corpo del nemico (solo asse Y)
-            Vector3 lookPos = playerTransform.position - transform.position;
-            lookPos.y = 0;
-            transform.rotation = Quaternion.LookRotation(lookPos);
-
-            enemyGun.Shoot(fireDirection);
-        }
-    }
-
-
-    void CheckForPlayer()
-    {
-        if (playerTransform == null) return;
-        float distanceToPlayer = Vector3.Distance(transform.position, playerTransform.position);
-
-        if (distanceToPlayer <= detectionRadius)
-        {
-            Vector3 directionToPlayer = (playerTransform.position - transform.position).normalized;
-            float angleToPlayer = Vector3.Angle(transform.forward, directionToPlayer);
-
-            if (angleToPlayer < fieldOfViewAngle / 2)
+            agent.speed = runSpeed;
+            agent.SetDestination(playerTransform.position);
+            if (animator != null) animator.SetBool("isRunning", true);
+            
+            if (Time.time >= nextFireTime)
             {
-                if (!Physics.Raycast(transform.position, directionToPlayer, distanceToPlayer, obstacleLayer))
-                {
-                    playerIsInSight = true;
-                    currentState = AIState.CHASE;
-                    return;
-                }
+                enemyGun.Shoot((playerTransform.position + Vector3.up * 0.8f - enemyGun.firePoint.position).normalized);
+                nextFireTime = Time.time + fireRate;
             }
         }
-
-        if (playerIsInSight)
+        else // Patrol
         {
-            playerIsInSight = false;
-            currentState = AIState.PATROL;
-            GotoNextPatrolPoint();
+            agent.speed = walkSpeed;
+            if (animator != null) animator.SetBool("isRunning", false);
+            
+            if (!agent.pathPending && agent.remainingDistance < 0.8f)
+                GotoNextPatrolPoint();
         }
-    }
-
-    void DoPatrol()
-    {
-        if (!agent.pathPending && agent.remainingDistance < 0.5f)
-        {
-            GotoNextPatrolPoint();
-        }
-    }
-
-    void DoChase()
-    {
-        agent.destination = playerTransform.position;
     }
 
     void GotoNextPatrolPoint()
     {
-        if (patrolPoints.Length == 0)
-        {
-            Debug.LogError("Nessun punto di pattuglia assegnato!", this);
-            return;
-        }
-        agent.destination = patrolPoints[currentPatrolIndex].position;
+        if (patrolPoints.Length == 0) return;
+        agent.SetDestination(patrolPoints[currentPatrolIndex].position);
         currentPatrolIndex = (currentPatrolIndex + 1) % patrolPoints.Length;
     }
 }
