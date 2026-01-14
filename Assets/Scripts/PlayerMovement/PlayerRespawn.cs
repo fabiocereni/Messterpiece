@@ -10,6 +10,12 @@ public class PlayerRespawn : MonoBehaviour
     [Tooltip("Lista degli spawn point disponibili")]
     public Transform[] spawnPoints;
     
+    [Header("Auto Spawn Points")]
+    [Tooltip("Cerca automaticamente spawn point con questo tag")]
+    public string spawnPointTag = "SpawnPoint";
+    [Tooltip("Usa spawn point automatici se l'array è vuoto")]
+    public bool useAutoSpawnPoints = true;
+    
     [Header("Respawn Settings")]
     [Tooltip("Delay prima del respawn in secondi")]
     public float respawnDelay = 2f;
@@ -160,28 +166,47 @@ public class PlayerRespawn : MonoBehaviour
     /// </summary>
     private Transform GetBestSpawnPoint()
     {
-        if (spawnPoints == null || spawnPoints.Length == 0)
+        // Prima controlla se ci sono spawn point manuali
+        if (spawnPoints != null && spawnPoints.Length > 0)
         {
-            // Fallback alla posizione originale
-            if (originalSpawnPoint != null)
-            {
-                if (showDebugLogs)
-                    Debug.Log("[PlayerRespawn] Uso spawn point originale");
-                return originalSpawnPoint;
-            }
+            // Scegli spawn point casuale
+            int randomIndex = Random.Range(0, spawnPoints.Length);
+            Transform selectedSpawn = spawnPoints[randomIndex];
             
-            // Ultimo fallback: posizione corrente
-            return transform;
+            if (showDebugLogs)
+                Debug.Log($"[PlayerRespawn] Spawn point manuale selezionato: {selectedSpawn.name}");
+            
+            return selectedSpawn;
         }
         
-        // Scegli spawn point casuale
-        int randomIndex = Random.Range(0, spawnPoints.Length);
-        Transform selectedSpawn = spawnPoints[randomIndex];
+        // Poi controlla spawn point automatici con tag
+        if (useAutoSpawnPoints && !string.IsNullOrEmpty(spawnPointTag))
+        {
+            GameObject[] spawnObjects = GameObject.FindGameObjectsWithTag(spawnPointTag);
+            if (spawnObjects.Length > 0)
+            {
+                int randomIndex = Random.Range(0, spawnObjects.Length);
+                Transform selectedSpawn = spawnObjects[randomIndex].transform;
+                
+                if (showDebugLogs)
+                    Debug.Log($"[PlayerRespawn] Spawn point automatico selezionato: {selectedSpawn.name}");
+                
+                return selectedSpawn;
+            }
+        }
         
+        // Fallback alla posizione originale
+        if (originalSpawnPoint != null)
+        {
+            if (showDebugLogs)
+                Debug.Log("[PlayerRespawn] Uso spawn point originale");
+            return originalSpawnPoint;
+        }
+        
+        // Ultimo fallback: posizione corrente
         if (showDebugLogs)
-            Debug.Log($"[PlayerRespawn] Spawn point selezionato: {selectedSpawn.name}");
-        
-        return selectedSpawn;
+            Debug.LogWarning("[PlayerRespawn] Nessuno spawn point trovato, uso posizione corrente");
+        return transform;
     }
     
     /// <summary>
