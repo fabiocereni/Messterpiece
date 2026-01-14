@@ -13,6 +13,10 @@ public class PlayerHealth : MonoBehaviour
     [Header("UI Reference")]
     [Tooltip("Riferimento alla barra della vita UI")]
     public HealthBarUI healthBarUI;
+    
+    [Header("Respawn System")]
+    [Tooltip("Riferimento al sistema di respawn")]
+    public PlayerRespawn playerRespawn;
 
     [Header("Damage Feedback")]
     [Tooltip("Tempo di invincibilità dopo aver preso danno")]
@@ -86,15 +90,23 @@ public class PlayerHealth : MonoBehaviour
     }
 
     /// <summary>
-    /// Player muore
+    /// Player muore - ora usa respawn invece di game over
     /// </summary>
     private void Die()
     {
         Debug.Log($"[PlayerHealth] Player DIED!");
 
-        // Qui puoi aggiungere logica per il game over
-        // Per ora stampiamo solo un messaggio
-        // TODO: Implementare logica di respawn o game over
+        // Usa il sistema di respawn invece del game over
+        if (playerRespawn != null)
+        {
+            playerRespawn.RespawnPlayer(gameObject);
+        }
+        else
+        {
+            Debug.LogWarning("[PlayerHealth] PlayerRespawn non assegnato! Il giocatore non può respawnare.");
+            // Fallback: respawn immediato alla posizione corrente
+            RestoreHealth(maxHealth);
+        }
     }
 
     /// <summary>
@@ -119,5 +131,25 @@ public class PlayerHealth : MonoBehaviour
     public float GetMaxHealth()
     {
         return maxHealth;
+    }
+    
+    /// <summary>
+    /// Ripristina la salute del giocatore (usato dal respawn)
+    /// </summary>
+    public void RestoreHealth(float amount)
+    {
+        currentHealth = amount;
+        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
+        
+        Debug.Log($"[PlayerHealth] Salute ripristinata a {currentHealth}/{maxHealth}");
+        
+        // Aggiorna la UI
+        if (healthBarUI != null)
+        {
+            healthBarUI.UpdateHealthBar(currentHealth, maxHealth);
+        }
+        
+        // Resetta invincibilità
+        isInvincible = false;
     }
 }

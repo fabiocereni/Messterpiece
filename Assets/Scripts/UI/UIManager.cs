@@ -7,6 +7,7 @@ public class UIManager : MonoBehaviour
     [Header("Panels")]
     public GameObject mainMenuPanel;
     public GameObject optionsPanel;
+    public GameObject gameOverPanel;
 
     private void Awake()
     {
@@ -38,5 +39,17 @@ public class UIManager : MonoBehaviour
     public void BackToMainMenu()
     {
         ShowMainMenu();
+    }
+    
+    public void ShowGameOver()
+    {
+        mainMenuPanel.SetActive(false);
+        optionsPanel.SetActive(false);
+        gameOverPanel.SetActive(true);
+    }
+    
+    public void HideGameOver()
+    {
+        gameOverPanel.SetActive(false);
     }
 }
