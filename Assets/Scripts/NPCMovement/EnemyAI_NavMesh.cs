@@ -15,6 +15,16 @@ public class EnemyAI_NavMesh : MonoBehaviour
     public float walkSpeed = 2.0f;
     public float runSpeed = 5.0f;
 
+    [Header("Rilevamento")]
+    [Tooltip("Angolo totale del cono visivo (es. 90 gradi)")]
+    public float fieldOfViewAngle = 90f;
+    [Tooltip("Distanza massima di visione")]
+    public float detectionRadius = 15f;
+    [Tooltip("Layer degli ostacoli per non vedere attraverso i muri")]
+    public LayerMask obstacleLayer;
+    [Tooltip("Spara solo se il nemico è girato verso il player entro questo angolo")]
+    public float shootingAngleThreshold = 10f;
+
     public Transform[] patrolPoints;
     private int currentPatrolIndex = 0;
 
@@ -23,7 +33,6 @@ public class EnemyAI_NavMesh : MonoBehaviour
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
 
-        // L'agente comanda tutto: posizione e rotazione
         agent.updatePosition = true;
         agent.updateRotation = true;
         agent.stoppingDistance = 0.5f;
@@ -36,22 +45,44 @@ public class EnemyAI_NavMesh : MonoBehaviour
 
     void Update()
     {
-        // Se insegue il player
+        bool canSeePlayer = false;
         float dist = Vector3.Distance(transform.position, playerTransform.position);
-        
-        if (dist < 15f) // Raggio di Chase
+
+        if (dist < detectionRadius)
+        {
+            // 1. Calcola la direzione e l'angolo tra il nemico e il giocatore
+            Vector3 directionToPlayer = (playerTransform.position - transform.position).normalized;
+            float angle = Vector3.Angle(transform.forward, directionToPlayer);
+
+            // 2. Controllo Cono Visivo: il player deve essere davanti (entro metà angolo per lato)
+            if (angle < fieldOfViewAngle / 2f)
+            {
+                // 3. Controllo Ostacoli: Raycast per vedere se ci sono muri nel mezzo
+                // Partiamo da Y+1 per non colpire il pavimento
+                if (!Physics.Raycast(transform.position + Vector3.up, directionToPlayer, dist, obstacleLayer))
+                {
+                    canSeePlayer = true;
+                }
+            }
+        }
+
+        if (canSeePlayer) // Stato CHASE
         {
             agent.speed = runSpeed;
             agent.SetDestination(playerTransform.position);
             if (animator != null) animator.SetBool("isRunning", true);
             
-            if (Time.time >= nextFireTime)
+            // 4. Spara solo se l'angolo di puntamento è stretto (non spara mentre si sta ancora girando)
+            Vector3 aimDir = (playerTransform.position - transform.position).normalized;
+            float aimAngle = Vector3.Angle(transform.forward, aimDir);
+
+            if (aimAngle < shootingAngleThreshold && Time.time >= nextFireTime)
             {
                 enemyGun.Shoot((playerTransform.position + Vector3.up * 0.8f - enemyGun.firePoint.position).normalized);
                 nextFireTime = Time.time + fireRate;
             }
         }
-        else // Patrol
+        else // Stato PATROL
         {
             agent.speed = walkSpeed;
             if (animator != null) animator.SetBool("isRunning", false);
