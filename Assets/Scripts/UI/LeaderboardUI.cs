@@ -75,21 +75,13 @@ public class LeaderboardUI : MonoBehaviour
 
     private void Update()
     {
-        // DEBUG: Log every second to verify Update is running
-        if (Time.frameCount % 60 == 0) // Every ~60 frames (1 second at 60 FPS)
-        {
-            Debug.Log("[LeaderboardUI] ✅ Update() is running! Frame: " + Time.frameCount);
-        }
-
         // Toggle leaderboard visibility with TAB (hold to show, release to hide)
         if (Input.GetKeyDown(leaderboardKey))
         {
-            Debug.Log($"[LeaderboardUI] 🔑 {leaderboardKey} key pressed!");
             ShowLeaderboard();
         }
         else if (Input.GetKeyUp(leaderboardKey))
         {
-            Debug.Log($"[LeaderboardUI] 🔑 {leaderboardKey} key released!");
             HideLeaderboard();
         }
 
