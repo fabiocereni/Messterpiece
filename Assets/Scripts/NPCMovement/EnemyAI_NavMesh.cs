@@ -47,6 +47,11 @@ public class EnemyAI_NavMesh : MonoBehaviour
     {
         // 1. Cerchiamo il bersaglio più vicino tra i layer selezionati
         FindClosestTarget();
+        
+        if (currentTarget != null && IsEntityDead(currentTarget.gameObject))
+        {
+            currentTarget = null;
+        }
 
         // 2. Se abbiamo un bersaglio valido
         if (currentTarget != null) // Stato CHASE
@@ -77,6 +82,20 @@ public class EnemyAI_NavMesh : MonoBehaviour
             if (!agent.pathPending && agent.remainingDistance < 0.8f)
                 GotoNextPatrolPoint();
         }
+    }
+    
+    // Funzione di supporto per capire se un bersaglio è morto
+    bool IsEntityDead(GameObject obj)
+    {
+        // Controlla se è un nemico
+        EnemyHealth eHealth = obj.GetComponentInParent<EnemyHealth>();
+        if (eHealth != null) return eHealth.IsDead();
+
+        // Controlla se è il player (assumendo che PlayerHealth abbia IsDead())
+        PlayerHealth pHealth = obj.GetComponentInParent<PlayerHealth>();
+        if (pHealth != null) return pHealth.IsDead();
+
+        return false;
     }
 
     /// <summary>

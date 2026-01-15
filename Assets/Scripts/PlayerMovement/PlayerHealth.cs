@@ -24,6 +24,9 @@ public class PlayerHealth : MonoBehaviour
 
     private bool isInvincible = false;
 
+    private GameObject lastAttacker = null;
+    private bool isDead = false;
+
     void Start()
     {
         currentHealth = maxHealth;
@@ -38,9 +41,10 @@ public class PlayerHealth : MonoBehaviour
     /// <summary>
     /// Applica danno al player
     /// </summary>
-    public void TakeDamage(float damage)
+    public void TakeDamage(float damage, Vector3 hitPoint, GameObject attacker = null)
     {
-        if (isInvincible) return;
+        // PROTEZIONE: Se è già morto o invincibile, ignora il danno
+        if (isDead || isInvincible) return;
 
         currentHealth -= damage;
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
@@ -52,6 +56,8 @@ public class PlayerHealth : MonoBehaviour
         {
             healthBarUI.UpdateHealthBar(currentHealth, maxHealth);
         }
+        
+        if (attacker != null) lastAttacker = attacker;
 
         // Attiva invincibilità temporanea
         StartCoroutine(InvincibilityCoroutine());
@@ -94,20 +100,33 @@ public class PlayerHealth : MonoBehaviour
     /// </summary>
     private void Die()
     {
-        Debug.Log($"[PlayerHealth] Player DIED!");
+        if (isDead) return; // Evita chiamate multiple se arrivano più colpi insieme
+        isDead = true;
 
-        // Usa il sistema di respawn invece del game over
+        Debug.Log($"[PlayerHealth] Player DIED!");
+        
+        // Registra la morte usando il ROOT, che è l'oggetto che il 
+        // MatchManager ha registrato all'inizio come "Player"
+        if (MatchManager.Instance != null)
+        {
+            MatchManager.Instance.RegisterKill(lastAttacker, transform.root.gameObject);
+        }
+
+        // ELIMINATA LA SECONDA CHIAMATA: prima chiamavi RegisterKill due volte, 
+        // una per il root e una per il gameObject specifico del collider. 
+        // Questo creava due entità diverse nella leaderboard.
+
         if (playerRespawn != null)
         {
             playerRespawn.RespawnPlayer(gameObject);
         }
         else
         {
-            Debug.LogWarning("[PlayerHealth] PlayerRespawn non assegnato! Il giocatore non può respawnare.");
-            // Fallback: respawn immediato alla posizione corrente
             RestoreHealth(maxHealth);
         }
     }
+    
+    
 
     /// <summary>
     /// Getter per checking se morto
@@ -138,6 +157,8 @@ public class PlayerHealth : MonoBehaviour
     /// </summary>
     public void RestoreHealth(float amount)
     {
+        isDead = false;
+        
         currentHealth = amount;
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
         
@@ -152,4 +173,6 @@ public class PlayerHealth : MonoBehaviour
         // Resetta invincibilità
         isInvincible = false;
     }
+    
+    
 }

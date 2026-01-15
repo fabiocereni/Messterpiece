@@ -31,6 +31,7 @@ public class PlayerHealthTester : MonoBehaviour
         }
     }
 
+    /*
     void Update()
     {
         if (playerHealth == null) return;
@@ -63,4 +64,5 @@ public class PlayerHealthTester : MonoBehaviour
             Debug.Log($"[TEST] Player curato completamente! Vita: {playerHealth.GetCurrentHealth()}/{playerHealth.GetMaxHealth()}");
         }
     }
+    */
 }

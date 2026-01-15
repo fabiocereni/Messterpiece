@@ -97,10 +97,12 @@ public class EnemyHealth : MonoBehaviour
 
         Debug.Log($"[EnemyHealth] {gameObject.name} KILLED!");
 
-        // 1. Registra la kill
+        GameObject rootEntity = transform.root.gameObject; 
+
         if (MatchManager.Instance != null)
         {
-            MatchManager.Instance.RegisterKill(lastAttacker, gameObject);
+            // Segnala la morte dell'entità principale, non del singolo collider
+            MatchManager.Instance.RegisterKill(lastAttacker, rootEntity);
         }
 
         // 2. FERMA IL MOVIMENTO FISICO

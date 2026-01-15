@@ -21,23 +21,26 @@ public class EnemyGun : MonoBehaviour
         if (audioSource != null && fireSound != null) audioSource.PlayOneShot(fireSound);
 
         RaycastHit hit;
-        // Esegue il Raycast usando la maschera di layer configurata
         if (Physics.Raycast(firePoint.position, direction, out hit, maxDistance, damageLayerMask))
         {
-            // 1. Prova a colpire il Player
-            PlayerHealth playerHealth = hit.collider.GetComponent<PlayerHealth>();
+            // Otteniamo la radice del nemico che spara
+            GameObject shooter = transform.root.gameObject; 
+
+            // 1. Controllo Player
+            PlayerHealth playerHealth = hit.collider.GetComponentInParent<PlayerHealth>();
             if (playerHealth != null)
             {
-                playerHealth.TakeDamage(damage); 
+                // Rispettiamo la nuova firma: danno, punto, e chi spara
+                playerHealth.TakeDamage(damage, hit.point, shooter); 
             }
-            // 2. Prova a colpire un Enemy (usa lo script EnemyHealth che abbiamo configurato)
+            // 2. Controllo Altri Nemici
             else 
             {
                 EnemyHealth enemyHealth = hit.collider.GetComponentInParent<EnemyHealth>();
                 if (enemyHealth != null)
                 {
-                    // Passiamo il danno, il punto di impatto e 'gameObject' come attaccante
-                    enemyHealth.TakeDamage(damage, hit.point, gameObject);
+                    // Rispettiamo la firma esistente di EnemyHealth
+                    enemyHealth.TakeDamage(damage, hit.point, shooter); 
                 }
             }
         }
