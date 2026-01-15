@@ -79,6 +79,37 @@ public class GameOverUI : MonoBehaviour
             Debug.Log("[GameOverUI] Inizializzato e pronto per gli eventi");
     }
     
+    private void OnEnable()
+    {
+        // Iscriviti all'evento di cambio scena per ri-iscriversi a MatchManager
+        UnityEngine.SceneManagement.SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+    
+    private void OnDisable()
+    {
+        UnityEngine.SceneManagement.SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+    
+    /// <summary>
+    /// Chiamato quando una nuova scena viene caricata - ri-iscriviti a MatchManager
+    /// </summary>
+    private void OnSceneLoaded(UnityEngine.SceneManagement.Scene scene, UnityEngine.SceneManagement.LoadSceneMode mode)
+    {
+        if (showDebugLogs)
+            Debug.Log($"[GameOverUI] Scena caricata: {scene.name}, tentativo di ri-iscrizione a MatchManager");
+        
+        // Aspetta un frame per permettere a MatchManager di inizializzarsi
+        StartCoroutine(ResubscribeAfterDelay());
+    }
+    
+    private System.Collections.IEnumerator ResubscribeAfterDelay()
+    {
+        // Aspetta la fine del frame per permettere a tutti gli Awake/Start di eseguire
+        yield return null;
+        
+        SubscribeToEvents();
+    }
+    
     /// <summary>
     /// Inizializza gli elementi UI
     /// </summary>
@@ -141,13 +172,17 @@ public class GameOverUI : MonoBehaviour
         // Iscriviti all'evento di fine partita
         if (MatchManager.Instance != null)
         {
+            // Rimuovi prima per evitare duplicati (importante per ri-iscrizione dopo cambio scena)
+            MatchManager.Instance.OnMatchEnd -= OnMatchEnded;
             MatchManager.Instance.OnMatchEnd += OnMatchEnded;
+            
             if (showDebugLogs)
                 Debug.Log("[GameOverUI] Sottoscritto a MatchManager.OnMatchEnd");
         }
         else
         {
-            Debug.LogWarning("[GameOverUI] MatchManager.Instance non trovato!");
+            if (showDebugLogs)
+                Debug.LogWarning("[GameOverUI] MatchManager.Instance non trovato!");
         }
     }
     
@@ -198,6 +233,7 @@ public class GameOverUI : MonoBehaviour
     
     /// <summary>
     /// Nasconde la schermata di game over
+    /// NOTA: Non gestisce il cursore - i singoli handler lo gestiscono
     /// </summary>
     public void HideGameOver()
     {
@@ -209,9 +245,8 @@ public class GameOverUI : MonoBehaviour
         // Riavvia il gioco
         Time.timeScale = 1f;
         
-        // Nascondi il cursore
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        // NOTA: Il cursore viene gestito dai singoli handler (Menu vs Gioca Ancora)
+        // perché hanno bisogno di comportamenti diversi
         
         // Nascondi il pannello
         if (gameOverPanel != null)
@@ -338,13 +373,17 @@ public class GameOverUI : MonoBehaviour
         if (showDebugLogs)
             Debug.Log("[GameOverUI] Click su 'Gioca Ancora'");
         
+        // SEMPRE nascondere il game over prima di tutto per ripristinare Time.timeScale
+        HideGameOver();
+        
+        // Blocca il cursore per il gameplay
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+        
         // Ottieni la prossima mappa
         if (MapRotationManager.Instance != null)
         {
             string nextMap = MapRotationManager.Instance.GetNextMap();
-            
-            // Nascondi game over
-            HideGameOver();
             
             // Carica la nuova mappa
             if (GameManager.Instance != null)
@@ -354,11 +393,25 @@ public class GameOverUI : MonoBehaviour
             else
             {
                 Debug.LogError("[GameOverUI] GameManager.Instance non trovato!");
+                // Fallback: ricarica la scena attuale
+                UnityEngine.SceneManagement.SceneManager.LoadScene(
+                    UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
             }
         }
         else
         {
-            Debug.LogError("[GameOverUI] MapRotationManager.Instance non trovato!");
+            Debug.LogWarning("[GameOverUI] MapRotationManager.Instance non trovato! Ricarico la scena corrente.");
+            // Fallback: ricarica la scena attuale se MapRotationManager non esiste
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.LoadNewMap(
+                    UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+            }
+            else
+            {
+                UnityEngine.SceneManagement.SceneManager.LoadScene(
+                    UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+            }
         }
     }
     
@@ -373,6 +426,10 @@ public class GameOverUI : MonoBehaviour
         // Nascondi game over
         HideGameOver();
         
+        // Mostra il cursore per il menu
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+        
         // Ritorna al menu principale
         if (GameManager.Instance != null)
         {
@@ -380,7 +437,9 @@ public class GameOverUI : MonoBehaviour
         }
         else
         {
-            Debug.LogError("[GameOverUI] GameManager.Instance non trovato!");
+            Debug.LogWarning("[GameOverUI] GameManager.Instance non trovato! Carico MainMenu direttamente.");
+            // Fallback: carica direttamente la scena MainMenu
+            UnityEngine.SceneManagement.SceneManager.LoadScene("MainMenu");
         }
     }
     
