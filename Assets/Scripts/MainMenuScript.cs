@@ -6,11 +6,30 @@ public class MainMenuScript : MonoBehaviour
 
     public GameObject mainMenuPanel;
     public GameObject selectionPanel;
+    
+    [Header("Opzioni")]
+    [Tooltip("Riferimento al controller del menu opzioni")]
+    public OptionsMenuUI optionsMenuUI;
 
     public void OpenSelectionMenu()
     {
         mainMenuPanel.SetActive(false);
         selectionPanel.SetActive(true);
+    }
+    
+    /// <summary>
+    /// Apre il menu delle opzioni
+    /// </summary>
+    public void OpenOptions()
+    {
+        if (optionsMenuUI != null)
+        {
+            optionsMenuUI.ShowOptions();
+        }
+        else
+        {
+            Debug.LogError("[MainMenuScript] OptionsMenuUI non assegnato!");
+        }
     }
 
     public void QuitGame()

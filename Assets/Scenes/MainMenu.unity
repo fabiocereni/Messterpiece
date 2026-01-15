@@ -790,6 +790,7 @@ GameObject:
   - component: {fileID: 386994427}
   - component: {fileID: 386994429}
   - component: {fileID: 386994428}
+  - component: {fileID: 386994430}
   m_Layer: 5
   m_Name: OptionsPanel
   m_TagString: Untagged
@@ -861,6 +862,25 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 386994426}
   m_CullTransparentMesh: 1
+--- !u!114 &386994430
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 386994426}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 38e75fba619cf6713adeb52cab7a1f0e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OptionsMenuUI
+  volumeSlider: {fileID: 1575016695}
+  volumeValueText: {fileID: 105112527}
+  difficultyDropdown: {fileID: 862856613}
+  backButton: {fileID: 907832007}
+  optionsPanel: {fileID: 386994426}
+  mainMenuPanel: {fileID: 701254616}
+  showDebugLogs: 1
 --- !u!1 &536805101
 GameObject:
   m_ObjectHideFlags: 0
@@ -1052,6 +1072,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   mainMenuPanel: {fileID: 701254616}
   selectionPanel: {fileID: 905110633}
+  optionsMenuUI: {fileID: 386994430}
 --- !u!1 &819842587
 GameObject:
   m_ObjectHideFlags: 0
@@ -1452,6 +1473,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MainMenuScript
   mainMenuPanel: {fileID: 701254616}
   selectionPanel: {fileID: 905110633}
+  optionsMenuUI: {fileID: 0}
 --- !u!114 &905110636
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2602,13 +2624,13 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 701254616}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: 
+      - m_Target: {fileID: 701254618}
+        m_TargetAssemblyTypeName: MainMenuScript, Assembly-CSharp
+        m_MethodName: OpenOptions
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
