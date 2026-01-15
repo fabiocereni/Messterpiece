@@ -39,7 +39,12 @@ public class OptionsMenuLogic : MonoBehaviour
     {
         if (audioMixer != null)
         {
-            audioMixer.SetFloat("MasterVolume", volume);
+            // Converti valore lineare (0-1) in decibel (-80dB a 0dB)
+            // 0 = silenzio (-80dB), 1 = volume massimo (0dB)
+            float volumeDB = volume > 0.0001f 
+                ? Mathf.Log10(volume) * 20f 
+                : -80f;
+            audioMixer.SetFloat("MasterVolume", volumeDB);
         }
         
         PlayerPrefs.SetFloat("MasterVolume", volume);
