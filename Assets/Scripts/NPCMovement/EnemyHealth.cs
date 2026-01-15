@@ -34,7 +34,11 @@ public class EnemyHealth : MonoBehaviour
 
     void Start()
     {
-        currentHealth = maxHealth;
+        // Applica moltiplicatore difficoltà alla vita
+        float healthMultiplier = GameSettings.Instance != null 
+            ? GameSettings.Instance.EnemyHealthMultiplier 
+            : 1f;
+        currentHealth = maxHealth * healthMultiplier;
     }
 
     /// <summary>

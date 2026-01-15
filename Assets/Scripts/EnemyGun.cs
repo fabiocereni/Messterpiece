@@ -20,6 +20,13 @@ public class EnemyGun : MonoBehaviour
         if (muzzleFlash != null) muzzleFlash.Play();
         if (audioSource != null && fireSound != null) audioSource.PlayOneShot(fireSound);
 
+        // Calcola danno con moltiplicatore difficoltà
+        float actualDamage = damage;
+        if (GameSettings.Instance != null)
+        {
+            actualDamage *= GameSettings.Instance.EnemyDamageMultiplier;
+        }
+
         RaycastHit hit;
         if (Physics.Raycast(firePoint.position, direction, out hit, maxDistance, damageLayerMask))
         {
@@ -31,7 +38,7 @@ public class EnemyGun : MonoBehaviour
             if (playerHealth != null)
             {
                 // Rispettiamo la nuova firma: danno, punto, e chi spara
-                playerHealth.TakeDamage(damage, hit.point, shooter); 
+                playerHealth.TakeDamage(actualDamage, hit.point, shooter); 
             }
             // 2. Controllo Altri Nemici
             else 
@@ -40,7 +47,7 @@ public class EnemyGun : MonoBehaviour
                 if (enemyHealth != null)
                 {
                     // Rispettiamo la firma esistente di EnemyHealth
-                    enemyHealth.TakeDamage(damage, hit.point, shooter); 
+                    enemyHealth.TakeDamage(actualDamage, hit.point, shooter); 
                 }
             }
         }

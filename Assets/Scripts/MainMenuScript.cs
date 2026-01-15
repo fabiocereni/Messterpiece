@@ -9,7 +9,7 @@ public class MainMenuScript : MonoBehaviour
     
     [Header("Opzioni")]
     [Tooltip("Riferimento al controller del menu opzioni")]
-    public OptionsMenuUI optionsMenuUI;
+    public OptionsMenuController optionsMenu;
 
     public void OpenSelectionMenu()
     {
@@ -22,13 +22,13 @@ public class MainMenuScript : MonoBehaviour
     /// </summary>
     public void OpenOptions()
     {
-        if (optionsMenuUI != null)
+        if (optionsMenu != null)
         {
-            optionsMenuUI.ShowOptions();
+            optionsMenu.ShowOptions();
         }
         else
         {
-            Debug.LogError("[MainMenuScript] OptionsMenuUI non assegnato!");
+            Debug.LogError("[MainMenuScript] OptionsMenuController non assegnato!");
         }
     }
 
