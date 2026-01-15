@@ -1,153 +1,166 @@
 using UnityEngine;
-using UnityEngine.AI;
+using UnityEngine.AI; // Importante! Devi importare questo namespace
 
-[RequireComponent(typeof(NavMeshAgent))]
+/// <summary>
+/// Gestisce l'IA di un nemico usando il sistema NavMesh di Unity.
+/// L'IA ha due stati:
+/// 1. PATROL: Si muove tra una serie di punti di pattuglia.
+/// 2. CHASE: Insegue il giocatore dopo averlo visto.
+///
+/// CONFIGURAZIONE (LEGGI "GUIDA ALLA CONFIGURAZIONE" SOTTO):
+/// 1. Installa il pacchetto AI Navigation (Window > Package Manager).
+/// 2. "Bake" (Cuoci) la tua mappa per creare una NavMesh.
+/// 3. Aggiungi questo script al tuo nemico.
+/// 4. Aggiungi un componente "NavMesh Agent" al nemico.
+/// 5. Assegna il tag "Player" al tuo giocatore.
+/// 6. Crea dei punti di pattuglia e assegnali all'array "patrolPoints".
+/// 7. Imposta i Layer (Player e Obstacle).
+/// </summary>
+[RequireComponent(typeof(NavMeshAgent))] // Assicura che ci sia sempre un NavMeshAgent
 public class EnemyAI_NavMesh : MonoBehaviour
 {
-    // Rimosso playerTransform come unico riferimento fisso, ora cerchiamo un target
-    private Transform currentTarget; 
-    private NavMeshAgent agent;
-    private Animator animator;
+    // --- Riferimenti ---
+    [Header("Riferimenti")]
+    [Tooltip("Riferimento al transform del giocatore (opzionale, può trovarlo da solo)")]
+    public Transform playerTransform;
+    private NavMeshAgent agent; // Il componente che gestisce il movimento
 
-    [Header("Impostazioni")]
-    public EnemyGun enemyGun;
-    public float fireRate = 1.0f;
-    private float nextFireTime = 0f;
-    public float walkSpeed = 2.0f;
-    public float runSpeed = 5.0f;
-
-    [Header("Rilevamento")]
-    [Tooltip("Layer che l'enemy deve attaccare (es. Player e Enemy)")]
-    public LayerMask targetLayers; 
-    [Tooltip("Angolo totale del cono visivo")]
-    public float fieldOfViewAngle = 90f;
-    [Tooltip("Distanza massima di visione")]
-    public float detectionRadius = 15f;
-    [Tooltip("Layer degli ostacoli per non vedere attraverso i muri")]
-    public LayerMask obstacleLayer;
-    [Tooltip("Spara solo se il nemico è girato verso il target entro questo angolo")]
-    public float shootingAngleThreshold = 10f;
-
+    // --- Impostazioni di Pattugliamento ---
+    [Header("Pattugliamento (Patrol)")]
+    [Tooltip("Un array di punti (Transforms) tra cui il nemico si muoverà")]
     public Transform[] patrolPoints;
-    private int currentPatrolIndex = 0;
+    private int currentPatrolIndex = 0; // L'indice del punto di pattuglia attuale
+
+    // --- Impostazioni di Rilevamento ---
+    [Header("Rilevamento (Chase)")]
+    [Tooltip("Il raggio in cui il nemico 'sente' la presenza del giocatore")]
+    public float detectionRadius = 15f;
+    [Tooltip("L'angolo del cono visivo del nemico (in gradi)")]
+    public float fieldOfViewAngle = 90f;
+    [Tooltip("Layer che contiene SOLO il giocatore")]
+    public LayerMask playerLayer;
+    [Tooltip("Layer che contengono gli ostacoli (es. Muri, Ambiente)")]
+    public LayerMask obstacleLayer;
+
+    // --- Stato ---
+    private enum AIState { PATROL, CHASE }
+    private AIState currentState;
+    private bool playerIsInSight = false;
 
     void Start()
     {
+        // Prendi i componenti necessari
         agent = GetComponent<NavMeshAgent>();
-        animator = GetComponent<Animator>();
 
-        agent.updatePosition = true;
-        agent.updateRotation = true;
-        agent.stoppingDistance = 0.5f;
+        // Cerca il giocatore se non è stato assegnato
+        if (playerTransform == null)
+        {
+            playerTransform = GameObject.FindGameObjectWithTag("Player")?.transform;
+        }
 
+        // Inizia lo stato di pattugliamento
+        currentState = AIState.PATROL;
         GotoNextPatrolPoint();
     }
 
     void Update()
     {
-        // 1. Cerchiamo il bersaglio più vicino tra i layer selezionati
-        FindClosestTarget();
-        
-        if (currentTarget != null && IsEntityDead(currentTarget.gameObject))
+        // Controlla sempre se il giocatore è in vista
+        CheckForPlayer();
+
+        // Esegui la logica in base allo stato attuale
+        switch (currentState)
         {
-            currentTarget = null;
+            case AIState.PATROL:
+                DoPatrol();
+                break;
+            case AIState.CHASE:
+                DoChase();
+                break;
         }
-
-        // 2. Se abbiamo un bersaglio valido
-        if (currentTarget != null) // Stato CHASE
-        {
-            float dist = Vector3.Distance(transform.position, currentTarget.position);
-            
-            agent.speed = runSpeed;
-            agent.SetDestination(currentTarget.position);
-            
-            if (animator != null) animator.SetBool("isRunning", true);
-            
-            // Logica di puntamento e sparo sul bersaglio corrente
-            Vector3 aimDir = (currentTarget.position - transform.position).normalized;
-            float aimAngle = Vector3.Angle(transform.forward, aimDir);
-
-            if (aimAngle < shootingAngleThreshold && Time.time >= nextFireTime)
-            {
-                // Puntiamo al petto del bersaglio (+0.8f)
-                enemyGun.Shoot((currentTarget.position + Vector3.up * 0.8f - enemyGun.firePoint.position).normalized);
-                nextFireTime = Time.time + fireRate;
-            }
-        }
-        else // Stato PATROL (nessun bersaglio nel cono visivo)
-        {
-            agent.speed = walkSpeed;
-            if (animator != null) animator.SetBool("isRunning", false);
-            
-            if (!agent.pathPending && agent.remainingDistance < 0.8f)
-                GotoNextPatrolPoint();
-        }
-    }
-    
-    // Funzione di supporto per capire se un bersaglio è morto
-    bool IsEntityDead(GameObject obj)
-    {
-        // Controlla se è un nemico
-        EnemyHealth eHealth = obj.GetComponentInParent<EnemyHealth>();
-        if (eHealth != null) return eHealth.IsDead();
-
-        // Controlla se è il player (assumendo che PlayerHealth abbia IsDead())
-        PlayerHealth pHealth = obj.GetComponentInParent<PlayerHealth>();
-        if (pHealth != null) return pHealth.IsDead();
-
-        return false;
     }
 
     /// <summary>
-    /// Scansiona l'area e identifica il bersaglio più vicino che rientra nel FOV e non è coperto da muri
+    /// Controlla la logica di rilevamento del giocatore.
     /// </summary>
-    void FindClosestTarget()
+    void CheckForPlayer()
     {
-        // Trova tutti i potenziali bersagli nei layer selezionati
-        Collider[] potentialTargets = Physics.OverlapSphere(transform.position, detectionRadius, targetLayers);
-        
-        Transform bestTarget = null;
-        float minDistance = Mathf.Infinity;
+        if (playerTransform == null) return;
 
-        foreach (var col in potentialTargets)
+        // Controlla se il giocatore è all'interno del raggio di rilevamento
+        float distanceToPlayer = Vector3.Distance(transform.position, playerTransform.position);
+
+        if (distanceToPlayer <= detectionRadius)
         {
-            // Salta se stesso (molto importante se il nemico è sul layer Enemy!)
-            if (col.transform == transform) continue;
+            // Il giocatore è abbastanza vicino, ora controlla il cono visivo e la linea di vista
 
-            Vector3 directionToTarget = (col.transform.position - transform.position).normalized;
-            float angle = Vector3.Angle(transform.forward, directionToTarget);
+            // 1. Controllo Cono Visivo (Field of View)
+            Vector3 directionToPlayer = (playerTransform.position - transform.position).normalized;
+            float angleToPlayer = Vector3.Angle(transform.forward, directionToPlayer);
 
-            // Controllo Cono Visivo
-            if (angle < fieldOfViewAngle / 2f)
+            if (angleToPlayer < fieldOfViewAngle / 2)
             {
-                float distanceToTarget = Vector3.Distance(transform.position, col.transform.position);
-                
-                // Controllo Ostacoli (Raycast)
-                if (!Physics.Raycast(transform.position + Vector3.up, directionToTarget, distanceToTarget, obstacleLayer))
+                // 2. Controllo Linea di Vista (Raycast)
+                // Controlla se c'è un ostacolo tra il nemico e il giocatore
+                if (!Physics.Raycast(transform.position, directionToPlayer, distanceToPlayer, obstacleLayer))
                 {
-                    if (distanceToTarget < minDistance)
-                    {
-                        minDistance = distanceToTarget;
-                        bestTarget = col.transform;
-                    }
+                    // GIOCATORE VISTO!
+                    playerIsInSight = true;
+                    currentState = AIState.CHASE;
+                    return; // Esci, abbiamo trovato il giocatore
                 }
             }
         }
 
-        currentTarget = bestTarget;
+        // Se arriviamo qui, il giocatore non è in vista
+        // Se stavamo inseguendo, torniamo a pattugliare
+        if (playerIsInSight)
+        {
+            playerIsInSight = false;
+            currentState = AIState.PATROL;
+            GotoNextPatrolPoint(); // Ricomincia a pattugliare dal punto più vicino
+        }
     }
 
+    /// <summary>
+    /// Logica per lo stato PATROL.
+    /// </summary>
+    void DoPatrol()
+    {
+        // Controlla se l'agente ha raggiunto la destinazione
+        // 'remainingDistance' non è affidabile se non è 'pathPending'
+        if (!agent.pathPending && agent.remainingDistance < 0.5f)
+        {
+            // Raggiunto il punto, vai al successivo
+            GotoNextPatrolPoint();
+        }
+    }
+
+    /// <summary>
+    /// Logica per lo stato CHASE.
+    /// </summary>
+    void DoChase()
+    {
+        // Imposta la destinazione sulla posizione attuale del giocatore
+        // Il NavMeshAgent calcolerà automaticamente il percorso migliore
+        agent.destination = playerTransform.position;
+    }
+
+    /// <summary>
+    /// Imposta la destinazione dell'agente sul prossimo punto di pattuglia.
+    /// </summary>
     void GotoNextPatrolPoint()
     {
-        if (patrolPoints.Length == 0) return;
-        agent.SetDestination(patrolPoints[currentPatrolIndex].position);
-        currentPatrolIndex = (currentPatrolIndex + 1) % patrolPoints.Length;
-    }
+        if (patrolPoints.Length == 0)
+        {
+            Debug.LogError("Nessun punto di pattuglia assegnato!", this);
+            return;
+        }
 
-    // Utile per vedere il raggio di rilevamento nell'editor
-    private void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, detectionRadius);
+        // Imposta la destinazione sul punto attuale
+        agent.destination = patrolPoints[currentPatrolIndex].position;
+
+        // Aggiorna l'indice per il prossimo giro, tornando a 0 se è alla fine
+        currentPatrolIndex = (currentPatrolIndex + 1) % patrolPoints.Length;
     }
 }
