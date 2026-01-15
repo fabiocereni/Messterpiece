@@ -46136,7 +46136,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 928478037771124390, guid: dcdcd6af294464f2b9b8c9e6d9bd15b2, type: 3}
       propertyPath: damage
-      value: 100
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 928478037771124390, guid: dcdcd6af294464f2b9b8c9e6d9bd15b2, type: 3}
       propertyPath: damageLayerMask.m_Bits
