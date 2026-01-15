@@ -7643,7 +7643,7 @@ MonoBehaviour:
   damage: 10
   damageLayerMask:
     serializedVersion: 2
-    m_Bits: 256
+    m_Bits: 768
   maxDistance: 100
 --- !u!1 &7251743817776086448
 GameObject:
@@ -13793,6 +13793,7 @@ GameObject:
   - component: {fileID: 1748093637105722626}
   - component: {fileID: 6588064982322070402}
   - component: {fileID: 5726766327316334074}
+  - component: {fileID: 8502689610475970593}
   m_Layer: 9
   m_Name: BananaBoy
   m_TagString: Enemy
@@ -13966,16 +13967,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 71b9093aa96e141cbbad43a8105ecdd0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAI_NavMesh
-  playerTransform: {fileID: 0}
   enemyGun: {fileID: 928478037771124390}
   fireRate: 0.5
   walkSpeed: 2
   runSpeed: 5
+  targetLayers:
+    serializedVersion: 2
+    m_Bits: 768
   fieldOfViewAngle: 90
   detectionRadius: 15
   obstacleLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 2048
   shootingAngleThreshold: 10
   patrolPoints:
   - {fileID: 0}
@@ -13998,6 +14001,23 @@ MonoBehaviour:
   killVfxPrefab: {fileID: 2526250184653296495, guid: 2d26c13b2f2934fb3969ad0fc744578c, type: 3}
   killVfxDuration: 1.5
   destroyDelay: 3
+--- !u!114 &8502689610475970593
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8501262253299624703}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd8028e7943f24535bd1bbab143d1a71, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyRespawn
+  spawnPoints:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  respawnDelay: 1
 --- !u!1 &8546136076627898830
 GameObject:
   m_ObjectHideFlags: 0
