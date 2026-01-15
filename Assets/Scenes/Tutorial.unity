@@ -1367,6 +1367,60 @@ Transform:
   - {fileID: 1617345736}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &684940614
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 684940616}
+  - component: {fileID: 684940615}
+  m_Layer: 0
+  m_Name: TutorialManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &684940615
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 684940614}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 36f575e246fa8493b8d747ebbb94a733, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TutorialUI
+  instructionPanel: {fileID: 916712523}
+  instructionText: {fileID: 914559430}
+  progressText: {fileID: 342545887}
+  progressBar: {fileID: 1744632710}
+  completionPanel: {fileID: 509599518}
+  completionText: {fileID: 494188882}
+  completionDisplayDuration: 2
+  finalCompletionPanel: {fileID: 1458927544}
+  finalCompletionText: {fileID: 1700382187}
+  fadeSpeed: 2
+--- !u!4 &684940616
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 684940614}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &698844587 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4261118608247567085, guid: 7be2fca7cbf904f5fb76a63dde809e94, type: 3}
@@ -11617,3 +11671,4 @@ SceneRoots:
   - {fileID: 458094586}
   - {fileID: 414483942}
   - {fileID: 1344214242}
+  - {fileID: 684940616}
