@@ -141,8 +141,22 @@ public class EnemyHealth : MonoBehaviour
             Destroy(killVfx, killVfxDuration);
         }
 
-        // 7. DISTRUZIONE FINALE
-        Destroy(gameObject, destroyDelay);
+        EnemyRespawn respawnSystem = GetComponent<EnemyRespawn>();
+        if (respawnSystem != null)
+        {
+            respawnSystem.RespawnEnemy();
+        }
+        else
+        {
+            // Se non c'è il sistema di respawn, distruggi normalmente
+            Destroy(gameObject, destroyDelay);
+        }
+    }
+    
+    public void RestoreHealth(float amount)
+    {
+        isDead = false;
+        currentHealth = amount;
     }
 
     /// <summary>
