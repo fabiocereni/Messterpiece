@@ -46,15 +46,34 @@ public class GameOverUI : MonoBehaviour
     [Tooltip("Metodo di ordinamento leaderboard")]
     public SortMethod leaderboardSort = SortMethod.ByScore;
     
+    [Header("UI da Nascondere Durante GameOver")]
+    [Tooltip("GameObject della barra della vita (HealthBarUI)")]
+    public GameObject healthBarUI;
+
+    [Tooltip("GameObject dell'indicatore munizioni (AmmoDisplay)")]
+    public GameObject ammoDisplayUI;
+
+    [Tooltip("GameObject del nome del player")]
+    public GameObject playerNameUI;
+
+    [Tooltip("Script della leaderboard in-game (per disabilitare TAB)")]
+    public LeaderboardUI leaderboardUIScript;
+
     [Header("Debug")]
     public bool showDebugLogs = true;
-    
+
     // Enum per ordinamento
     public enum SortMethod { ByScore, ByKills, ByKDRatio }
-    
+
     // Stato interno
     private List<GameObject> spawnedRows = new List<GameObject>();
     private bool isGameOverActive = false;
+
+    // Stati originali delle UI (per ripristinarle correttamente)
+    private bool healthBarOriginalState;
+    private bool ammoDisplayOriginalState;
+    private bool playerNameOriginalState;
+    private bool leaderboardScriptOriginalState;
     
     private void Awake()
     {
@@ -74,7 +93,13 @@ public class GameOverUI : MonoBehaviour
     {
         InitializeUI();
         SubscribeToEvents();
-        
+
+        // Se i riferimenti UI non sono stati assegnati manualmente, prova a trovarli automaticamente
+        if (healthBarUI == null || ammoDisplayUI == null || leaderboardUIScript == null)
+        {
+            RefreshUIReferences();
+        }
+
         if (showDebugLogs)
             Debug.Log("[GameOverUI] Inizializzato e pronto per gli eventi");
     }
@@ -91,15 +116,18 @@ public class GameOverUI : MonoBehaviour
     }
     
     /// <summary>
-    /// Chiamato quando una nuova scena viene caricata - ri-iscriviti a MatchManager
+    /// Chiamato quando una nuova scena viene caricata - ri-iscriviti a MatchManager e ri-trova UI
     /// </summary>
     private void OnSceneLoaded(UnityEngine.SceneManagement.Scene scene, UnityEngine.SceneManagement.LoadSceneMode mode)
     {
         if (showDebugLogs)
             Debug.Log($"[GameOverUI] Scena caricata: {scene.name}, tentativo di ri-iscrizione a MatchManager");
-        
+
         // Aspetta un frame per permettere a MatchManager di inizializzarsi
         StartCoroutine(ResubscribeAfterDelay());
+
+        // Ri-trova i riferimenti UI nella nuova scena
+        RefreshUIReferences();
     }
     
     private System.Collections.IEnumerator ResubscribeAfterDelay()
@@ -208,25 +236,28 @@ public class GameOverUI : MonoBehaviour
                 Debug.LogWarning("[GameOverUI] Game over già attivo");
             return;
         }
-        
+
         isGameOverActive = true;
-        
+
         // Pausa il gioco
         Time.timeScale = 0f;
-        
+
         // Mostra il cursore
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
-        
+
+        // Nascondi le UI di gameplay
+        HideGameplayUI();
+
         // Mostra il pannello
         if (gameOverPanel != null)
         {
             gameOverPanel.SetActive(true);
         }
-        
+
         // Popola la leaderboard finale
         PopulateFinalLeaderboard();
-        
+
         if (showDebugLogs)
             Debug.Log("[GameOverUI] Schermata game over mostrata");
     }
@@ -239,24 +270,27 @@ public class GameOverUI : MonoBehaviour
     {
         if (!isGameOverActive)
             return;
-        
+
         isGameOverActive = false;
-        
+
         // Riavvia il gioco
         Time.timeScale = 1f;
-        
+
         // NOTA: Il cursore viene gestito dai singoli handler (Menu vs Gioca Ancora)
         // perché hanno bisogno di comportamenti diversi
-        
+
+        // Ripristina le UI di gameplay
+        ShowGameplayUI();
+
         // Nascondi il pannello
         if (gameOverPanel != null)
         {
             gameOverPanel.SetActive(false);
         }
-        
+
         // Pulisci le righe della leaderboard
         ClearLeaderboardRows();
-        
+
         if (showDebugLogs)
             Debug.Log("[GameOverUI] Schermata game over nascosta");
     }
@@ -364,7 +398,151 @@ public class GameOverUI : MonoBehaviour
         }
         spawnedRows.Clear();
     }
-    
+
+    /// <summary>
+    /// Nasconde le UI di gameplay durante il game over
+    /// </summary>
+    private void HideGameplayUI()
+    {
+        // Salva stato originale e disattiva barra vita
+        if (healthBarUI != null)
+        {
+            healthBarOriginalState = healthBarUI.activeSelf;
+            healthBarUI.SetActive(false);
+            if (showDebugLogs)
+                Debug.Log("[GameOverUI] Barra vita nascosta");
+        }
+
+        // Salva stato originale e disattiva munizioni
+        if (ammoDisplayUI != null)
+        {
+            ammoDisplayOriginalState = ammoDisplayUI.activeSelf;
+            ammoDisplayUI.SetActive(false);
+            if (showDebugLogs)
+                Debug.Log("[GameOverUI] Munizioni nascoste");
+        }
+
+        // Salva stato originale e disattiva nome player
+        if (playerNameUI != null)
+        {
+            playerNameOriginalState = playerNameUI.activeSelf;
+            playerNameUI.SetActive(false);
+            if (showDebugLogs)
+                Debug.Log("[GameOverUI] Nome player nascosto");
+        }
+
+        // Salva stato originale e disabilita script leaderboard (tasto TAB)
+        if (leaderboardUIScript != null)
+        {
+            leaderboardScriptOriginalState = leaderboardUIScript.enabled;
+            leaderboardUIScript.enabled = false;
+            if (showDebugLogs)
+                Debug.Log("[GameOverUI] Leaderboard script disabilitato (TAB bloccato)");
+        }
+    }
+
+    /// <summary>
+    /// Ripristina le UI di gameplay dopo il game over
+    /// </summary>
+    private void ShowGameplayUI()
+    {
+        // Ripristina barra vita
+        if (healthBarUI != null)
+        {
+            healthBarUI.SetActive(healthBarOriginalState);
+            if (showDebugLogs)
+                Debug.Log("[GameOverUI] Barra vita ripristinata");
+        }
+
+        // Ripristina munizioni
+        if (ammoDisplayUI != null)
+        {
+            ammoDisplayUI.SetActive(ammoDisplayOriginalState);
+            if (showDebugLogs)
+                Debug.Log("[GameOverUI] Munizioni ripristinate");
+        }
+
+        // Ripristina nome player
+        if (playerNameUI != null)
+        {
+            playerNameUI.SetActive(playerNameOriginalState);
+            if (showDebugLogs)
+                Debug.Log("[GameOverUI] Nome player ripristinato");
+        }
+
+        // Ripristina script leaderboard (tasto TAB)
+        if (leaderboardUIScript != null)
+        {
+            leaderboardUIScript.enabled = leaderboardScriptOriginalState;
+            if (showDebugLogs)
+                Debug.Log("[GameOverUI] Leaderboard script riabilitato (TAB sbloccato)");
+        }
+    }
+
+    /// <summary>
+    /// Ri-trova i riferimenti UI nella nuova scena dopo un cambio scena
+    /// </summary>
+    private void RefreshUIReferences()
+    {
+        if (showDebugLogs)
+            Debug.Log("[GameOverUI] Tentativo di ri-trovare i riferimenti UI nella nuova scena...");
+
+        // Cerca HealthBarUI
+        HealthBarUI healthBar = FindObjectOfType<HealthBarUI>();
+        if (healthBar != null)
+        {
+            healthBarUI = healthBar.gameObject;
+            if (showDebugLogs)
+                Debug.Log($"[GameOverUI] HealthBarUI trovato: {healthBarUI.name}");
+        }
+        else if (showDebugLogs)
+        {
+            Debug.LogWarning("[GameOverUI] HealthBarUI non trovato nella scena!");
+        }
+
+        // Cerca AmmoDisplay
+        AmmoDisplay ammoDisplay = FindObjectOfType<AmmoDisplay>();
+        if (ammoDisplay != null)
+        {
+            ammoDisplayUI = ammoDisplay.gameObject;
+            if (showDebugLogs)
+                Debug.Log($"[GameOverUI] AmmoDisplay trovato: {ammoDisplayUI.name}");
+        }
+        else if (showDebugLogs)
+        {
+            Debug.LogWarning("[GameOverUI] AmmoDisplay non trovato nella scena!");
+        }
+
+        // Cerca il GameObject del nome player (cerca per tag o nome specifico)
+        // Provo a trovarlo come child di HealthBarUI se esiste
+        if (healthBarUI != null)
+        {
+            TextMeshProUGUI playerNameText = healthBarUI.GetComponentInChildren<TextMeshProUGUI>();
+            if (playerNameText != null && playerNameText.gameObject != healthBarUI)
+            {
+                playerNameUI = playerNameText.gameObject;
+                if (showDebugLogs)
+                    Debug.Log($"[GameOverUI] PlayerName UI trovato: {playerNameUI.name}");
+            }
+        }
+
+        // Cerca LeaderboardUI script
+        LeaderboardUI leaderboard = FindObjectOfType<LeaderboardUI>();
+        if (leaderboard != null)
+        {
+            leaderboardUIScript = leaderboard;
+            if (showDebugLogs)
+                Debug.Log($"[GameOverUI] LeaderboardUI script trovato: {leaderboard.gameObject.name}");
+        }
+        else if (showDebugLogs)
+        {
+            Debug.LogWarning("[GameOverUI] LeaderboardUI script non trovato nella scena!");
+        }
+
+        if (showDebugLogs)
+            Debug.Log("[GameOverUI] Refresh UI completato");
+    }
+
     /// <summary>
     /// Handler per il click sul pulsante "Gioca Ancora"
     /// </summary>
