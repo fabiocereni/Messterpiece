@@ -65,6 +65,16 @@ public class PlayerRespawn : MonoBehaviour
     private bool isDead = false;
     private Transform originalSpawnPoint;
     
+    // METODO SOLO PER TESTARE IL RESPAWN
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.K))
+        {
+            Debug.Log("Test Morte manuale attivato");
+            RespawnPlayer(gameObject);
+        }
+    }
+
     private void Awake()
     {
         // Ottieni i componenti necessari
