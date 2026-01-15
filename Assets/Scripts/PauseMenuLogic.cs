@@ -11,6 +11,19 @@ public class PauseMenuLogic : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
+            // Check if player is dead before allowing pause
+            PlayerHealth playerHealth = FindObjectOfType<PlayerHealth>();
+            if (playerHealth != null && playerHealth.IsDead())
+            {
+                return;
+            }
+
+            // Check if match is over before allowing pause
+            if (MatchManager.Instance != null && !MatchManager.Instance.IsMatchActive)
+            {
+                return;
+            }
+
             if (isPaused)
             {
                 ResumeGame();

@@ -139,6 +139,25 @@ public class Gun : MonoBehaviour
         }
 
         // ═══════════════════════════════════════════════════════
+        // DEATH CHECK - Disable shooting/reload when player is dead
+        // ═══════════════════════════════════════════════════════
+        PlayerHealth playerHealth = ownerPlayer?.GetComponent<PlayerHealth>();
+        if (playerHealth != null && playerHealth.IsDead())
+        {
+            RecoverWeaponPosition();
+            return;
+        }
+
+        // ═══════════════════════════════════════════════════════
+        // MATCH END CHECK - Disable shooting/reload when match ended
+        // ═══════════════════════════════════════════════════════
+        if (MatchManager.Instance != null && !MatchManager.Instance.IsMatchActive)
+        {
+            RecoverWeaponPosition();
+            return;
+        }
+
+        // ═══════════════════════════════════════════════════════
         // RELOAD INPUT - Press R to reload manually
         // ═══════════════════════════════════════════════════════
         if (Input.GetKeyDown(KeyCode.R) && !isReloading && currentAmmo < maxAmmo)

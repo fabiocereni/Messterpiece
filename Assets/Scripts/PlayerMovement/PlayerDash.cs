@@ -37,6 +37,19 @@ public class PlayerDash : MonoBehaviour
             return;
         }
 
+        // Disable dashing when player is dead
+        PlayerHealth playerHealth = GetComponent<PlayerHealth>();
+        if (playerHealth != null && playerHealth.IsDead())
+        {
+            return;
+        }
+
+        // Disable dashing when match is over
+        if (MatchManager.Instance != null && !MatchManager.Instance.IsMatchActive)
+        {
+            return;
+        }
+
         if (Input.GetKeyDown(KeyCode.E) && Time.time >= nextDashTime)
         {
             dashRequested = true;
