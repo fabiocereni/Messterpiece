@@ -21,7 +21,7 @@ GameObject:
   - component: {fileID: 2287583825432335681}
   m_Layer: 8
   m_Name: PlayerV2
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -256,6 +256,7 @@ MonoBehaviour:
   maxHealth: 150
   currentHealth: 0
   healthBarUI: {fileID: 8393576342397739058}
+  playerRespawn: {fileID: 0}
   invincibilityDuration: 1
 --- !u!114 &2287583825432335681
 MonoBehaviour:
@@ -15008,6 +15009,7 @@ MonoBehaviour:
   damageLayerMask:
     serializedVersion: 2
     m_Bits: 512
+  ownerPlayer: {fileID: 0}
   minHitDistance: 0.5
   maxRaycastDistance: 500
   debugMode: 1
