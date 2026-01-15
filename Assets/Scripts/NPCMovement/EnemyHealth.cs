@@ -97,10 +97,12 @@ public class EnemyHealth : MonoBehaviour
 
         Debug.Log($"[EnemyHealth] {gameObject.name} KILLED!");
 
-        // 1. Registra la kill
+        GameObject rootEntity = transform.root.gameObject; 
+
         if (MatchManager.Instance != null)
         {
-            MatchManager.Instance.RegisterKill(lastAttacker, gameObject);
+            // Segnala la morte dell'entità principale, non del singolo collider
+            MatchManager.Instance.RegisterKill(lastAttacker, rootEntity);
         }
 
         // 2. FERMA IL MOVIMENTO FISICO
@@ -139,8 +141,22 @@ public class EnemyHealth : MonoBehaviour
             Destroy(killVfx, killVfxDuration);
         }
 
-        // 7. DISTRUZIONE FINALE
-        Destroy(gameObject, destroyDelay);
+        EnemyRespawn respawnSystem = GetComponent<EnemyRespawn>();
+        if (respawnSystem != null)
+        {
+            respawnSystem.RespawnEnemy();
+        }
+        else
+        {
+            // Se non c'è il sistema di respawn, distruggi normalmente
+            Destroy(gameObject, destroyDelay);
+        }
+    }
+    
+    public void RestoreHealth(float amount)
+    {
+        isDead = false;
+        currentHealth = amount;
     }
 
     /// <summary>

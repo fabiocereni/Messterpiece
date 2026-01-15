@@ -11,34 +11,37 @@ public class EnemyGun : MonoBehaviour
 
     [Header("Impostazioni IA")]
     public float damage = 10f;
+    [Tooltip("Assicurati di includere sia 'Player' che 'Enemy' qui!")]
     public LayerMask damageLayerMask;
     public float maxDistance = 100f;
 
     public void Shoot(Vector3 direction)
     {
-        //Riproduco suono
-        
-        
         if (muzzleFlash != null) muzzleFlash.Play();
         if (audioSource != null && fireSound != null) audioSource.PlayOneShot(fireSound);
 
         RaycastHit hit;
         if (Physics.Raycast(firePoint.position, direction, out hit, maxDistance, damageLayerMask))
         {
-            // 1. Cerchiamo lo script PlayerHealth sull'oggetto colpito
-            PlayerHealth playerHealth = hit.collider.GetComponent<PlayerHealth>();
+            // Otteniamo la radice del nemico che spara
+            GameObject shooter = transform.root.gameObject; 
 
-            // 2. Se lo troviamo, applichiamo il danno
+            // 1. Controllo Player
+            PlayerHealth playerHealth = hit.collider.GetComponentInParent<PlayerHealth>();
             if (playerHealth != null)
             {
-                playerHealth.TakeDamage(damage); 
-                Debug.Log($"🎯 Hai colpito il Player! Danno inflitto: {damage}");
+                // Rispettiamo la nuova firma: danno, punto, e chi spara
+                playerHealth.TakeDamage(damage, hit.point, shooter); 
             }
-            else if (hit.collider.CompareTag("Player"))
+            // 2. Controllo Altri Nemici
+            else 
             {
-                // Fail-safe: se l'oggetto ha il tag Player ma lo script è in un oggetto padre
-                playerHealth = hit.collider.GetComponentInParent<PlayerHealth>();
-                if (playerHealth != null) playerHealth.TakeDamage(damage);
+                EnemyHealth enemyHealth = hit.collider.GetComponentInParent<EnemyHealth>();
+                if (enemyHealth != null)
+                {
+                    // Rispettiamo la firma esistente di EnemyHealth
+                    enemyHealth.TakeDamage(damage, hit.point, shooter); 
+                }
             }
         }
 
