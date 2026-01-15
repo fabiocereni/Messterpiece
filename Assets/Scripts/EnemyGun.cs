@@ -11,34 +11,34 @@ public class EnemyGun : MonoBehaviour
 
     [Header("Impostazioni IA")]
     public float damage = 10f;
+    [Tooltip("Assicurati di includere sia 'Player' che 'Enemy' qui!")]
     public LayerMask damageLayerMask;
     public float maxDistance = 100f;
 
     public void Shoot(Vector3 direction)
     {
-        //Riproduco suono
-        
-        
         if (muzzleFlash != null) muzzleFlash.Play();
         if (audioSource != null && fireSound != null) audioSource.PlayOneShot(fireSound);
 
         RaycastHit hit;
+        // Esegue il Raycast usando la maschera di layer configurata
         if (Physics.Raycast(firePoint.position, direction, out hit, maxDistance, damageLayerMask))
         {
-            // 1. Cerchiamo lo script PlayerHealth sull'oggetto colpito
+            // 1. Prova a colpire il Player
             PlayerHealth playerHealth = hit.collider.GetComponent<PlayerHealth>();
-
-            // 2. Se lo troviamo, applichiamo il danno
             if (playerHealth != null)
             {
                 playerHealth.TakeDamage(damage); 
-                Debug.Log($"🎯 Hai colpito il Player! Danno inflitto: {damage}");
             }
-            else if (hit.collider.CompareTag("Player"))
+            // 2. Prova a colpire un Enemy (usa lo script EnemyHealth che abbiamo configurato)
+            else 
             {
-                // Fail-safe: se l'oggetto ha il tag Player ma lo script è in un oggetto padre
-                playerHealth = hit.collider.GetComponentInParent<PlayerHealth>();
-                if (playerHealth != null) playerHealth.TakeDamage(damage);
+                EnemyHealth enemyHealth = hit.collider.GetComponentInParent<EnemyHealth>();
+                if (enemyHealth != null)
+                {
+                    // Passiamo il danno, il punto di impatto e 'gameObject' come attaccante
+                    enemyHealth.TakeDamage(damage, hit.point, gameObject);
+                }
             }
         }
 
