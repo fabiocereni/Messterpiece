@@ -46,8 +46,7 @@ public class ThirdPersonCamera : MonoBehaviour
 
     // References
     private CameraController cameraController;
-    private Camera mainCamera;
-    private Transform cameraHolder;
+    private Camera tpsCamera;
     private Transform playerTransform;
 
     // Camera state
@@ -59,24 +58,14 @@ public class ThirdPersonCamera : MonoBehaviour
     private bool isColliding = false;
     private float targetCollisionDistance;
 
-    // Original position
-    private Vector3 originalLocalPosition;
-
     /// <summary>
     /// Inizializza il componente TPS Camera
     /// </summary>
-    public void Initialize(CameraController controller, Camera camera, Transform holder, Transform player)
+    public void Initialize(CameraController controller, Camera camera, Transform player)
     {
         cameraController = controller;
-        mainCamera = camera;
-        cameraHolder = holder;
+        tpsCamera = camera;
         playerTransform = player;
-
-        // Salva posizione locale originale
-        if (cameraHolder != null)
-        {
-            originalLocalPosition = cameraHolder.localPosition;
-        }
 
         // Inizializza distanza
         currentDistance = targetDistance;
@@ -86,25 +75,15 @@ public class ThirdPersonCamera : MonoBehaviour
     private void OnEnable()
     {
         // Quando viene attivato TPS, inizializza la posizione
-        if (cameraHolder != null && playerTransform != null)
+        if (tpsCamera != null && playerTransform != null)
         {
             ResetPosition();
         }
     }
 
-    private void OnDisable()
-    {
-        // Quando viene disattivato TPS, ripristina posizione locale originale
-        if (cameraHolder != null)
-        {
-            cameraHolder.localPosition = originalLocalPosition;
-            cameraHolder.localRotation = Quaternion.identity;
-        }
-    }
-
     private void LateUpdate()
     {
-        if (!enabled || cameraHolder == null || playerTransform == null)
+        if (!enabled || tpsCamera == null || playerTransform == null)
             return;
 
         // Update camera position e collision
@@ -113,7 +92,7 @@ public class ThirdPersonCamera : MonoBehaviour
 
     private void UpdateCameraPosition()
     {
-        // 1. Calcola pivot position (punto di rotazione della camera)
+        // 1. Calcola pivot position (punto di rotazione della camera - occhi del player)
         pivotPosition = playerTransform.position + pivotOffset;
 
         // 2. Calcola direzione camera (dietro il player + offset laterale)
@@ -122,7 +101,7 @@ public class ThirdPersonCamera : MonoBehaviour
         // 3. Collision detection
         float adjustedDistance = CheckCameraCollision(pivotPosition, targetDirection);
 
-        // 4. Calcola posizione finale
+        // 4. Calcola posizione finale (dietro il player)
         Vector3 targetPosition = pivotPosition - (targetDirection * adjustedDistance);
 
         // 5. Smooth movement
@@ -132,8 +111,8 @@ public class ThirdPersonCamera : MonoBehaviour
             Time.deltaTime * positionSmoothSpeed
         );
 
-        // 6. Applica posizione al CameraHolder
-        cameraHolder.position = currentCameraPosition;
+        // 6. Applica posizione alla TPS Camera (NON al CameraHolder!)
+        tpsCamera.transform.position = currentCameraPosition;
 
         // 7. Guarda sempre verso il player (pivot point)
         UpdateCameraRotation();
@@ -223,14 +202,14 @@ public class ThirdPersonCamera : MonoBehaviour
     private void UpdateCameraRotation()
     {
         // La camera guarda sempre verso il pivot point (occhi del player)
-        Vector3 lookDirection = pivotPosition - cameraHolder.position;
-        
+        Vector3 lookDirection = pivotPosition - tpsCamera.transform.position;
+
         if (lookDirection.sqrMagnitude > 0.001f)
         {
             Quaternion targetRotation = Quaternion.LookRotation(lookDirection);
 
-            cameraHolder.rotation = Quaternion.Slerp(
-                cameraHolder.rotation,
+            tpsCamera.transform.rotation = Quaternion.Slerp(
+                tpsCamera.transform.rotation,
                 targetRotation,
                 Time.deltaTime * rotationSmoothSpeed
             );
@@ -268,16 +247,20 @@ public class ThirdPersonCamera : MonoBehaviour
     {
         currentDistance = targetDistance;
         targetCollisionDistance = targetDistance;
-        
-        if (playerTransform != null)
+
+        if (playerTransform != null && tpsCamera != null)
         {
             pivotPosition = playerTransform.position + pivotOffset;
             Vector3 direction = CalculateCameraDirection();
             currentCameraPosition = pivotPosition - (direction * currentDistance);
-            
-            if (cameraHolder != null)
+
+            tpsCamera.transform.position = currentCameraPosition;
+
+            // Guarda verso il pivot
+            Vector3 lookDirection = pivotPosition - tpsCamera.transform.position;
+            if (lookDirection.sqrMagnitude > 0.001f)
             {
-                cameraHolder.position = currentCameraPosition;
+                tpsCamera.transform.rotation = Quaternion.LookRotation(lookDirection);
             }
         }
     }

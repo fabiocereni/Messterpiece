@@ -10,12 +10,15 @@ using CameraSystem;
 public class CameraController : MonoBehaviour
 {
     [Header("Camera References")]
-    [Tooltip("La camera principale del giocatore")]
-    public Camera mainCamera;
-    
-    [Tooltip("Transform del CameraHolder (parent della camera)")]
+    [Tooltip("Camera FPS (figlia di CameraHolder)")]
+    public Camera fpsMainCamera;
+
+    [Tooltip("Camera TPS (separata, da creare nella scena)")]
+    public Camera tpsMainCamera;
+
+    [Tooltip("Transform del CameraHolder (parent della camera FPS)")]
     public Transform cameraHolder;
-    
+
     [Tooltip("Transform del player (root object)")]
     public Transform playerTransform;
 
@@ -37,17 +40,8 @@ public class CameraController : MonoBehaviour
     public Renderer[] hideInFPS;
 
     [Header("Weapon Settings")]
-    [Tooltip("Transform del WeaponHolder")]
+    [Tooltip("Transform del WeaponHolder - resta sempre in posizione FPS")]
     public Transform weaponHolder;
-    
-    [Tooltip("Posizione locale arma in FPS")]
-    public Vector3 weaponPositionFPS = new Vector3(0.4f, -0.3f, 0.5f);
-    
-    [Tooltip("Posizione locale arma in TPS")]
-    public Vector3 weaponPositionTPS = new Vector3(0.3f, 0f, 0.3f);
-    
-    [Tooltip("Velocità di transizione posizione arma")]
-    public float weaponTransitionSpeed = 8f;
 
     [Header("Debug")]
     [Tooltip("Mostra log di debug")]
@@ -64,7 +58,6 @@ public class CameraController : MonoBehaviour
 
     // Cache
     private Vector3 originalCameraPosition;
-    private Vector3 originalWeaponPosition;
 
     #region Unity Lifecycle
 
@@ -82,11 +75,6 @@ public class CameraController : MonoBehaviour
         if (cameraHolder != null)
         {
             originalCameraPosition = cameraHolder.localPosition;
-        }
-        
-        if (weaponHolder != null)
-        {
-            originalWeaponPosition = weaponHolder.localPosition;
         }
 
         // Inizializza componenti camera
@@ -106,9 +94,6 @@ public class CameraController : MonoBehaviour
 
         // Update camera corrente
         UpdateCurrentCamera();
-
-        // Smooth weapon transition
-        UpdateWeaponPosition();
     }
 
     private void LateUpdate()
@@ -123,17 +108,30 @@ public class CameraController : MonoBehaviour
 
     private void AutoFindReferences()
     {
-        // Auto-find MainCamera
-        if (mainCamera == null)
+        // Auto-find FPS MainCamera
+        if (fpsMainCamera == null)
         {
             Transform cameraHolderTransform = transform.Find("CameraHolder");
             if (cameraHolderTransform != null)
             {
-                mainCamera = cameraHolderTransform.GetComponentInChildren<Camera>();
+                fpsMainCamera = cameraHolderTransform.GetComponentInChildren<Camera>();
                 cameraHolder = cameraHolderTransform;
-                
-                if (showDebugLogs && mainCamera != null)
-                    Debug.Log("[CameraController] MainCamera trovata automaticamente");
+
+                if (showDebugLogs && fpsMainCamera != null)
+                    Debug.Log("[CameraController] FPS MainCamera trovata automaticamente");
+            }
+        }
+
+        // Auto-find TPS MainCamera
+        if (tpsMainCamera == null)
+        {
+            GameObject tpsCamObj = GameObject.Find("TPSCamera");
+            if (tpsCamObj != null)
+            {
+                tpsMainCamera = tpsCamObj.GetComponent<Camera>();
+
+                if (showDebugLogs && tpsMainCamera != null)
+                    Debug.Log("[CameraController] TPS MainCamera trovata automaticamente");
             }
         }
 
@@ -187,13 +185,13 @@ public class CameraController : MonoBehaviour
         // Inizializza FPS Camera
         if (fpsCamera != null)
         {
-            fpsCamera.Initialize(this, mainCamera, cameraHolder);
+            fpsCamera.Initialize(this, fpsMainCamera, cameraHolder);
         }
 
         // Inizializza TPS Camera
         if (tpsCamera != null)
         {
-            tpsCamera.Initialize(this, mainCamera, cameraHolder, playerTransform);
+            tpsCamera.Initialize(this, tpsMainCamera, playerTransform);
         }
 
         if (showDebugLogs)
@@ -226,9 +224,19 @@ public class CameraController : MonoBehaviour
         // Attiva/disattiva componenti camera
         if (fpsCamera != null)
             fpsCamera.enabled = (mode == CameraMode.FirstPerson);
-        
+
         if (tpsCamera != null)
             tpsCamera.enabled = (mode == CameraMode.ThirdPerson);
+
+        // Attiva/disattiva le camere stesse
+        if (fpsMainCamera != null)
+            fpsMainCamera.enabled = (mode == CameraMode.FirstPerson);
+
+        if (tpsMainCamera != null)
+            tpsMainCamera.enabled = (mode == CameraMode.ThirdPerson);
+
+        // Aggiorna Gun.cs per usare la camera attiva
+        UpdateGunCameraReference();
 
         if (showDebugLogs)
             Debug.Log($"[CameraController] Camera mode changed to: {mode}");
@@ -303,23 +311,6 @@ public class CameraController : MonoBehaviour
         // Gestito dai componenti FirstPersonCamera e ThirdPersonCamera
     }
 
-    private void UpdateWeaponPosition()
-    {
-        if (weaponHolder == null)
-            return;
-
-        // Target position in base alla modalità
-        Vector3 targetPosition = (currentMode == CameraMode.FirstPerson) 
-            ? weaponPositionFPS 
-            : weaponPositionTPS;
-
-        // Smooth lerp
-        weaponHolder.localPosition = Vector3.Lerp(
-            weaponHolder.localPosition,
-            targetPosition,
-            Time.deltaTime * weaponTransitionSpeed
-        );
-    }
 
     private void UpdatePlayerVisibility()
     {
@@ -345,11 +336,33 @@ public class CameraController : MonoBehaviour
     #region Public API
 
     /// <summary>
-    /// Ottiene la camera principale
+    /// Ottiene la camera attiva corrente
     /// </summary>
     public Camera GetMainCamera()
     {
-        return mainCamera;
+        if (currentMode == CameraMode.FirstPerson)
+            return fpsMainCamera;
+        else
+            return tpsMainCamera;
+    }
+
+    /// <summary>
+    /// Aggiorna il reference della camera in Gun.cs
+    /// </summary>
+    private void UpdateGunCameraReference()
+    {
+        Gun gun = GetComponent<Gun>();
+        if (gun != null)
+        {
+            Camera activeCamera = GetMainCamera();
+            if (activeCamera != null)
+            {
+                gun.fpsCam = activeCamera;
+
+                if (showDebugLogs)
+                    Debug.Log($"[CameraController] Gun camera updated to: {activeCamera.name}");
+            }
+        }
     }
 
     /// <summary>
@@ -378,20 +391,22 @@ public class CameraController : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        if (!showDebugLogs || cameraHolder == null)
+        if (!showDebugLogs)
             return;
 
         // Disegna FPS position
-        Gizmos.color = Color.green;
-        Vector3 fpsPos = transform.position + transform.TransformDirection(originalCameraPosition);
-        Gizmos.DrawWireSphere(fpsPos, 0.2f);
+        if (fpsMainCamera != null)
+        {
+            Gizmos.color = Color.green;
+            Gizmos.DrawWireSphere(fpsMainCamera.transform.position, 0.2f);
+        }
 
         // Disegna TPS position
-        if (tpsCamera != null && currentMode == CameraMode.ThirdPerson)
+        if (tpsMainCamera != null && currentMode == CameraMode.ThirdPerson)
         {
             Gizmos.color = Color.cyan;
-            Gizmos.DrawWireSphere(mainCamera.transform.position, 0.3f);
-            Gizmos.DrawLine(transform.position, mainCamera.transform.position);
+            Gizmos.DrawWireSphere(tpsMainCamera.transform.position, 0.3f);
+            Gizmos.DrawLine(transform.position, tpsMainCamera.transform.position);
         }
     }
 
