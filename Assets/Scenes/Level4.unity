@@ -17860,28 +17860,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: daf35912ed6504e92b33f76c60bef3be, type: 3}
---- !u!1 &839817759 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 8501262253299624703, guid: dcdcd6af294464f2b9b8c9e6d9bd15b2, type: 3}
-  m_PrefabInstance: {fileID: 2054262829}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &839817760
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 839817759}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dd8028e7943f24535bd1bbab143d1a71, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::EnemyRespawn
-  spawnPoints:
-  - {fileID: 1265499105}
-  - {fileID: 1477723472}
-  - {fileID: 980211}
-  respawnDelay: 1
 --- !u!1001 &840717389
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -46060,13 +46038,22 @@ PrefabInstance:
       propertyPath: m_Name
       value: BananaBoy
       objectReference: {fileID: 0}
+    - target: {fileID: 8502689610475970593, guid: dcdcd6af294464f2b9b8c9e6d9bd15b2, type: 3}
+      propertyPath: 'spawnPoints.Array.data[0]'
+      value: 
+      objectReference: {fileID: 1265499105}
+    - target: {fileID: 8502689610475970593, guid: dcdcd6af294464f2b9b8c9e6d9bd15b2, type: 3}
+      propertyPath: 'spawnPoints.Array.data[1]'
+      value: 
+      objectReference: {fileID: 1477723472}
+    - target: {fileID: 8502689610475970593, guid: dcdcd6af294464f2b9b8c9e6d9bd15b2, type: 3}
+      propertyPath: 'spawnPoints.Array.data[2]'
+      value: 
+      objectReference: {fileID: 980211}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 8501262253299624703, guid: dcdcd6af294464f2b9b8c9e6d9bd15b2, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 839817760}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: dcdcd6af294464f2b9b8c9e6d9bd15b2, type: 3}
 --- !u!1001 &2058363643
 PrefabInstance:
