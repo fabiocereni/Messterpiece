@@ -13969,9 +13969,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAI_NavMesh
   enemyGun: {fileID: 928478037771124390}
-  fireRate: 0.5
   walkSpeed: 2
   runSpeed: 4
+  rotationSpeed: 5
   targetLayers:
     serializedVersion: 2
     m_Bits: 768
@@ -13981,7 +13981,8 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 2048
   shootingAngleThreshold: 10
-  rotationSpeed: 5
+  attackStoppingDistance: 6
+  fireRate: 0.5
   patrolPoints:
   - {fileID: 0}
   - {fileID: 0}
