@@ -115,6 +115,12 @@ public class EnemyAI_NavMesh : MonoBehaviour
                 Vector3 shootDirection = (currentTarget.position + Vector3.up * 0.8f - enemyGun.firePoint.position).normalized;
                 enemyGun.Shoot(shootDirection);
                 nextFireTime = Time.time + fireRate;
+
+                // Trigger animazione SOLO se siamo fermi
+                if (animator != null && agent.isStopped)
+                {
+                    animator.SetTrigger("shoot");
+                }
             }
         }
     }
