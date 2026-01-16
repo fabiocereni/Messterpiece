@@ -4,17 +4,17 @@ using UnityEngine.AI;
 [RequireComponent(typeof(NavMeshAgent))]
 public class EnemyAI_NavMesh : MonoBehaviour
 {
-    // Rimosso playerTransform come unico riferimento fisso, ora cerchiamo un target
     private Transform currentTarget; 
     private NavMeshAgent agent;
     private Animator animator;
 
-    [Header("Impostazioni")]
+    [Header("Riferimenti")]
     public EnemyGun enemyGun;
-    public float fireRate = 1.0f;
-    private float nextFireTime = 0f;
+
+    [Header("Impostazioni Movimento")]
     public float walkSpeed = 2.0f;
     public float runSpeed = 5.0f;
+    public float rotationSpeed = 10f; // Velocità di rotazione su se stesso
 
     [Header("Rilevamento")]
     [Tooltip("Layer che l'enemy deve attaccare (es. Player e Enemy)")]
@@ -28,14 +28,20 @@ public class EnemyAI_NavMesh : MonoBehaviour
     [Tooltip("Spara solo se il nemico è girato verso il target entro questo angolo")]
     public float shootingAngleThreshold = 10f;
     
+    [Header("Combat Tuning")]
+    [Tooltip("Distanza alla quale l'NPC si ferma per sparare invece di correre addosso")]
+    public float attackStoppingDistance = 6f; 
+    public float fireRate = 1.0f;
+    private float nextFireTime = 0f;
+    
+    // Logica di Allerta
     private Transform alertTarget;
     private float alertTimer = 0f;
-    private float alertDuration = 5f; // Quanto tempo resta "allerta" dopo il colpo
-    public float rotationSpeed = 5f; // Velocità di rotazione su se stesso
-    
+    private float alertDuration = 5f;
 
+    [Header("Pattugliamento")]
     public Transform[] patrolPoints;
-    private int currentPatrolIndex = 0;
+    private int currentPatrolIndex = -1;
 
     void Start()
     {
@@ -46,7 +52,12 @@ public class EnemyAI_NavMesh : MonoBehaviour
         agent.updateRotation = true;
         agent.stoppingDistance = 0.5f;
 
-        GotoNextPatrolPoint();
+        // Inizializza con un punto di pattuglia casuale
+        if (patrolPoints.Length > 0)
+        {
+            currentPatrolIndex = Random.Range(0, patrolPoints.Length);
+            GotoNextPatrolPoint();
+        }
     }
 
     void Update()
@@ -60,32 +71,64 @@ public class EnemyAI_NavMesh : MonoBehaviour
 
         if (currentTarget != null) 
         {
-            // Forza la rotazione verso il bersaglio ---
-            FaceTarget(currentTarget.position);
-            // ----------------------------------------------------
+            HandleCombat();
+        }
+        else 
+        {
+            HandlePatrol();
+        }
+    }
 
-            float dist = Vector3.Distance(transform.position, currentTarget.position);
+    private void HandleCombat()
+    {
+        // 1. Forza sempre la rotazione verso il bersaglio (anche se l'agente è fermo)
+        FaceTarget(currentTarget.position);
+
+        float dist = Vector3.Distance(transform.position, currentTarget.position);
+
+        // 2. CONTROLLO DISTANZA (Anti-girotondo)
+        if (dist <= attackStoppingDistance)
+        {
+            // Troppo vicino per correre: ci fermiamo e puntiamo l'arma
+            agent.isStopped = true; 
+            if (animator != null) animator.SetBool("isRunning", false);
+        }
+        else
+        {
+            // Lontano: corriamo verso il bersaglio
+            agent.isStopped = false;
             agent.speed = runSpeed;
             agent.SetDestination(currentTarget.position);
-        
             if (animator != null) animator.SetBool("isRunning", true);
-        
-            Vector3 aimDir = (currentTarget.position - transform.position).normalized;
-            float aimAngle = Vector3.Angle(transform.forward, aimDir);
+        }
 
-            if (aimAngle < shootingAngleThreshold && Time.time >= nextFireTime)
+        // 3. LOGICA DI SPARO
+        Vector3 aimDir = (currentTarget.position - transform.position).normalized;
+        float aimAngle = Vector3.Angle(transform.forward, aimDir);
+
+        if (aimAngle < shootingAngleThreshold && Time.time >= nextFireTime)
+        {
+            // Controllo ostacoli prima di sparare (usa il firePoint dell'arma)
+            if (enemyGun != null && !Physics.Raycast(enemyGun.firePoint.position, aimDir, dist, obstacleLayer))
             {
-                enemyGun.Shoot((currentTarget.position + Vector3.up * 0.8f - enemyGun.firePoint.position).normalized);
+                // Miriamo al petto (offset 0.8)
+                Vector3 shootDirection = (currentTarget.position + Vector3.up * 0.8f - enemyGun.firePoint.position).normalized;
+                enemyGun.Shoot(shootDirection);
                 nextFireTime = Time.time + fireRate;
             }
         }
-        else // Stato PATROL (nessun bersaglio nel cono visivo)
+    }
+
+    private void HandlePatrol()
+    {
+        // Assicuriamoci che l'agente possa muoversi dopo un combattimento
+        agent.isStopped = false; 
+        agent.speed = walkSpeed;
+        if (animator != null) animator.SetBool("isRunning", false);
+        
+        if (!agent.pathPending && agent.remainingDistance < 0.8f)
         {
-            agent.speed = walkSpeed;
-            if (animator != null) animator.SetBool("isRunning", false);
-            
-            if (!agent.pathPending && agent.remainingDistance < 0.8f)
-                GotoNextPatrolPoint();
+            GotoNextPatrolPoint();
         }
     }
     
@@ -93,29 +136,22 @@ public class EnemyAI_NavMesh : MonoBehaviour
     {
         if (attacker == null) return;
         alertTarget = attacker.transform;
-        alertTimer = alertDuration; // Si attiva il timer di allerta
+        alertTimer = alertDuration; 
     }
     
-    // Funzione di supporto per capire se un bersaglio è morto
     bool IsEntityDead(GameObject obj)
     {
-        // Controlla se è un nemico
         EnemyHealth eHealth = obj.GetComponentInParent<EnemyHealth>();
         if (eHealth != null) return eHealth.IsDead();
 
-        // Controlla se è il player (assumendo che PlayerHealth abbia IsDead())
         PlayerHealth pHealth = obj.GetComponentInParent<PlayerHealth>();
         if (pHealth != null) return pHealth.IsDead();
 
         return false;
     }
 
-    /// <summary>
-    /// Scansiona l'area e identifica il bersaglio più vicino che rientra nel FOV e non è coperto da muri
-    /// </summary>
     void FindClosestTarget()
     {
-        // Riduciamo il timer nel tempo
         if (alertTimer > 0) alertTimer -= Time.deltaTime;
 
         Collider[] potentialTargets = Physics.OverlapSphere(transform.position, detectionRadius, targetLayers);
@@ -125,20 +161,18 @@ public class EnemyAI_NavMesh : MonoBehaviour
 
         foreach (var col in potentialTargets)
         {
-            if (col.transform == transform) continue;
+            // Ignora se stesso
+            if (col.transform.root == transform.root) continue;
 
             Vector3 directionToTarget = (col.transform.position - transform.position).normalized;
             float angle = Vector3.Angle(transform.forward, directionToTarget);
 
-            // Entra nel loop se il bersaglio è nel FOV 
-            // OPPURE se è il bersaglio che ci ha appena colpito (alertTarget)
             bool isAlertSource = (alertTimer > 0 && col.transform == alertTarget);
 
             if (isAlertSource || angle < fieldOfViewAngle / 2f)
             {
                 float distanceToTarget = Vector3.Distance(transform.position, col.transform.position);
             
-                // Controllo Ostacoli (Raycast) - Resta necessario per non sparare attraverso i muri
                 if (!Physics.Raycast(transform.position + Vector3.up, directionToTarget, distanceToTarget, obstacleLayer))
                 {
                     if (distanceToTarget < minDistance)
@@ -156,15 +190,13 @@ public class EnemyAI_NavMesh : MonoBehaviour
     void GotoNextPatrolPoint()
     {
         if (patrolPoints.Length == 0) return;
-
-        // Se c'è solo un punto, vai lì e basta
         if (patrolPoints.Length == 1)
         {
             agent.SetDestination(patrolPoints[0].position);
             return;
         }
 
-        // Scegliamo un nuovo indice a caso diverso da quello attuale
+        // Scegliamo un indice casuale differente dal precedente
         int newIndex = currentPatrolIndex;
         while (newIndex == currentPatrolIndex)
         {
@@ -175,22 +207,24 @@ public class EnemyAI_NavMesh : MonoBehaviour
         agent.SetDestination(patrolPoints[currentPatrolIndex].position);
     }
 
-    // Utile per vedere il raggio di rilevamento nell'editor
     private void OnDrawGizmosSelected()
     {
+        // Raggio di rilevamento
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, detectionRadius);
+        // Distanza di arresto combattimento
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, attackStoppingDistance);
     }
     
     void FaceTarget(Vector3 targetPosition)
     {
         Vector3 direction = (targetPosition - transform.position).normalized;
-        direction.y = 0; // Impedisce all'NPC di inclinarsi verso l'alto/basso
+        direction.y = 0; 
     
         if (direction != Vector3.zero)
         {
             Quaternion lookRotation = Quaternion.LookRotation(direction);
-            // Ruota gradualmente ma velocemente verso il target
             transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * rotationSpeed);
         }
     }
