@@ -156,8 +156,23 @@ public class EnemyAI_NavMesh : MonoBehaviour
     void GotoNextPatrolPoint()
     {
         if (patrolPoints.Length == 0) return;
+
+        // Se c'è solo un punto, vai lì e basta
+        if (patrolPoints.Length == 1)
+        {
+            agent.SetDestination(patrolPoints[0].position);
+            return;
+        }
+
+        // Scegliamo un nuovo indice a caso diverso da quello attuale
+        int newIndex = currentPatrolIndex;
+        while (newIndex == currentPatrolIndex)
+        {
+            newIndex = Random.Range(0, patrolPoints.Length);
+        }
+
+        currentPatrolIndex = newIndex;
         agent.SetDestination(patrolPoints[currentPatrolIndex].position);
-        currentPatrolIndex = (currentPatrolIndex + 1) % patrolPoints.Length;
     }
 
     // Utile per vedere il raggio di rilevamento nell'editor
