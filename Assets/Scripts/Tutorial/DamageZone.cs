@@ -13,6 +13,7 @@ public class DamageZone : MonoBehaviour
     [SerializeField] private bool continuousDamage = false; // Danno continuo mentre dentro
 
     [Header("Visual Feedback")]
+    [SerializeField] private Material zoneMaterial = null; // Materiale custom assegnato manualmente
     [SerializeField] private Color zoneColor = new Color(1f, 0f, 0f, 0.3f);
     [SerializeField] private bool showZone = true;
 
@@ -36,17 +37,26 @@ public class DamageZone : MonoBehaviour
                 mf.mesh = CreateCubeMesh();
             }
 
-            Material mat = new Material(Shader.Find("Standard"));
-            mat.color = zoneColor;
-            mat.SetFloat("_Mode", 3); // Transparent mode
-            mat.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
-            mat.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
-            mat.SetInt("_ZWrite", 0);
-            mat.DisableKeyword("_ALPHATEST_ON");
-            mat.EnableKeyword("_ALPHABLEND_ON");
-            mat.DisableKeyword("_ALPHAPREMULTIPLY_ON");
-            mat.renderQueue = 3000;
-            mr.material = mat;
+            // Usa il materiale assegnato manualmente, se disponibile
+            if (zoneMaterial != null)
+            {
+                mr.material = zoneMaterial;
+            }
+            else
+            {
+                // Fallback: crea materiale procedurale
+                Material mat = new Material(Shader.Find("Standard"));
+                mat.color = zoneColor;
+                mat.SetFloat("_Mode", 3); // Transparent mode
+                mat.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
+                mat.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+                mat.SetInt("_ZWrite", 0);
+                mat.DisableKeyword("_ALPHATEST_ON");
+                mat.EnableKeyword("_ALPHABLEND_ON");
+                mat.DisableKeyword("_ALPHAPREMULTIPLY_ON");
+                mat.renderQueue = 3000;
+                mr.material = mat;
+            }
         }
     }
 

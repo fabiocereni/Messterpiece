@@ -69,6 +69,12 @@ public class TargetCounter : MonoBehaviour
         // Invoca l'evento custom
         onAllTargetsDestroyed?.Invoke();
 
+        // Notifica il TutorialManager
+        if (TutorialManager.Instance != null)
+        {
+            TutorialManager.Instance.CompleteSection("Shooting");
+        }
+
         Debug.Log("Tutorial Shooting Range completato!");
     }
 

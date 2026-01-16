@@ -387,18 +387,43 @@ public class Gun : MonoBehaviour
     /// </summary>
     private void ApplyDamage(RaycastHit hit)
     {
-        // Check if we hit an enemy (layer "Enemy")
+        // ═══════════════════════════════════════════════════════
+        // PRIORITY 1: Check if target implements IDamagable (generic system)
+        // ═══════════════════════════════════════════════════════
+        IDamagable damagable = hit.collider.GetComponent<IDamagable>();
+        if (damagable != null)
+        {
+            Debug.Log($"[Gun] 🎯 TARGET HIT! Object: {hit.collider.name} at distance {hit.distance:F2}m");
+
+            // Apply damage via IDamagable interface
+            damagable.Damage(damagePerShot);
+
+            if (debugMode)
+            {
+                Debug.Log($"[Gun] Applied {damagePerShot} damage to {hit.collider.name} via IDamagable");
+            }
+
+            // Spawn VFX if available
+            if (enemyHitVfxPrefab != null)
+            {
+                GameObject hitVfx = Instantiate(enemyHitVfxPrefab, hit.point, Quaternion.identity);
+                Destroy(hitVfx, 2f);
+            }
+
+            return; // Exit early - damage applied
+        }
+
+        // ═══════════════════════════════════════════════════════
+        // PRIORITY 2: Fallback to EnemyHealth (for backward compatibility)
+        // ═══════════════════════════════════════════════════════
         if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Enemy"))
         {
             Debug.Log($"[Gun] 🎯 ENEMY HIT! Target: {hit.collider.name} at distance {hit.distance:F2}m");
 
-            // ═══════════════════════════════════════════════════════
-            // APPLY DAMAGE - Get EnemyHealth component and deal damage
-            // ═══════════════════════════════════════════════════════
             EnemyHealth enemyHealth = hit.collider.GetComponent<EnemyHealth>();
             if (enemyHealth != null)
             {
-                // Apply damage AND pass the owner (player) for kill attribution
+                // Apply damage with kill attribution
                 enemyHealth.TakeDamage(damagePerShot, hit.point, ownerPlayer);
 
                 if (debugMode)
@@ -411,15 +436,10 @@ public class Gun : MonoBehaviour
                 Debug.LogWarning($"[Gun] Enemy hit but no EnemyHealth component found on {hit.collider.name}!");
             }
 
-            // ═══════════════════════════════════════════════════════
-            // ENEMY HIT VFX - Spawn paint explosion (cyan spheres)
-            // ═══════════════════════════════════════════════════════
+            // Enemy hit VFX
             if (enemyHitVfxPrefab != null)
             {
-                // Spawn VFX at impact point
                 GameObject hitVfx = Instantiate(enemyHitVfxPrefab, hit.point, Quaternion.identity);
-
-                // Auto-destroy after particle lifetime
                 Destroy(hitVfx, 2f);
 
                 if (debugMode)
