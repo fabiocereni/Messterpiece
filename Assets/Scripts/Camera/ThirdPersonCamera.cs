@@ -2,7 +2,7 @@ using UnityEngine;
 
 /// <summary>
 /// Gestisce la logica della camera in terza persona (TPS)
-/// Include collision detection, wall avoidance e smooth follow
+/// Include collision detection, wall avoidance, smooth follow e rotazione verticale indipendente
 /// </summary>
 public class ThirdPersonCamera : MonoBehaviour
 {
@@ -10,18 +10,27 @@ public class ThirdPersonCamera : MonoBehaviour
     [Tooltip("Distanza ideale della camera dal player")]
     public float targetDistance = 3.5f;
     
-    [Tooltip("Altezza della camera rispetto al player")]
-    public float cameraHeight = 1.8f;
-    
     [Tooltip("Offset laterale (over-the-shoulder)")]
-    public float shoulderOffset = 0.5f;
+    public float shoulderOffset = 0.8f;
+
+    [Header("Mouse Sensitivity")]
+    [Tooltip("Sensibilità mouse orizzontale")]
+    public float sensX = 200f;
+    [Tooltip("Sensibilità mouse verticale")]
+    public float sensY = 200f;
+
+    [Header("Vertical Rotation Limits")]
+    [Tooltip("Angolo minimo verticale (guardare in basso)")]
+    public float minVerticalAngle = -40f;
+    [Tooltip("Angolo massimo verticale (guardare in alto)")]
+    public float maxVerticalAngle = 60f;
 
     [Header("Camera Smoothing")]
     [Tooltip("Velocità di smoothing della posizione")]
     public float positionSmoothSpeed = 10f;
     
     [Tooltip("Velocità di smoothing della rotazione")]
-    public float rotationSmoothSpeed = 8f;
+    public float rotationSmoothSpeed = 15f;
 
     [Header("Collision Settings")]
     [Tooltip("LayerMask per collision detection")]
@@ -54,9 +63,16 @@ public class ThirdPersonCamera : MonoBehaviour
     private float currentDistance;
     private Vector3 pivotPosition;
 
+    // Rotazione indipendente per TPS
+    private float yaw;   // Rotazione orizzontale
+    private float pitch; // Rotazione verticale
+
     // Collision
     private bool isColliding = false;
     private float targetCollisionDistance;
+
+    // Sensitivity multiplier from settings
+    private float sensitivityMult = 1.0f;
 
     /// <summary>
     /// Inizializza il componente TPS Camera
@@ -70,13 +86,21 @@ public class ThirdPersonCamera : MonoBehaviour
         // Inizializza distanza
         currentDistance = targetDistance;
         targetCollisionDistance = targetDistance;
+
+        // Carica sensitivity dalle impostazioni
+        sensitivityMult = PlayerPrefs.GetFloat("Sensitivity", 1.0f);
     }
 
     private void OnEnable()
     {
-        // Quando viene attivato TPS, inizializza la posizione
+        // Quando viene attivato TPS, sincronizza con la rotazione attuale del player
         if (tpsCamera != null && playerTransform != null)
         {
+            // Inizializza yaw dalla rotazione attuale del player
+            yaw = playerTransform.eulerAngles.y;
+            // Resetta pitch a 0 (guarda dritto)
+            pitch = 0f;
+            
             ResetPosition();
         }
     }
@@ -86,8 +110,35 @@ public class ThirdPersonCamera : MonoBehaviour
         if (!enabled || tpsCamera == null || playerTransform == null)
             return;
 
+        // Processa input del mouse per rotazione
+        HandleMouseInput();
+
         // Update camera position e collision
         UpdateCameraPosition();
+
+        // Sincronizza la rotazione del player con la direzione della camera
+        SyncPlayerRotation();
+
+        // Sincronizza il CameraHolder (arma) con il pitch della camera
+        SyncCameraHolderRotation();
+    }
+
+    private void HandleMouseInput()
+    {
+        // Disabilita durante warmup o morte
+        if (MatchFlowManager.Instance != null && !MatchFlowManager.Instance.CanPlayerMove())
+            return;
+
+        // Mouse input
+        float mouseX = Input.GetAxis("Mouse X") * sensX * sensitivityMult * Time.deltaTime;
+        float mouseY = Input.GetAxis("Mouse Y") * sensY * sensitivityMult * Time.deltaTime;
+
+        // Aggiorna rotazioni
+        yaw += mouseX;
+        pitch -= mouseY;
+        
+        // Clamp pitch (limita quanto puoi guardare su/giù)
+        pitch = Mathf.Clamp(pitch, minVerticalAngle, maxVerticalAngle);
     }
 
     private void UpdateCameraPosition()
@@ -95,49 +146,74 @@ public class ThirdPersonCamera : MonoBehaviour
         // 1. Calcola pivot position (punto di rotazione della camera - occhi del player)
         pivotPosition = playerTransform.position + pivotOffset;
 
-        // 2. Calcola direzione camera (dietro il player + offset laterale)
-        Vector3 targetDirection = CalculateCameraDirection();
+        // 2. Calcola la direzione della camera basata su yaw e pitch
+        Quaternion cameraRotation = Quaternion.Euler(pitch, yaw, 0f);
+        Vector3 cameraDirection = cameraRotation * Vector3.forward;
 
-        // 3. Collision detection
-        float adjustedDistance = CheckCameraCollision(pivotPosition, targetDirection);
+        // 3. Calcola offset laterale in world space
+        Vector3 rightOffset = cameraRotation * Vector3.right * shoulderOffset;
 
-        // 4. Calcola posizione finale (dietro il player)
-        Vector3 targetPosition = pivotPosition - (targetDirection * adjustedDistance);
+        // 4. Posizione target: dietro il player + offset laterale
+        // La camera è DIETRO (opposta alla direzione forward) rispetto al pivot
+        Vector3 targetPosition = pivotPosition - (cameraDirection * targetDistance) + rightOffset;
 
-        // 5. Smooth movement
+        // 5. Collision detection (usa la direzione dal pivot alla camera target)
+        Vector3 collisionDirection = (targetPosition - pivotPosition).normalized;
+        float adjustedDistance = CheckCameraCollision(pivotPosition, collisionDirection);
+        
+        // Ricalcola posizione con distanza aggiustata
+        targetPosition = pivotPosition + (collisionDirection * adjustedDistance);
+
+        // 6. Smooth movement
         currentCameraPosition = Vector3.Lerp(
             currentCameraPosition,
             targetPosition,
             Time.deltaTime * positionSmoothSpeed
         );
 
-        // 6. Applica posizione alla TPS Camera (NON al CameraHolder!)
+        // 7. Applica posizione alla TPS Camera
         tpsCamera.transform.position = currentCameraPosition;
 
-        // 7. Guarda sempre verso il player (pivot point)
-        UpdateCameraRotation();
+        // 8. La camera guarda nella direzione calcolata
+        Quaternion targetRotation = Quaternion.Euler(pitch, yaw, 0f);
+        tpsCamera.transform.rotation = Quaternion.Slerp(
+            tpsCamera.transform.rotation,
+            targetRotation,
+            Time.deltaTime * rotationSmoothSpeed
+        );
     }
 
-    private Vector3 CalculateCameraDirection()
+    private void SyncPlayerRotation()
     {
-        // Direzione basata sulla rotazione del player
-        // Ritorna la direzione FORWARD del player (poi verrà sottratta per posizionare dietro)
+        // Il player ruota solo su Y per seguire la direzione della camera
+        // Questo mantiene il player allineato con dove sta guardando la camera
+        Quaternion targetPlayerRotation = Quaternion.Euler(0f, yaw, 0f);
+        playerTransform.rotation = Quaternion.Slerp(
+            playerTransform.rotation,
+            targetPlayerRotation,
+            Time.deltaTime * rotationSmoothSpeed
+        );
+    }
 
-        // Forward del player (dove guarda)
-        Vector3 playerForward = playerTransform.forward;
-        Vector3 playerRight = playerTransform.right;
+    private void SyncCameraHolderRotation()
+    {
+        // Sincronizza il CameraHolder (che contiene l'arma) con il pitch della camera TPS
+        // Così l'arma punta dove la camera sta guardando
+        if (cameraController == null)
+            return;
 
-        // Direzione della camera (forward del player)
-        // Verrà sottratta dal pivot per posizionare la camera dietro
-        Vector3 direction = playerForward;
+        Transform cameraHolder = cameraController.GetCameraHolder();
+        if (cameraHolder == null)
+            return;
 
-        // Offset laterale (over-the-shoulder)
-        direction += playerRight * shoulderOffset;
-
-        // Normalizza
-        direction.Normalize();
-
-        return direction;
+        // Il CameraHolder ruota solo su X (pitch) in local space
+        // La rotazione Y è già gestita dal player stesso
+        Quaternion targetRotation = Quaternion.Euler(pitch, 0f, 0f);
+        cameraHolder.localRotation = Quaternion.Slerp(
+            cameraHolder.localRotation,
+            targetRotation,
+            Time.deltaTime * rotationSmoothSpeed
+        );
     }
 
     private float CheckCameraCollision(Vector3 origin, Vector3 direction)
@@ -147,7 +223,7 @@ public class ThirdPersonCamera : MonoBehaviour
         
         float checkDistance = targetDistance + collisionRadius;
         
-        // Esegui SphereCast
+        // Esegui SphereCast (direzione invertita perché andiamo verso la camera, non verso il player)
         if (Physics.SphereCast(
             origin,
             collisionRadius,
@@ -199,23 +275,6 @@ public class ThirdPersonCamera : MonoBehaviour
         }
     }
 
-    private void UpdateCameraRotation()
-    {
-        // La camera guarda sempre verso il pivot point (occhi del player)
-        Vector3 lookDirection = pivotPosition - tpsCamera.transform.position;
-
-        if (lookDirection.sqrMagnitude > 0.001f)
-        {
-            Quaternion targetRotation = Quaternion.LookRotation(lookDirection);
-
-            tpsCamera.transform.rotation = Quaternion.Slerp(
-                tpsCamera.transform.rotation,
-                targetRotation,
-                Time.deltaTime * rotationSmoothSpeed
-            );
-        }
-    }
-
     /// <summary>
     /// Imposta la distanza della camera
     /// </summary>
@@ -250,18 +309,20 @@ public class ThirdPersonCamera : MonoBehaviour
 
         if (playerTransform != null && tpsCamera != null)
         {
+            // Inizializza rotazioni dalla rotazione attuale del player
+            yaw = playerTransform.eulerAngles.y;
+            pitch = 0f;
+
             pivotPosition = playerTransform.position + pivotOffset;
-            Vector3 direction = CalculateCameraDirection();
-            currentCameraPosition = pivotPosition - (direction * currentDistance);
-
+            
+            // Calcola posizione iniziale
+            Quaternion cameraRotation = Quaternion.Euler(pitch, yaw, 0f);
+            Vector3 cameraDirection = cameraRotation * Vector3.forward;
+            Vector3 rightOffset = cameraRotation * Vector3.right * shoulderOffset;
+            
+            currentCameraPosition = pivotPosition - (cameraDirection * currentDistance) + rightOffset;
             tpsCamera.transform.position = currentCameraPosition;
-
-            // Guarda verso il pivot
-            Vector3 lookDirection = pivotPosition - tpsCamera.transform.position;
-            if (lookDirection.sqrMagnitude > 0.001f)
-            {
-                tpsCamera.transform.rotation = Quaternion.LookRotation(lookDirection);
-            }
+            tpsCamera.transform.rotation = cameraRotation;
         }
     }
 
@@ -291,3 +352,4 @@ public class ThirdPersonCamera : MonoBehaviour
 
     #endregion
 }
+

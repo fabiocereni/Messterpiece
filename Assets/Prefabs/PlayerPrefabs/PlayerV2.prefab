@@ -245,7 +245,7 @@ MonoBehaviour:
   - {fileID: 8360505552941366927}
   - {fileID: 6531619658230474624}
   - {fileID: 5065271893814925766}
-  completelyInvisible: 0
+  completelyInvisibleInFPS: 0
 --- !u!114 &4013198510900401081
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -335,9 +335,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: af7ec3786738348a698d7758f67345cb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ThirdPersonCamera
-  targetDistance: 3.5
-  cameraHeight: 1.8
-  shoulderOffset: 0.5
+  targetDistance: 4
+  shoulderOffset: 1.7
+  sensX: 200
+  sensY: 200
+  minVerticalAngle: -40
+  maxVerticalAngle: 60
   positionSmoothSpeed: 10
   rotationSmoothSpeed: 8
   collisionLayers:
@@ -13877,7 +13880,7 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.3
+  near clip plane: 0.1
   far clip plane: 1000
   field of view: 60
   orthographic: 0
