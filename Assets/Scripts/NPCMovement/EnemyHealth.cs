@@ -57,6 +57,14 @@ public class EnemyHealth : MonoBehaviour
         if (attacker != null)
         {
             lastAttacker = attacker;
+    
+            // Usiamo GetComponentInParent per essere sicuri di colpire l'IA 
+            // anche se questo script è su un collider figlio
+            EnemyAI_NavMesh ai = GetComponentInParent<EnemyAI_NavMesh>();
+            if (ai != null)
+            {
+                ai.ReportHit(attacker);
+            }
         }
 
         Debug.Log($"[EnemyHealth] {gameObject.name} took {damage} damage from {(attacker != null ? attacker.name : "unknown")}. Health: {currentHealth}/{maxHealth}");
