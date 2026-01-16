@@ -20,6 +20,9 @@ GameObject:
   - component: {fileID: 4013198510900401081}
   - component: {fileID: 2287583825432335681}
   - component: {fileID: 8684917997001301347}
+  - component: {fileID: 5815573292253457842}
+  - component: {fileID: 1239627768448529695}
+  - component: {fileID: 4670337079203500737}
   m_Layer: 8
   m_Name: PlayerV2
   m_TagString: Player
@@ -201,7 +204,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerLook
   sensX: 500
   sensY: 500
-  cam: {fileID: 3873133362468167533}
+  cam: {fileID: 6052684899414954706}
   smoothSpeed: 0.1
 --- !u!114 &7679492090856405484
 MonoBehaviour:
@@ -301,6 +304,80 @@ MonoBehaviour:
   playerVisuals: {fileID: 2900344887481976602}
   playerCamera: {fileID: 321838283031119619}
   droneCamera: {fileID: 0}
+  showDebugLogs: 1
+--- !u!114 &5815573292253457842
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 413985046921310704}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 838c8338d228f49ba848e15b32e4da8e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FirstPersonCamera
+  cameraOffset: {x: 0, y: 0, z: 0}
+  positionSmoothSpeed: 0.1
+  enableHeadBob: 0
+  bobAmount: 0.05
+  bobSpeed: 14
+--- !u!114 &1239627768448529695
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 413985046921310704}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: af7ec3786738348a698d7758f67345cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ThirdPersonCamera
+  targetDistance: 3.5
+  cameraHeight: 1.8
+  shoulderOffset: 0.5
+  positionSmoothSpeed: 10
+  rotationSmoothSpeed: 8
+  collisionLayers:
+    serializedVersion: 2
+    m_Bits: 7927
+  collisionRadius: 0.3
+  minDistanceFromWall: 0.5
+  collisionZoomSpeed: 15
+  pivotOffset: {x: 0, y: 1.6, z: 0}
+  showCollisionGizmos: 1
+--- !u!114 &4670337079203500737
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 413985046921310704}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 34c511093c405442a8417a1de38bd0ca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraController
+  mainCamera: {fileID: 321838283031119619}
+  cameraHolder: {fileID: 6052684899414954706}
+  playerTransform: {fileID: 5638210106189490797}
+  startingMode: 0
+  toggleKey: 118
+  transitionSpeed: 10
+  playerVisuals: {fileID: 2900344887481976602}
+  hideInFPS:
+  - {fileID: 5288214787979132068}
+  - {fileID: 2688757948767162532}
+  - {fileID: 4811633347838642301}
+  - {fileID: 7991200588557048773}
+  - {fileID: 680125501000057628}
+  - {fileID: 5065271893814925766}
+  - {fileID: 6531619658230474624}
+  weaponHolder: {fileID: 6407368898787623913}
+  weaponPositionFPS: {x: -0.01, y: -0.6, z: 0.6}
+  weaponPositionTPS: {x: 0.3, y: 0, z: 0.3}
+  weaponTransitionSpeed: 8
   showDebugLogs: 1
 --- !u!1 &1266288695285668696
 GameObject:
@@ -14243,9 +14320,19 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9f18b81c4556a4435b47e6a56f69a729, type: 3}
+--- !u!23 &2688757948767162532 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -8341554513606571954, guid: 9f18b81c4556a4435b47e6a56f69a729, type: 3}
+  m_PrefabInstance: {fileID: 2984966563748829418}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &3379391023554215681 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 9f18b81c4556a4435b47e6a56f69a729, type: 3}
+  m_PrefabInstance: {fileID: 2984966563748829418}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &4811633347838642301 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -1465112097943564137, guid: 9f18b81c4556a4435b47e6a56f69a729, type: 3}
   m_PrefabInstance: {fileID: 2984966563748829418}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &4713091381225266122
@@ -15150,9 +15237,19 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9f18b81c4556a4435b47e6a56f69a729, type: 3}
+--- !u!23 &680125501000057628 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -1465112097943564137, guid: 9f18b81c4556a4435b47e6a56f69a729, type: 3}
+  m_PrefabInstance: {fileID: 7123193524198658955}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &7300356678615315552 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 9f18b81c4556a4435b47e6a56f69a729, type: 3}
+  m_PrefabInstance: {fileID: 7123193524198658955}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &7991200588557048773 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -8341554513606571954, guid: 9f18b81c4556a4435b47e6a56f69a729, type: 3}
   m_PrefabInstance: {fileID: 7123193524198658955}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &7174663467811615899
