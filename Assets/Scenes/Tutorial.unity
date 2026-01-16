@@ -1014,7 +1014,7 @@ GameObject:
   - component: {fileID: 281536069}
   - component: {fileID: 281536068}
   - component: {fileID: 281536067}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Barrier_Movement
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1627,7 +1627,7 @@ GameObject:
   - component: {fileID: 450852094}
   - component: {fileID: 450852093}
   - component: {fileID: 450852092}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1849,7 +1849,7 @@ GameObject:
   - component: {fileID: 475939763}
   - component: {fileID: 475939762}
   - component: {fileID: 475939761}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3181,7 +3181,7 @@ GameObject:
   - component: {fileID: 948791190}
   - component: {fileID: 948791189}
   - component: {fileID: 948791188}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Marker_Backward
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4207,7 +4207,7 @@ GameObject:
   - component: {fileID: 1358284927}
   - component: {fileID: 1358284926}
   - component: {fileID: 1358284925}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Barrier_Health
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4318,7 +4318,7 @@ GameObject:
   - component: {fileID: 1372335095}
   - component: {fileID: 1372335094}
   - component: {fileID: 1372335093}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Marker_Left
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4505,7 +4505,7 @@ GameObject:
   - component: {fileID: 1478669564}
   - component: {fileID: 1478669563}
   - component: {fileID: 1478669562}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Marker_Forward
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4616,7 +4616,7 @@ GameObject:
   - component: {fileID: 1485039231}
   - component: {fileID: 1485039230}
   - component: {fileID: 1485039229}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Barrier_Shooting
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5123,7 +5123,7 @@ GameObject:
   - component: {fileID: 1625427931}
   - component: {fileID: 1625427930}
   - component: {fileID: 1625427929}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Barrier_Jump
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5789,7 +5789,7 @@ GameObject:
   - component: {fileID: 1804604581}
   - component: {fileID: 1804604580}
   - component: {fileID: 1804604579}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6106,6 +6106,10 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 56450742}
+    - target: {fileID: 3190984878421999749, guid: e9ce68c878357476d8781580e5e38489, type: 3}
+      propertyPath: m_VersionIndex
+      value: 945
+      objectReference: {fileID: 0}
     - target: {fileID: 3399747593812718400, guid: e9ce68c878357476d8781580e5e38489, type: 3}
       propertyPath: m_Mesh
       value: 
@@ -6114,6 +6118,10 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 1150585712}
+    - target: {fileID: 4319880199679928123, guid: e9ce68c878357476d8781580e5e38489, type: 3}
+      propertyPath: m_VersionIndex
+      value: 2064
+      objectReference: {fileID: 0}
     - target: {fileID: 5638210106189490797, guid: e9ce68c878357476d8781580e5e38489, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -6166,6 +6174,10 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 137786120}
+    - target: {fileID: 7730222688733311182, guid: e9ce68c878357476d8781580e5e38489, type: 3}
+      propertyPath: m_VersionIndex
+      value: 590
+      objectReference: {fileID: 0}
     - target: {fileID: 7862538426198524846, guid: e9ce68c878357476d8781580e5e38489, type: 3}
       propertyPath: m_Mesh
       value: 
@@ -6174,10 +6186,18 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 1357894035}
+    - target: {fileID: 8165270926434454527, guid: e9ce68c878357476d8781580e5e38489, type: 3}
+      propertyPath: m_Material
+      value: 
+      objectReference: {fileID: 13400000, guid: 6160a2a2a22ac442b98cdc1d7b6ecc67, type: 2}
     - target: {fileID: 9081433988478700192, guid: e9ce68c878357476d8781580e5e38489, type: 3}
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 1357894035}
+    - target: {fileID: 9081433988478700192, guid: e9ce68c878357476d8781580e5e38489, type: 3}
+      propertyPath: m_VersionIndex
+      value: 945
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 2287583825432335681, guid: e9ce68c878357476d8781580e5e38489, type: 3}
     m_RemovedGameObjects: []
@@ -6714,7 +6734,7 @@ GameObject:
   - component: {fileID: 2139164381}
   - component: {fileID: 2139164380}
   - component: {fileID: 2139164379}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Marker_Right
   m_TagString: Untagged
   m_Icon: {fileID: 0}

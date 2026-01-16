@@ -110,16 +110,49 @@ public class PlayerMovement : MonoBehaviour
             return;
         }
 
-        // Controlla se c'è un muro davanti/dietro/laterale
-        bool touchingWall = Physics.Raycast(transform.position, orientation.forward, wallCheckDistance, whatIsWall) ||
-                            Physics.Raycast(transform.position, -orientation.forward, wallCheckDistance, whatIsWall) ||
-                            Physics.Raycast(transform.position, orientation.right, wallCheckDistance, whatIsWall) ||
-                            Physics.Raycast(transform.position, -orientation.right, wallCheckDistance, whatIsWall);
-        // Se tocchi un muro e non sei a terra, rimuovi friction simulando slide
+        // Controlla se c'è un muro in ogni direzione e memorizza la direzione del muro
+        Vector3 wallNormal = Vector3.zero;
+        bool touchingWall = false;
+        RaycastHit wallHit;
+
+        if (Physics.Raycast(transform.position, orientation.forward, out wallHit, wallCheckDistance, whatIsWall))
+        {
+            touchingWall = true;
+            wallNormal = wallHit.normal;
+        }
+        else if (Physics.Raycast(transform.position, -orientation.forward, out wallHit, wallCheckDistance, whatIsWall))
+        {
+            touchingWall = true;
+            wallNormal = wallHit.normal;
+        }
+        else if (Physics.Raycast(transform.position, orientation.right, out wallHit, wallCheckDistance, whatIsWall))
+        {
+            touchingWall = true;
+            wallNormal = wallHit.normal;
+        }
+        else if (Physics.Raycast(transform.position, -orientation.right, out wallHit, wallCheckDistance, whatIsWall))
+        {
+            touchingWall = true;
+            wallNormal = wallHit.normal;
+        }
+
+        // Se tocchi un muro e non sei a terra, applica meccaniche di slide
         if (touchingWall && !grounded)
         {
-            // Forza verso il basso per far scivolare il player
-            rb.AddForce(Vector3.down * 15f, ForceMode.Force);
+            // 1. AZZERARE LA COMPONENTE DI VELOCITÀ CHE SPINGE CONTRO IL MURO
+            float velocityAgainstWall = Vector3.Dot(rb.linearVelocity, -wallNormal);
+
+            if (velocityAgainstWall > 0)
+            {
+                Vector3 velocityIntoWall = -wallNormal * velocityAgainstWall;
+                rb.linearVelocity -= velocityIntoWall;
+            }
+
+            // 2. FORZA VERSO IL BASSO AUMENTATA (da 15f a 50f)
+            rb.AddForce(Vector3.down * 50f, ForceMode.Force);
+
+            // 3. FORZA DI ALLONTANAMENTO DAL MURO
+            rb.AddForce(wallNormal * 2f, ForceMode.Force);
         }
     }
 
@@ -167,7 +200,15 @@ public class PlayerMovement : MonoBehaviour
         }
         else // Movimento in aria
         {
-            rb.AddForce(moveDirection.normalized * currentMoveSpeed * 10f * airMultiplier, ForceMode.Force);
+            // Controlla se stai toccando un muro
+            bool touchingWall = Physics.Raycast(transform.position, orientation.forward, wallCheckDistance, whatIsWall) ||
+                                Physics.Raycast(transform.position, -orientation.forward, wallCheckDistance, whatIsWall) ||
+                                Physics.Raycast(transform.position, orientation.right, wallCheckDistance, whatIsWall) ||
+                                Physics.Raycast(transform.position, -orientation.right, wallCheckDistance, whatIsWall);
+
+            // Riduci forza di movimento quando tocchi un muro (80% di riduzione)
+            float airForceMultiplier = touchingWall ? 0.2f : 1.0f;
+            rb.AddForce(moveDirection.normalized * currentMoveSpeed * 10f * airMultiplier * airForceMultiplier, ForceMode.Force);
         }
     }
     
