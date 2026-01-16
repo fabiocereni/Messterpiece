@@ -7640,7 +7640,7 @@ MonoBehaviour:
   muzzleFlash: {fileID: 0}
   audioSource: {fileID: 2999375436484997529}
   fireSound: {fileID: 8300000, guid: 0856b9672d5184efe9c1f8e044f5b3ea, type: 3}
-  damage: 10
+  damage: 25
   damageLayerMask:
     serializedVersion: 2
     m_Bits: 768
@@ -13981,7 +13981,12 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 2048
   shootingAngleThreshold: 10
+  rotationSpeed: 5
   patrolPoints:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
 --- !u!114 &5726766327316334074
@@ -14015,6 +14020,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyRespawn
   spawnPoints:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
