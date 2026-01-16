@@ -99,6 +99,14 @@ public class PlayerLook : MonoBehaviour
             currentCameraMode = cameraController.GetCurrentMode();
         }
 
+        // In TPS mode, ThirdPersonCamera gestisce tutto (mouse input + rotazione)
+        // PlayerLook non deve fare nulla per evitare conflitti
+        if (currentCameraMode == CameraMode.ThirdPerson)
+        {
+            return;
+        }
+
+        // Solo in FPS mode: processa input e applica rotazione
         // Mouse input
         float mouseX = Input.GetAxis("Mouse X") * sensX * sensitivityMult * Time.deltaTime;
         float mouseY = Input.GetAxis("Mouse Y") * sensY * sensitivityMult * Time.deltaTime;
@@ -108,8 +116,8 @@ public class PlayerLook : MonoBehaviour
         xRot -= mouseY;
         xRot = Mathf.Clamp(xRot, -90f, 90f);
 
-        // Applica rotazione in base alla modalità
-        ApplyRotation();
+        // Applica rotazione FPS
+        ApplyFirstPersonRotation();
     }
 
     private void ApplyRotation()

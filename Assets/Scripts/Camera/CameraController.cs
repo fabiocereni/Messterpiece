@@ -235,6 +235,13 @@ public class CameraController : MonoBehaviour
         if (tpsMainCamera != null)
             tpsMainCamera.enabled = (mode == CameraMode.ThirdPerson);
 
+        // Quando si passa a TPS, resetta la rotazione del CameraHolder
+        // Questo evita che l'arma resti puntata nella direzione FPS precedente
+        if (mode == CameraMode.ThirdPerson && cameraHolder != null)
+        {
+            cameraHolder.localRotation = Quaternion.identity;
+        }
+
         // Aggiorna Gun.cs per usare la camera attiva
         UpdateGunCameraReference();
 
@@ -314,22 +321,31 @@ public class CameraController : MonoBehaviour
 
     private void UpdatePlayerVisibility()
     {
-        if (hideInFPS == null || hideInFPS.Length == 0)
-            return;
-
         bool showPlayer = (currentMode == CameraMode.ThirdPerson);
 
-        foreach (Renderer renderer in hideInFPS)
+        // Aggiorna i renderer nell'array hideInFPS (metodo legacy)
+        if (hideInFPS != null && hideInFPS.Length > 0)
         {
-            if (renderer != null)
+            foreach (Renderer renderer in hideInFPS)
             {
-                renderer.enabled = showPlayer;
+                if (renderer != null)
+                {
+                    renderer.enabled = showPlayer;
+                }
             }
+        }
+
+        // Aggiorna PlayerBodyVisibility (gestisce anche ShadowsOnly mode)
+        PlayerBodyVisibility bodyVisibility = GetComponent<PlayerBodyVisibility>();
+        if (bodyVisibility != null)
+        {
+            bodyVisibility.SetVisible(showPlayer);
         }
 
         if (showDebugLogs)
             Debug.Log($"[CameraController] Player visibility: {showPlayer}");
     }
+
 
     #endregion
 
