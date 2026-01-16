@@ -19,6 +19,7 @@ GameObject:
   - component: {fileID: 8151251396798498090}
   - component: {fileID: 4013198510900401081}
   - component: {fileID: 2287583825432335681}
+  - component: {fileID: 8684917997001301347}
   m_Layer: 8
   m_Name: PlayerV2
   m_TagString: Player
@@ -253,10 +254,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4014cc477dd4944fda20af9b9679f14d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerHealth
-  maxHealth: 150
+  maxHealth: 100
   currentHealth: 0
   healthBarUI: {fileID: 8393576342397739058}
-  playerRespawn: {fileID: 0}
+  playerRespawn: {fileID: 8684917997001301347}
   invincibilityDuration: 1
 --- !u!114 &2287583825432335681
 MonoBehaviour:
@@ -273,6 +274,31 @@ MonoBehaviour:
   playerHealth: {fileID: 4013198510900401081}
   testDamageAmount: 20
   testHealAmount: 30
+--- !u!114 &8684917997001301347
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 413985046921310704}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d9c749735c57d4499844aa349a8a6fae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerRespawn
+  spawnPoints:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  spawnPointTag: SpawnPoint
+  useAutoSpawnPoints: 1
+  respawnHealth: 100
+  respawnAmmo: 30
+  disablePlayerOnDeath: 1
+  resetVelocity: 1
+  respawnEffect: {fileID: 0}
+  respawnSound: {fileID: 0}
+  showDebugLogs: 1
 --- !u!1 &1266288695285668696
 GameObject:
   m_ObjectHideFlags: 0
@@ -10196,7 +10222,7 @@ AudioSource:
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 0
   m_Volume: 1
-  m_Pitch: 1
+  m_Pitch: 1.22
   Loop: 0
   Mute: 0
   Spatialize: 0
@@ -10239,7 +10265,7 @@ AudioSource:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 1
+      value: 0
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -10527,7 +10553,7 @@ MonoBehaviour:
   m_PreserveMeshAssetOnDestroy: 0
   assetGuid: 
   m_Mesh: {fileID: 0}
-  m_VersionIndex: 560
+  m_VersionIndex: 587
   m_IsSelectable: 1
   m_SelectedFaces: 
   m_SelectedEdges: []
@@ -11789,7 +11815,7 @@ MonoBehaviour:
   m_PreserveMeshAssetOnDestroy: 0
   assetGuid: 
   m_Mesh: {fileID: 0}
-  m_VersionIndex: 915
+  m_VersionIndex: 942
   m_IsSelectable: 1
   m_SelectedFaces: 
   m_SelectedEdges: []
@@ -11944,7 +11970,7 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 0
-  m_Volume: 1
+  m_Volume: 0.799
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -11988,7 +12014,7 @@ AudioSource:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 1
+      value: 0
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -12456,7 +12482,7 @@ MonoBehaviour:
   m_PreserveMeshAssetOnDestroy: 0
   assetGuid: 
   m_Mesh: {fileID: 0}
-  m_VersionIndex: 2034
+  m_VersionIndex: 2061
   m_IsSelectable: 1
   m_SelectedFaces: 
   m_SelectedEdges: []
@@ -12727,7 +12753,7 @@ AudioSource:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 1
+      value: 0
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -13597,7 +13623,7 @@ MonoBehaviour:
   m_PreserveMeshAssetOnDestroy: 0
   assetGuid: 
   m_Mesh: {fileID: 0}
-  m_VersionIndex: 915
+  m_VersionIndex: 942
   m_IsSelectable: 1
   m_SelectedFaces: 
   m_SelectedEdges: []
