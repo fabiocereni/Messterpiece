@@ -15,8 +15,15 @@ public class EnemyGun : MonoBehaviour
     public LayerMask damageLayerMask;
     public float maxDistance = 100f;
 
+    [Tooltip("Regola l'altezza del tiro: valori negativi per mirare più in basso, positivi per più in alto.")]
+    public float verticalOffset = -0.1f;
+
     public void Shoot(Vector3 direction)
     {
+        // 1. APPLICA OFFSET: Modifichiamo la direzione verso l'alto o verso il basso
+        direction.y += verticalOffset;
+        direction = direction.normalized; // Manteniamo il vettore normalizzato dopo la modifica
+
         if (muzzleFlash != null) muzzleFlash.Play();
         if (audioSource != null && fireSound != null) audioSource.PlayOneShot(fireSound);
 
@@ -28,25 +35,21 @@ public class EnemyGun : MonoBehaviour
         }
 
         RaycastHit hit;
+        // Usiamo la direzione modificata per il Raycast
         if (Physics.Raycast(firePoint.position, direction, out hit, maxDistance, damageLayerMask))
         {
-            // Otteniamo la radice del nemico che spara
             GameObject shooter = transform.root.gameObject; 
 
-            // 1. Controllo Player
             PlayerHealth playerHealth = hit.collider.GetComponentInParent<PlayerHealth>();
             if (playerHealth != null)
             {
-                // Rispettiamo la nuova firma: danno, punto, e chi spara
                 playerHealth.TakeDamage(actualDamage, hit.point, shooter); 
             }
-            // 2. Controllo Altri Nemici
             else 
             {
                 EnemyHealth enemyHealth = hit.collider.GetComponentInParent<EnemyHealth>();
                 if (enemyHealth != null)
                 {
-                    // Rispettiamo la firma esistente di EnemyHealth
                     enemyHealth.TakeDamage(actualDamage, hit.point, shooter); 
                 }
             }
@@ -54,6 +57,7 @@ public class EnemyGun : MonoBehaviour
 
         if (projectilePrefab != null)
         {
+            // Usiamo la direzione modificata anche per la rotazione del proiettile
             Instantiate(projectilePrefab, firePoint.position, Quaternion.LookRotation(direction));
         }
     }

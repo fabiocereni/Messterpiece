@@ -7644,7 +7644,8 @@ MonoBehaviour:
   damageLayerMask:
     serializedVersion: 2
     m_Bits: 768
-  maxDistance: 100
+  maxDistance: 200
+  verticalOffset: -0.1
 --- !u!1 &7251743817776086448
 GameObject:
   m_ObjectHideFlags: 0
@@ -13975,7 +13976,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 768
   fieldOfViewAngle: 90
-  detectionRadius: 15
+  detectionRadius: 20
   obstacleLayer:
     serializedVersion: 2
     m_Bits: 2048

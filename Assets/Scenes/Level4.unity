@@ -24330,17 +24330,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1.2365628, y: 3.7448697, z: 1.1242919}
   m_Center: {x: 0.0063327556, y: 1.3724333, z: -0.062146142}
---- !u!114 &1122295453 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 928478037771124390, guid: dcdcd6af294464f2b9b8c9e6d9bd15b2, type: 3}
-  m_PrefabInstance: {fileID: 2054262829}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d2d25ecd2fc1746dfb176feb5712514b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: '::'
 --- !u!1001 &1123445650
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -46551,30 +46540,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 928478037771124390, guid: dcdcd6af294464f2b9b8c9e6d9bd15b2, type: 3}
-      propertyPath: damage
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 928478037771124390, guid: dcdcd6af294464f2b9b8c9e6d9bd15b2, type: 3}
-      propertyPath: damageLayerMask.m_Bits
-      value: 768
-      objectReference: {fileID: 0}
-    - target: {fileID: 6588064982322070402, guid: dcdcd6af294464f2b9b8c9e6d9bd15b2, type: 3}
-      propertyPath: enemyGun
-      value: 
-      objectReference: {fileID: 1122295453}
-    - target: {fileID: 6588064982322070402, guid: dcdcd6af294464f2b9b8c9e6d9bd15b2, type: 3}
-      propertyPath: playerTransform
-      value: 
-      objectReference: {fileID: 370640900}
-    - target: {fileID: 6588064982322070402, guid: dcdcd6af294464f2b9b8c9e6d9bd15b2, type: 3}
-      propertyPath: targetLayers.m_Bits
-      value: 768
-      objectReference: {fileID: 0}
-    - target: {fileID: 6588064982322070402, guid: dcdcd6af294464f2b9b8c9e6d9bd15b2, type: 3}
-      propertyPath: obstacleLayer.m_Bits
-      value: 2048
-      objectReference: {fileID: 0}
     - target: {fileID: 6588064982322070402, guid: dcdcd6af294464f2b9b8c9e6d9bd15b2, type: 3}
       propertyPath: 'patrolPoints.Array.data[0]'
       value: 
