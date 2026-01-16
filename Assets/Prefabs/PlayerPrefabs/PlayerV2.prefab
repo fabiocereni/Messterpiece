@@ -298,6 +298,9 @@ MonoBehaviour:
   resetVelocity: 1
   respawnEffect: {fileID: 0}
   respawnSound: {fileID: 0}
+  playerVisuals: {fileID: 2900344887481976602}
+  playerCamera: {fileID: 321838283031119619}
+  droneCamera: {fileID: 0}
   showDebugLogs: 1
 --- !u!1 &1266288695285668696
 GameObject:

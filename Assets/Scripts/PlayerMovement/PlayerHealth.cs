@@ -125,11 +125,11 @@ public class PlayerHealth : MonoBehaviour
     
 
     /// <summary>
-    /// Getter per checking se morto
+    /// Getter per checking se morto (usa il flag isDead invece di solo currentHealth)
     /// </summary>
     public bool IsDead()
     {
-        return currentHealth <= 0;
+        return isDead;
     }
 
     /// <summary>

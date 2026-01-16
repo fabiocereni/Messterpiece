@@ -39,9 +39,19 @@ public class PlayerRespawn : MonoBehaviour
     [Header("Visual Effects")]
     [Tooltip("Effetto visivo durante il respawn")]
     public GameObject respawnEffect;
-    
+
     [Tooltip("Suono del respawn")]
     public AudioClip respawnSound;
+
+    [Header("Death Camera Settings")]
+    [Tooltip("GameObject contenente PlayerVisuals (mesh del player)")]
+    public GameObject playerVisuals;
+
+    [Tooltip("Camera del player (da disattivare alla morte)")]
+    public Camera playerCamera;
+
+    [Tooltip("Drone Camera da attivare quando il player muore")]
+    public Camera droneCamera;
     
 
     
@@ -99,10 +109,10 @@ public class PlayerRespawn : MonoBehaviour
         playerMovement = GetComponent<PlayerMovement>();
         playerLook = GetComponent<PlayerLook>();
         playerGun = GetComponent<Gun>();
-        
+
         // Cerca AmmoDisplay nella scena
         ammoDisplay = FindObjectOfType<AmmoDisplay>();
-        
+
         // Audio source
         audioSource = GetComponent<AudioSource>();
         if (audioSource == null)
@@ -110,7 +120,43 @@ public class PlayerRespawn : MonoBehaviour
             audioSource = gameObject.AddComponent<AudioSource>();
             audioSource.playOnAwake = false;
         }
-        
+
+        // Auto-find PlayerVisuals se non assegnato
+        if (playerVisuals == null)
+        {
+            Transform visualsTransform = transform.Find("PlayerVisuals");
+            if (visualsTransform != null)
+            {
+                playerVisuals = visualsTransform.gameObject;
+                if (showDebugLogs)
+                    Debug.Log("[PlayerRespawn] PlayerVisuals trovato automaticamente");
+            }
+        }
+
+        // Auto-find PlayerCamera se non assegnata
+        if (playerCamera == null)
+        {
+            Transform cameraHolder = transform.Find("CameraHolder");
+            if (cameraHolder != null)
+            {
+                playerCamera = cameraHolder.GetComponentInChildren<Camera>();
+                if (playerCamera != null && showDebugLogs)
+                    Debug.Log("[PlayerRespawn] PlayerCamera trovata automaticamente");
+            }
+        }
+
+        // Auto-find DroneCamera se non assegnata
+        if (droneCamera == null)
+        {
+            GameObject droneCamObj = GameObject.Find("DroneCamera");
+            if (droneCamObj != null)
+            {
+                droneCamera = droneCamObj.GetComponent<Camera>();
+                if (droneCamera != null && showDebugLogs)
+                    Debug.Log("[PlayerRespawn] DroneCamera trovata automaticamente");
+            }
+        }
+
         if (showDebugLogs)
             Debug.Log("[PlayerRespawn] Componenti ottenuti");
     }
@@ -349,12 +395,15 @@ public class PlayerRespawn : MonoBehaviour
     {
         if (playerMovement != null)
             playerMovement.enabled = false;
-        
+
         if (playerLook != null)
             playerLook.enabled = false;
-        
+
         if (playerGun != null)
             playerGun.enabled = false;
+
+        // Nascondi il player e cambia camera
+        HidePlayerAndSwitchToDroneCamera();
     }
     
     /// <summary>
@@ -362,16 +411,19 @@ public class PlayerRespawn : MonoBehaviour
     /// </summary>
     private void EnablePlayerControls(Transform spawnPoint)
     {
+        // Mostra il player e cambia camera
+        ShowPlayerAndSwitchToPlayerCamera();
+
         if (playerMovement != null)
             playerMovement.enabled = true;
-        
+
         if (playerLook != null)
         {
             playerLook.enabled = true;
             // Resetta la rotazione della camera per matchare lo spawn point
             ResetPlayerRotation(spawnPoint);
         }
-        
+
         if (playerGun != null)
             playerGun.enabled = true;
     }
@@ -512,6 +564,78 @@ public class PlayerRespawn : MonoBehaviour
         }
     }
     
+    /// <summary>
+    /// Nasconde il player e attiva la DroneCamera
+    /// </summary>
+    private void HidePlayerAndSwitchToDroneCamera()
+    {
+        // Nascondi PlayerVisuals
+        if (playerVisuals != null)
+        {
+            playerVisuals.SetActive(false);
+            if (showDebugLogs)
+                Debug.Log("[PlayerRespawn] PlayerVisuals nascosto");
+        }
+        else if (showDebugLogs)
+        {
+            Debug.LogWarning("[PlayerRespawn] PlayerVisuals non assegnato! Assegnalo nell'Inspector.");
+        }
+
+        // Disattiva PlayerCamera
+        if (playerCamera != null)
+        {
+            playerCamera.enabled = false;
+            if (showDebugLogs)
+                Debug.Log("[PlayerRespawn] PlayerCamera disattivata");
+        }
+        else if (showDebugLogs)
+        {
+            Debug.LogWarning("[PlayerRespawn] PlayerCamera non assegnata! Assegnala nell'Inspector.");
+        }
+
+        // Attiva DroneCamera
+        if (droneCamera != null)
+        {
+            droneCamera.enabled = true;
+            if (showDebugLogs)
+                Debug.Log("[PlayerRespawn] DroneCamera attivata");
+        }
+        else if (showDebugLogs)
+        {
+            Debug.LogWarning("[PlayerRespawn] DroneCamera non trovata! Creala nella scena o assegnala nell'Inspector.");
+        }
+    }
+
+    /// <summary>
+    /// Mostra il player e riattiva la PlayerCamera
+    /// </summary>
+    private void ShowPlayerAndSwitchToPlayerCamera()
+    {
+        // Mostra PlayerVisuals
+        if (playerVisuals != null)
+        {
+            playerVisuals.SetActive(true);
+            if (showDebugLogs)
+                Debug.Log("[PlayerRespawn] PlayerVisuals mostrato");
+        }
+
+        // Attiva PlayerCamera
+        if (playerCamera != null)
+        {
+            playerCamera.enabled = true;
+            if (showDebugLogs)
+                Debug.Log("[PlayerRespawn] PlayerCamera riattivata");
+        }
+
+        // Disattiva DroneCamera
+        if (droneCamera != null)
+        {
+            droneCamera.enabled = false;
+            if (showDebugLogs)
+                Debug.Log("[PlayerRespawn] DroneCamera disattivata");
+        }
+    }
+
     // Metodi per debug
     [ContextMenu("Test Respawn")]
     public void DebugRespawn()
