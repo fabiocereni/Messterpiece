@@ -44522,10 +44522,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: PlayerV2
       objectReference: {fileID: 0}
-    - target: {fileID: 413985046921310704, guid: e9ce68c878357476d8781580e5e38489, type: 3}
-      propertyPath: m_TagString
-      value: Player
-      objectReference: {fileID: 0}
     - target: {fileID: 670368892723439239, guid: e9ce68c878357476d8781580e5e38489, type: 3}
       propertyPath: m_Mesh
       value: 
@@ -44552,39 +44548,19 @@ PrefabInstance:
       objectReference: {fileID: 449393436}
     - target: {fileID: 3190984878421999749, guid: e9ce68c878357476d8781580e5e38489, type: 3}
       propertyPath: m_VersionIndex
-      value: 936
+      value: 945
       objectReference: {fileID: 0}
     - target: {fileID: 3399747593812718400, guid: e9ce68c878357476d8781580e5e38489, type: 3}
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 1896990359}
-    - target: {fileID: 4013198510900401081, guid: e9ce68c878357476d8781580e5e38489, type: 3}
-      propertyPath: maxHealth
-      value: 100
-      objectReference: {fileID: 0}
-    - target: {fileID: 4013198510900401081, guid: e9ce68c878357476d8781580e5e38489, type: 3}
-      propertyPath: playerRespawn
-      value: 
-      objectReference: {fileID: 2092560881}
-    - target: {fileID: 4138991143377901744, guid: e9ce68c878357476d8781580e5e38489, type: 3}
-      propertyPath: m_Pitch
-      value: 1.22
-      objectReference: {fileID: 0}
-    - target: {fileID: 4138991143377901744, guid: e9ce68c878357476d8781580e5e38489, type: 3}
-      propertyPath: panLevelCustomCurve.m_Curve.Array.data[0].value
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 4319880199679928123, guid: e9ce68c878357476d8781580e5e38489, type: 3}
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 53049669}
     - target: {fileID: 4319880199679928123, guid: e9ce68c878357476d8781580e5e38489, type: 3}
       propertyPath: m_VersionIndex
-      value: 2055
-      objectReference: {fileID: 0}
-    - target: {fileID: 4406395718911559954, guid: e9ce68c878357476d8781580e5e38489, type: 3}
-      propertyPath: panLevelCustomCurve.m_Curve.Array.data[0].value
-      value: 0
+      value: 2064
       objectReference: {fileID: 0}
     - target: {fileID: 5638210106189490797, guid: e9ce68c878357476d8781580e5e38489, type: 3}
       propertyPath: m_LocalPosition.x
@@ -44640,7 +44616,7 @@ PrefabInstance:
       objectReference: {fileID: 1896990359}
     - target: {fileID: 7730222688733311182, guid: e9ce68c878357476d8781580e5e38489, type: 3}
       propertyPath: m_VersionIndex
-      value: 581
+      value: 590
       objectReference: {fileID: 0}
     - target: {fileID: 7862538426198524846, guid: e9ce68c878357476d8781580e5e38489, type: 3}
       propertyPath: m_Mesh
@@ -44650,29 +44626,30 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 408879505}
-    - target: {fileID: 8380612137819659290, guid: e9ce68c878357476d8781580e5e38489, type: 3}
-      propertyPath: m_Volume
-      value: 0.799
-      objectReference: {fileID: 0}
-    - target: {fileID: 8380612137819659290, guid: e9ce68c878357476d8781580e5e38489, type: 3}
-      propertyPath: panLevelCustomCurve.m_Curve.Array.data[0].value
-      value: 0
-      objectReference: {fileID: 0}
+    - target: {fileID: 8684917997001301347, guid: e9ce68c878357476d8781580e5e38489, type: 3}
+      propertyPath: 'spawnPoints.Array.data[0]'
+      value: 
+      objectReference: {fileID: 1265499105}
+    - target: {fileID: 8684917997001301347, guid: e9ce68c878357476d8781580e5e38489, type: 3}
+      propertyPath: 'spawnPoints.Array.data[1]'
+      value: 
+      objectReference: {fileID: 1477723472}
+    - target: {fileID: 8684917997001301347, guid: e9ce68c878357476d8781580e5e38489, type: 3}
+      propertyPath: 'spawnPoints.Array.data[2]'
+      value: 
+      objectReference: {fileID: 980211}
     - target: {fileID: 9081433988478700192, guid: e9ce68c878357476d8781580e5e38489, type: 3}
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 408879505}
     - target: {fileID: 9081433988478700192, guid: e9ce68c878357476d8781580e5e38489, type: 3}
       propertyPath: m_VersionIndex
-      value: 936
+      value: 945
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 413985046921310704, guid: e9ce68c878357476d8781580e5e38489, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 2092560881}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e9ce68c878357476d8781580e5e38489, type: 3}
 --- !u!1001 &2001459499
 PrefabInstance:
@@ -47229,31 +47206,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 413985046921310704, guid: e9ce68c878357476d8781580e5e38489, type: 3}
   m_PrefabInstance: {fileID: 1999179780}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &2092560881
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2092560870}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d9c749735c57d4499844aa349a8a6fae, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerRespawn
-  spawnPoints:
-  - {fileID: 1265499105}
-  - {fileID: 1477723472}
-  - {fileID: 980211}
-  spawnPointTag: SpawnPoint
-  useAutoSpawnPoints: 1
-  respawnHealth: 100
-  respawnAmmo: 30
-  disablePlayerOnDeath: 1
-  resetVelocity: 1
-  respawnEffect: {fileID: 0}
-  respawnSound: {fileID: 0}
-  showDebugLogs: 1
 --- !u!4 &2094709185 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: daf35912ed6504e92b33f76c60bef3be, type: 3}

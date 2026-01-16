@@ -112,10 +112,6 @@ public class PlayerHealth : MonoBehaviour
             MatchManager.Instance.RegisterKill(lastAttacker, transform.root.gameObject);
         }
 
-        // ELIMINATA LA SECONDA CHIAMATA: prima chiamavi RegisterKill due volte, 
-        // una per il root e una per il gameObject specifico del collider. 
-        // Questo creava due entità diverse nella leaderboard.
-
         if (playerRespawn != null)
         {
             playerRespawn.RespawnPlayer(gameObject);
