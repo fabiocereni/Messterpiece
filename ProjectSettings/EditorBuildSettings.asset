@@ -17,7 +17,7 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/PlayerMovementTestScene.unity
     guid: d1ed993bc0f2547928cca09243451454
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Level1.unity
     guid: 1f694357d8e88431fb342c35aef9803e
   - enabled: 1
