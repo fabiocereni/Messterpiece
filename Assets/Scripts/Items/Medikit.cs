@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 /// <summary>
@@ -19,8 +20,23 @@ public class Medikit : MonoBehaviour
     
     [Tooltip("Effetto particelle quando raccolto")]
     public GameObject pickupVFX;
+    
+    [Header("Respawn")]
+    [Tooltip("Tempo di respawn del medikit")]
+    public float respawnTime = 10f;
+    
+    private Renderer[] renderers;
+    private Light[] lights;
+    private Collider pickupCollider;
 
     private bool isCollected = false;
+    
+    private void Awake()
+    {
+        renderers = GetComponentsInChildren<Renderer>(true);
+        lights = GetComponentsInChildren<Light>(true);
+        pickupCollider = GetComponent<Collider>();
+    }
 
     private void OnTriggerEnter(Collider other)
     {
@@ -38,16 +54,28 @@ public class Medikit : MonoBehaviour
                 playerHealth.Heal(healAmount);
                 
                 isCollected = true;
-                
-                Debug.Log($"[Medikit] Player curato di {healAmount} HP");
 
-                // Effetti opzionali
                 PlayEffects();
 
-                // Distruggi il medikit
-                Destroy(gameObject);
+                // Nascondi visivamente il medikit
+                SetMedikitActive(false);
+
+                // Avvia respawn
+                StartCoroutine(RespawnCoroutine());
             }
         }
+    }
+    
+    private void SetMedikitActive(bool active)
+    {
+        foreach (var r in renderers)
+            r.enabled = active;
+
+        foreach (var l in lights)
+            l.enabled = active;
+
+        if (pickupCollider != null)
+            pickupCollider.enabled = active;
     }
 
     private void PlayEffects()
@@ -64,5 +92,13 @@ public class Medikit : MonoBehaviour
             GameObject vfx = Instantiate(pickupVFX, transform.position, Quaternion.identity);
             Destroy(vfx, 2f);
         }
+    }
+    
+    private IEnumerator RespawnCoroutine()
+    {
+        yield return new WaitForSeconds(respawnTime);
+
+        isCollected = false;
+        SetMedikitActive(true);
     }
 }
