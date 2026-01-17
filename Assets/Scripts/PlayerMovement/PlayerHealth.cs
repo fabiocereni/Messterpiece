@@ -31,16 +31,23 @@ public class PlayerHealth : MonoBehaviour
     private GameObject lastAttacker = null;
     private bool isDead = false;
 
+    private bool hasMatchStarted = false;
+
     void Start()
     {
         currentHealth = maxHealth;
 
-        // Aggiorna la UI all'inizio
         if (healthBarUI != null)
         {
             healthBarUI.UpdateHealthBar(currentHealth, maxHealth);
         }
+
+        if (MatchFlowManager.Instance != null)
+        {
+            MatchFlowManager.Instance.OnWarmupComplete += OnMatchStarted;
+        }
     }
+
 
     /// <summary>
     /// Applica danno al player
@@ -174,9 +181,28 @@ public class PlayerHealth : MonoBehaviour
 
         isInvincible = false;
 
-        if (crosshairUI != null)
+        if (crosshairUI != null && hasMatchStarted)
         {
             crosshairUI.SetActive(true);
+        }
+
+    }
+    
+    private void OnMatchStarted()
+    {
+        hasMatchStarted = true;
+
+        if (!isDead && crosshairUI != null)
+        {
+            crosshairUI.SetActive(true);
+        }
+    }
+    
+    private void OnDestroy()
+    {
+        if (MatchFlowManager.Instance != null)
+        {
+            MatchFlowManager.Instance.OnWarmupComplete -= OnMatchStarted;
         }
     }
 
