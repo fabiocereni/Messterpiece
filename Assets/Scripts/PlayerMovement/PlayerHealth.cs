@@ -21,6 +21,10 @@ public class PlayerHealth : MonoBehaviour
     [Header("Damage Feedback")]
     [Tooltip("Tempo di invincibilità dopo aver preso danno")]
     public float invincibilityDuration = 1.0f;
+    
+    [Header("UI")]
+    [Tooltip("Mirino del player")]
+    public GameObject crosshairUI;
 
     private bool isInvincible = false;
 
@@ -100,13 +104,16 @@ public class PlayerHealth : MonoBehaviour
     /// </summary>
     private void Die()
     {
-        if (isDead) return; // Evita chiamate multiple se arrivano più colpi insieme
+        if (isDead) return;
         isDead = true;
 
-        Debug.Log($"[PlayerHealth] Player DIED!");
-        
-        // Registra la morte usando il ROOT, che è l'oggetto che il 
-        // MatchManager ha registrato all'inizio come "Player"
+        Debug.Log("[PlayerHealth] Player DIED!");
+
+        if (crosshairUI != null)
+        {
+            crosshairUI.SetActive(false);
+        }
+
         if (MatchManager.Instance != null)
         {
             MatchManager.Instance.RegisterKill(lastAttacker, transform.root.gameObject);
@@ -154,21 +161,25 @@ public class PlayerHealth : MonoBehaviour
     public void RestoreHealth(float amount)
     {
         isDead = false;
-        
+
         currentHealth = amount;
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
-        
+
         Debug.Log($"[PlayerHealth] Salute ripristinata a {currentHealth}/{maxHealth}");
-        
-        // Aggiorna la UI
+
         if (healthBarUI != null)
         {
             healthBarUI.UpdateHealthBar(currentHealth, maxHealth);
         }
-        
-        // Resetta invincibilità
+
         isInvincible = false;
+
+        if (crosshairUI != null)
+        {
+            crosshairUI.SetActive(true);
+        }
     }
+
     
     
 }
