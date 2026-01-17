@@ -3,30 +3,35 @@ using UnityEngine.SceneManagement;
 
 public class PauseMenuLogic : MonoBehaviour
 {
+    [Header("UI References")]
+    public GameObject pausePanel;     // Il menu di pausa principale
+    public GameObject commandsPanel;  // IL NUOVO Pannello con l'immagine dei comandi
 
-    public GameObject pausePanel;
     public bool isPaused = false;
 
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            // Check if player is dead before allowing pause
+            // Controlli di sicurezza (se morto o match finito non fa nulla)
             PlayerHealth playerHealth = FindObjectOfType<PlayerHealth>();
-            if (playerHealth != null && playerHealth.IsDead())
-            {
-                return;
-            }
+            if (playerHealth != null && playerHealth.IsDead()) return;
 
-            // Check if match is over before allowing pause
-            if (MatchManager.Instance != null && !MatchManager.Instance.IsMatchActive)
-            {
-                return;
-            }
+            if (MatchManager.Instance != null && !MatchManager.Instance.IsMatchActive) return;
 
+            // LOGICA ESC:
             if (isPaused)
             {
-                ResumeGame();
+                // Se il menu comandi è aperto, chiudilo e torna al menu pausa
+                if (commandsPanel.activeSelf)
+                {
+                    CloseCommands();
+                }
+                else
+                {
+                    // Altrimenti torna al gioco
+                    ResumeGame();
+                }
             }
             else
             {
@@ -37,22 +42,42 @@ public class PauseMenuLogic : MonoBehaviour
 
     public void PauseGame()
     {
-        pausePanel.SetActive(true); 
-        Time.timeScale = 0f; // congelo il tempo (nemici fermi, animazioni ferme)
+        pausePanel.SetActive(true);
+        commandsPanel.SetActive(false); // Assicuriamoci che i comandi siano chiusi all'inizio
+        
+        Time.timeScale = 0f; 
         isPaused = true;
 
-        Cursor.lockState = CursorLockMode.None; // mostro il cursore
+        Cursor.lockState = CursorLockMode.None; 
         Cursor.visible = true;
     }
 
     public void ResumeGame()
     {
-        pausePanel.SetActive(false); 
+        pausePanel.SetActive(false);
+        commandsPanel.SetActive(false); // Chiudiamo tutto
+        
         Time.timeScale = 1f;
         isPaused = false;
 
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+    }
+
+    // --- NUOVE FUNZIONI PER I COMANDI ---
+
+    // Collegalo al bottone "COMANDI" nel menu di pausa
+    public void OpenCommands()
+    {
+        pausePanel.SetActive(false);   // Nascondo il menu pausa
+        commandsPanel.SetActive(true); // Mostro l'immagine comandi
+    }
+
+    // Collegalo a un bottone "INDIETRO" dentro la schermata dei comandi
+    public void CloseCommands()
+    {
+        commandsPanel.SetActive(false); // Nascondo i comandi
+        pausePanel.SetActive(true);     // Riapro il menu pausa
     }
 
     public void QuitToMainMenu()
