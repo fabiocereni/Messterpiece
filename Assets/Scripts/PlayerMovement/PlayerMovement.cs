@@ -164,6 +164,7 @@ public class PlayerMovement : MonoBehaviour
         }
 
         moveDirection = orientation.forward * verticalInput + orientation.right * horizontalInput;
+        moveDirection.y = 0;
         onSlope = CheckOnSlope();
 
         if (onSlope)
