@@ -2935,7 +2935,7 @@ GameObject:
   m_Component:
   - component: {fileID: 892629397}
   m_Layer: 0
-  m_Name: Player_Spawn
+  m_Name: SpawnPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6197,6 +6197,14 @@ PrefabInstance:
       propertyPath: m_Material
       value: 
       objectReference: {fileID: 13400000, guid: 6160a2a2a22ac442b98cdc1d7b6ecc67, type: 2}
+    - target: {fileID: 8684917997001301347, guid: e9ce68c878357476d8781580e5e38489, type: 3}
+      propertyPath: spawnPoints.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8684917997001301347, guid: e9ce68c878357476d8781580e5e38489, type: 3}
+      propertyPath: 'spawnPoints.Array.data[0]'
+      value: 
+      objectReference: {fileID: 892629397}
     - target: {fileID: 9081433988478700192, guid: e9ce68c878357476d8781580e5e38489, type: 3}
       propertyPath: m_Mesh
       value: 
