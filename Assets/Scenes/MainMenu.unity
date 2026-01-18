@@ -844,13 +844,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 38e75fba619cf6713adeb52cab7a1f0e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::OptionsMenuUI
-  volumeSlider: {fileID: 1575016695}
-  volumeValueText: {fileID: 105112527}
-  difficultyDropdown: {fileID: 862856613}
-  backButton: {fileID: 907832007}
-  optionsPanel: {fileID: 386994426}
-  mainMenuPanel: {fileID: 701254616}
-  showDebugLogs: 1
 --- !u!114 &386994431
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4431,7 +4424,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: fd0834e4eadb84f00a9abf59a9ae4eb2, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 7019247a62e2e4fe28ed090580136c1e, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
