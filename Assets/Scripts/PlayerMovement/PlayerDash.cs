@@ -1,23 +1,23 @@
-using System.Collections; // Necessario per IEnumerator
+using System.Collections;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
 public class PlayerDash : MonoBehaviour
 {
     public AudioSource audioSource;
-    public AudioClip dashSound;     // file audio (.wav o .mp3)
-    
+    public AudioClip dashSound;
+
     [Header("Dashing")]
     public float dashForce = 15f;
-    public float dashDuration = 0.2f; // Durata in secondi del dash
+    public float dashDuration = 0.2f;
     public float dashCooldown = 1f;
-    public Transform cameraTransform; // <-- ASSEGNA LA MAIN CAMERA QUI
+    public Transform cameraTransform;
 
     private Rigidbody rb;
     private bool dashRequested;
     private float nextDashTime = 0f;
+    private float dashEndTime;
 
-    // Proprietà pubblica per far sapere agli altri script se stiamo scattando
     public bool IsDashing { get; private set; }
 
     void Start()
@@ -31,24 +31,11 @@ public class PlayerDash : MonoBehaviour
 
     void Update()
     {
-        // Disable dashing during warmup
-        if (MatchFlowManager.Instance != null && !MatchFlowManager.Instance.CanPlayerMove())
-        {
-            return;
-        }
-
-        // Disable dashing when player is dead
+        // Controlli di stato (warmup, morte, match)
+        if (MatchFlowManager.Instance != null && !MatchFlowManager.Instance.CanPlayerMove()) return;
         PlayerHealth playerHealth = GetComponent<PlayerHealth>();
-        if (playerHealth != null && playerHealth.IsDead())
-        {
-            return;
-        }
-
-        // Disable dashing when match is over
-        if (MatchManager.Instance != null && !MatchManager.Instance.IsMatchActive)
-        {
-            return;
-        }
+        if (playerHealth != null && playerHealth.IsDead()) return;
+        if (MatchManager.Instance != null && !MatchManager.Instance.IsMatchActive) return;
 
         if (Input.GetKeyDown(KeyCode.E) && Time.time >= nextDashTime)
         {
@@ -61,35 +48,34 @@ public class PlayerDash : MonoBehaviour
     {
         if (dashRequested)
         {
-            HandleDash();
+            StartDash();
             dashRequested = false;
         }
-    }
 
-    private void HandleDash()
-    {
-        if (cameraTransform != null)
+        if (IsDashing)
         {
-            // Imposta lo stato di dash
-            IsDashing = true;
-
-            // Applica l'impulso
-            rb.AddForce(cameraTransform.forward * dashForce, ForceMode.Impulse);
-            
-            // Riproduci l'audio
-            audioSource.PlayOneShot(dashSound);
-
-            // Avvia la coroutine per resettare lo stato dopo 'dashDuration'
-            StartCoroutine(StopDash());
+            // Mantiene la velocità costante per la durata del dash
+            if (Time.time >= dashEndTime)
+            {
+                IsDashing = false;
+            }
+            else
+            {
+                rb.linearVelocity = cameraTransform.forward.normalized * dashForce;
+            }
         }
     }
 
-    private IEnumerator StopDash()
+    private void StartDash()
     {
-        // Attendi la fine della durata del dash
-        yield return new WaitForSeconds(dashDuration);
-        
-        // Resetta lo stato
-        IsDashing = false;
+        if (cameraTransform == null) return;
+
+        IsDashing = true;
+        dashEndTime = Time.time + dashDuration;
+
+        if (audioSource != null && dashSound != null)
+        {
+            audioSource.PlayOneShot(dashSound);
+        }
     }
 }
