@@ -13978,6 +13978,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3483431209616832692}
   - component: {fileID: 6281401069868923329}
+  - component: {fileID: 2558542054175281196}
   m_Layer: 8
   m_Name: DamageIndicator
   m_TagString: Untagged
@@ -14019,7 +14020,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DamageIndicator
   DamageLocation: {x: 0, y: 0, z: 0}
   PlayerObject: {fileID: 5638210106189490797}
-  DamageImagePivot: {fileID: 9136686631979759668}
+  DamageImagePivot: {fileID: 3483431209616832692}
+--- !u!225 &2558542054175281196
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7492942291973114058}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &7794301638925643296
 GameObject:
   m_ObjectHideFlags: 0
