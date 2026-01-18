@@ -3,9 +3,12 @@ using UnityEngine.SceneManagement;
 
 public class PauseMenuLogic : MonoBehaviour
 {
-    [Header("UI References")]
-    public GameObject pausePanel;     // Il menu di pausa principale
-    public GameObject commandsPanel;  // IL NUOVO Pannello con l'immagine dei comandi
+    [Header("Pannelli UI")]
+    public GameObject pausePanel;     
+    public GameObject commandsPanel;
+    
+    [Header("Interfaccia Giocatore")]
+    public GameObject playerHUD; // NUOVO: Trascina qui il Canvas con Vita, Mirino, ecc.
 
     public bool isPaused = false;
 
@@ -13,23 +16,18 @@ public class PauseMenuLogic : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            // Controlli di sicurezza (se morto o match finito non fa nulla)
             PlayerHealth playerHealth = FindObjectOfType<PlayerHealth>();
             if (playerHealth != null && playerHealth.IsDead()) return;
-
             if (MatchManager.Instance != null && !MatchManager.Instance.IsMatchActive) return;
 
-            // LOGICA ESC:
             if (isPaused)
             {
-                // Se il menu comandi è aperto, chiudilo e torna al menu pausa
                 if (commandsPanel.activeSelf)
                 {
                     CloseCommands();
                 }
                 else
                 {
-                    // Altrimenti torna al gioco
                     ResumeGame();
                 }
             }
@@ -43,20 +41,26 @@ public class PauseMenuLogic : MonoBehaviour
     public void PauseGame()
     {
         pausePanel.SetActive(true);
-        commandsPanel.SetActive(false); // Assicuriamoci che i comandi siano chiusi all'inizio
+        commandsPanel.SetActive(false);
         
+        // NUOVO: Nascondi l'interfaccia di gioco (vita, mirino...)
+        if (playerHUD != null) playerHUD.SetActive(false);
+
         Time.timeScale = 0f; 
         isPaused = true;
 
-        Cursor.lockState = CursorLockMode.None; 
+        Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
     }
 
     public void ResumeGame()
     {
         pausePanel.SetActive(false);
-        commandsPanel.SetActive(false); // Chiudiamo tutto
+        commandsPanel.SetActive(false);
         
+        // NUOVO: Riaccendi l'interfaccia di gioco
+        if (playerHUD != null) playerHUD.SetActive(true);
+
         Time.timeScale = 1f;
         isPaused = false;
 
@@ -64,25 +68,22 @@ public class PauseMenuLogic : MonoBehaviour
         Cursor.visible = false;
     }
 
-    // --- NUOVE FUNZIONI PER I COMANDI ---
-
-    // Collegalo al bottone "COMANDI" nel menu di pausa
     public void OpenCommands()
     {
-        pausePanel.SetActive(false);   // Nascondo il menu pausa
-        commandsPanel.SetActive(true); // Mostro l'immagine comandi
+        pausePanel.SetActive(false);   
+        commandsPanel.SetActive(true); 
+        // L'HUD è già spento perché siamo in pausa, quindi non serve fare nulla qui
     }
 
-    // Collegalo a un bottone "INDIETRO" dentro la schermata dei comandi
     public void CloseCommands()
     {
-        commandsPanel.SetActive(false); // Nascondo i comandi
-        pausePanel.SetActive(true);     // Riapro il menu pausa
+        commandsPanel.SetActive(false); 
+        pausePanel.SetActive(true);     
     }
 
-    public void QuitToMainMenu()
+    public void QuitGame()
     {
-        Time.timeScale = 1f;
+        Time.timeScale = 1f; 
         SceneManager.LoadScene("MainMenu");
     }
 }
