@@ -5,16 +5,23 @@ public class MainMenuScript : MonoBehaviour
 {
 
     public GameObject mainMenuPanel;
-    public GameObject selectionPanel;
+    public GameObject playMenuPanel;
+    public GameObject mapSelectionPanel;
     
     [Header("Opzioni")]
     [Tooltip("Riferimento al controller del menu opzioni")]
     public OptionsMenuController optionsMenu;
 
-    public void OpenSelectionMenu()
+    public void OpenPlayMenu()
     {
         mainMenuPanel.SetActive(false);
-        selectionPanel.SetActive(true);
+        playMenuPanel.SetActive(true);
+    }
+    
+    public void OpenMapSelection()
+    {
+        playMenuPanel.SetActive(false);
+        mapSelectionPanel.SetActive(true);
     }
     
     /// <summary>
@@ -52,7 +59,8 @@ public class MainMenuScript : MonoBehaviour
 
     public void BackToMainMenu()
     {
-        selectionPanel.SetActive(false);
+        mapSelectionPanel.SetActive(false);
+        playMenuPanel.SetActive(false);
         mainMenuPanel.SetActive(true);
     }
 }
