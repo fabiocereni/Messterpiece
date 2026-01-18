@@ -264,6 +264,7 @@ MonoBehaviour:
   playerRespawn: {fileID: 8684917997001301347}
   invincibilityDuration: 1
   crosshairUI: {fileID: 3628212040044803269}
+  myDamageIndicator: {fileID: 6281401069868923329}
 --- !u!114 &2287583825432335681
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -271,7 +272,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 413985046921310704}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3b047428900cb4a5f8682445c8cdc517, type: 3}
   m_Name: 
@@ -13985,7 +13986,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &3483431209616832692
 RectTransform:
   m_ObjectHideFlags: 0
@@ -14021,6 +14022,9 @@ MonoBehaviour:
   DamageLocation: {x: 0, y: 0, z: 0}
   PlayerObject: {fileID: 5638210106189490797}
   DamageImagePivot: {fileID: 3483431209616832692}
+  DamageImageCanvas: {fileID: 2558542054175281196}
+  FadeStartTime: 1.5
+  FadeTime: 1.5
 --- !u!225 &2558542054175281196
 CanvasGroup:
   m_ObjectHideFlags: 0

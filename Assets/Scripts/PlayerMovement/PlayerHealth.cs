@@ -25,6 +25,7 @@ public class PlayerHealth : MonoBehaviour
     [Header("UI")]
     [Tooltip("Mirino del player")]
     public GameObject crosshairUI;
+    public DamageIndicator myDamageIndicator;
 
     private bool isInvincible = false;
 
@@ -72,6 +73,14 @@ public class PlayerHealth : MonoBehaviour
         if (healthBarUI != null)
         {
             healthBarUI.UpdateHealthBar(currentHealth, maxHealth);
+        }
+        
+        // Crea la freccia (rossa) che indica la direzione del danno
+        if (myDamageIndicator != null)
+        {
+            myDamageIndicator.DamageLocation = hitPoint;
+            GameObject go = Instantiate(myDamageIndicator.gameObject, myDamageIndicator.transform.position, myDamageIndicator.transform.rotation, myDamageIndicator.transform.parent);
+            go.SetActive(true);
         }
         
         if (attacker != null) lastAttacker = attacker;
