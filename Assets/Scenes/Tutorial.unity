@@ -6108,7 +6108,7 @@ PrefabInstance:
       objectReference: {fileID: 56450742}
     - target: {fileID: 3190984878421999749, guid: e9ce68c878357476d8781580e5e38489, type: 3}
       propertyPath: m_VersionIndex
-      value: 945
+      value: 999
       objectReference: {fileID: 0}
     - target: {fileID: 3399747593812718400, guid: e9ce68c878357476d8781580e5e38489, type: 3}
       propertyPath: m_Mesh
@@ -6120,7 +6120,7 @@ PrefabInstance:
       objectReference: {fileID: 1150585712}
     - target: {fileID: 4319880199679928123, guid: e9ce68c878357476d8781580e5e38489, type: 3}
       propertyPath: m_VersionIndex
-      value: 2064
+      value: 2118
       objectReference: {fileID: 0}
     - target: {fileID: 5638210106189490797, guid: e9ce68c878357476d8781580e5e38489, type: 3}
       propertyPath: m_LocalPosition.x
@@ -6166,6 +6166,14 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 1150585712}
+    - target: {fileID: 6281401069868923329, guid: e9ce68c878357476d8781580e5e38489, type: 3}
+      propertyPath: DamageLocation.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6281401069868923329, guid: e9ce68c878357476d8781580e5e38489, type: 3}
+      propertyPath: DamageLocation.z
+      value: 15
+      objectReference: {fileID: 0}
     - target: {fileID: 7658331409579503768, guid: e9ce68c878357476d8781580e5e38489, type: 3}
       propertyPath: m_Mesh
       value: 
@@ -6176,7 +6184,7 @@ PrefabInstance:
       objectReference: {fileID: 137786120}
     - target: {fileID: 7730222688733311182, guid: e9ce68c878357476d8781580e5e38489, type: 3}
       propertyPath: m_VersionIndex
-      value: 590
+      value: 644
       objectReference: {fileID: 0}
     - target: {fileID: 7862538426198524846, guid: e9ce68c878357476d8781580e5e38489, type: 3}
       propertyPath: m_Mesh
@@ -6196,7 +6204,7 @@ PrefabInstance:
       objectReference: {fileID: 1357894035}
     - target: {fileID: 9081433988478700192, guid: e9ce68c878357476d8781580e5e38489, type: 3}
       propertyPath: m_VersionIndex
-      value: 945
+      value: 999
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 2287583825432335681, guid: e9ce68c878357476d8781580e5e38489, type: 3}
