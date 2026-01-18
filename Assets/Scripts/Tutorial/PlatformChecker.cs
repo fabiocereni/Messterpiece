@@ -92,12 +92,12 @@ public class PlatformChecker : MonoBehaviour
 
         GUILayout.BeginArea(new Rect(10, 100, 300, 100));
         GUILayout.Label("=== JUMP TRACKER ===");
-        GUILayout.Label($"Piattaforme visitate: {visitedPlatforms.Count}/{platforms.Count}");
+        GUILayout.Label($"Platforms visited: {visitedPlatforms.Count}/{platforms.Count}");
 
         for (int i = 0; i < platforms.Count; i++)
         {
             string status = visitedPlatforms.Contains(i) ? "✓" : "✗";
-            GUILayout.Label($"Piattaforma {i + 1}: {status}");
+            GUILayout.Label($"Platform {i + 1}: {status}");
         }
         GUILayout.EndArea();
     }

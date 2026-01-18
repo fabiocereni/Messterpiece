@@ -148,8 +148,8 @@ public class HealthDemoChecker : MonoBehaviour
 
         GUILayout.BeginArea(new Rect(10, 100, 300, 100));
         GUILayout.Label("=== HEALTH DEMO ===");
-        GUILayout.Label($"Danno preso: {(hasTakenDamage ? "✓" : "✗")} ({playerInitialHealth - playerLowestHealth:F0}/{damageThreshold})");
-        GUILayout.Label($"Curato: {(hasHealed ? "✓" : "✗")}");
+        GUILayout.Label($"Damage taken: {(hasTakenDamage ? "✓" : "✗")} ({playerInitialHealth - playerLowestHealth:F0}/{damageThreshold})");
+        GUILayout.Label($"Healed: {(hasHealed ? "✓" : "✗")}");
         GUILayout.EndArea();
     }
 }

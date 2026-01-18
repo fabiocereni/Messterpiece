@@ -2460,19 +2460,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TutorialManager
   sections:
   - sectionName: Movement
-    instructions: Muoviti con WASD in tutte le direzioni. Esplora l'area!
+    instructions: Move with WASD in all directions. Explore the area!
     sectionObject: {fileID: 181947257}
   - sectionName: Jump
-    instructions: "Salta sulle 3 piattaforme usando SPACE. Raggiungi la piattaforma
-      pi\xF9 alta!"
+    instructions: Jump on all 3 platforms using SPACE. Reach the highest one!
     sectionObject: {fileID: 46529423}
   - sectionName: Shooting
-    instructions: Distruggi tutti i 6 target sparando con il mouse. Colpisci anche
-      quelli in movimento!
+    instructions: Destroy all 6 targets shooting with mouse + RMB. Try to hit the
+      moving ones as well!
     sectionObject: {fileID: 164259212}
   - sectionName: Health Demo
-    instructions: Entra nella zona rossa per prendere danno, poi raccogli il medikit
-      per curarti.
+    instructions: Get in the red zone to take damage, then, you can restore your
+      health using the Medikit!
     sectionObject: {fileID: 1987120393}
   tutorialUI: {fileID: 684940615}
   movementBarrier: {fileID: 281536065}

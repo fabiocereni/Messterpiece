@@ -49,7 +49,7 @@ public class EnemyCounter : MonoBehaviour
     {
         if (counterText != null)
         {
-            counterText.text = $"Nemici: {enemiesDefeated}/{totalEnemies}";
+            counterText.text = $"Enemies: {enemiesDefeated}/{totalEnemies}";
         }
     }
 
@@ -57,7 +57,7 @@ public class EnemyCounter : MonoBehaviour
     {
         if (counterText != null)
         {
-            counterText.text = "Tutti i nemici sconfitti!\nEsci dal portale →";
+            counterText.text = "All enemies defeated!\nExit via the portal →";
         }
 
         // Attiva l'oggetto (es: sblocca Exit Portal)

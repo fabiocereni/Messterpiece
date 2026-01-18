@@ -62,7 +62,7 @@ public class TutorialUI : MonoBehaviour
         // Aggiorna testo
         if (progressText != null)
         {
-            progressText.text = $"Progresso: {currentSection}/{totalSections}";
+            progressText.text = $"Progress: {currentSection}/{totalSections}";
         }
 
         // Aggiorna barra
@@ -82,7 +82,7 @@ public class TutorialUI : MonoBehaviour
 
         if (completionText != null)
         {
-            completionText.text = $"✓ {sectionName} Completato!";
+            completionText.text = $"✓ {sectionName} Completed!";
         }
 
         StartCoroutine(ShowCompletionFeedback());
@@ -139,7 +139,7 @@ public class TutorialUI : MonoBehaviour
 
             if (finalCompletionText != null)
             {
-                finalCompletionText.text = "Tutorial Completato!\n\nPuoi procedere al menu principale.";
+                finalCompletionText.text = "Tutorial Completed!\n\nYou can proceed to the main menu.";
             }
         }
     }

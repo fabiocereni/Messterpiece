@@ -57,7 +57,7 @@ public class TargetCounter : MonoBehaviour
     {
         if (counterText != null)
         {
-            counterText.text = "Tutti i target distrutti! Procedi →";
+            counterText.text = "All targets destroyed! Proceed →";
         }
 
         // Attiva l'oggetto (es: apri la porta)
