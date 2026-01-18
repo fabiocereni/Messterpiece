@@ -219,8 +219,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 618953ec025ef4551b6db49500ad09f1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerDash
-  audioSource: {fileID: 0}
-  dashSound: {fileID: 0}
+  audioSource: {fileID: 8380612137819659290}
+  dashSound: {fileID: 8300000, guid: f77baaa9aabc24f45bb7ac57b963c1ce, type: 3}
   dashForce: 15
   dashDuration: 0.4
   dashCooldown: 1
@@ -12206,7 +12206,7 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 0
-  m_Volume: 0.799
+  m_Volume: 0.579
   m_Pitch: 1
   Loop: 0
   Mute: 0
