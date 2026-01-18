@@ -11347,7 +11347,7 @@ PrefabInstance:
       objectReference: {fileID: 774243510}
     - target: {fileID: 918287461200139097, guid: 4727a63c083fc41a88c0e6dc7f0ad24b, type: 3}
       propertyPath: countdownDuration
-      value: 5
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 3078905840591628450, guid: 4727a63c083fc41a88c0e6dc7f0ad24b, type: 3}
       propertyPath: m_Name
@@ -13439,6 +13439,14 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 1989567375}
+    - target: {fileID: 1239627768448529695, guid: e9ce68c878357476d8781580e5e38489, type: 3}
+      propertyPath: sensX
+      value: 500
+      objectReference: {fileID: 0}
+    - target: {fileID: 1239627768448529695, guid: e9ce68c878357476d8781580e5e38489, type: 3}
+      propertyPath: sensY
+      value: 500
+      objectReference: {fileID: 0}
     - target: {fileID: 1951839291938983559, guid: e9ce68c878357476d8781580e5e38489, type: 3}
       propertyPath: m_Mesh
       value: 

@@ -44,5 +44,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 79f7856fc32344f2bb3b2e13e8794569, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MatchManager
-  matchDuration: 600
+  matchDuration: 120
   playerObject: {fileID: 0}
