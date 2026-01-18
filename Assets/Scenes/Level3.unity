@@ -11347,7 +11347,7 @@ PrefabInstance:
       objectReference: {fileID: 774243510}
     - target: {fileID: 918287461200139097, guid: 4727a63c083fc41a88c0e6dc7f0ad24b, type: 3}
       propertyPath: countdownDuration
-      value: 3
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 3078905840591628450, guid: 4727a63c083fc41a88c0e6dc7f0ad24b, type: 3}
       propertyPath: m_Name
@@ -14396,7 +14396,7 @@ PrefabInstance:
       objectReference: {fileID: 1727782114}
     - target: {fileID: 4781535138798214001, guid: 1413464ca42d544b28afa25b7208aec6, type: 3}
       propertyPath: matchDuration
-      value: 10
+      value: 120
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
