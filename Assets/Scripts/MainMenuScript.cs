@@ -45,7 +45,7 @@ public class MainMenuScript : MonoBehaviour
 
     public void PlayGame()
     {
-        int randomLevelIndex = Random.Range(1, 5); // get a random level index between 1 and 4
+        int randomLevelIndex = Random.Range(1, 4); // get a random level index between 1 and 3
         Debug.Log("Loading Level numero: " + randomLevelIndex);
         SceneManager.LoadScene(randomLevelIndex);
     }
