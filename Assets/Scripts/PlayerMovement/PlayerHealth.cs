@@ -42,9 +42,15 @@ public class PlayerHealth : MonoBehaviour
             healthBarUI.UpdateHealthBar(currentHealth, maxHealth);
         }
 
+        // Se esiste il MatchFlowManager → aspetta il warmup
         if (MatchFlowManager.Instance != null)
         {
             MatchFlowManager.Instance.OnWarmupComplete += OnMatchStarted;
+        }
+        else
+        {
+            // Nessun warmup → match già iniziato
+            OnMatchStarted();
         }
     }
 
