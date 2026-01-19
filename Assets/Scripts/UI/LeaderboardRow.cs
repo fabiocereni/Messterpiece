@@ -2,32 +2,26 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 
-/// <summary>
-/// Represents a single row in the leaderboard.
-/// This script is attached to the LeaderboardRow prefab.
-/// Supports both TextMeshPro and Unity UI Text components.
-/// </summary>
+
 public class LeaderboardRow : MonoBehaviour
 {
     [Header("TextMeshPro UI References (Optional)")]
-    public TextMeshProUGUI rankTextTMP;        // "#1", "#2", etc.
-    public TextMeshProUGUI playerNameTextTMP;  // "Player", "Bot_01", etc.
-    public TextMeshProUGUI kdTextTMP;          // "10/2" (kills/deaths)
-    public TextMeshProUGUI scoreTextTMP;       // "800"
+    public TextMeshProUGUI rankTextTMP;
+    public TextMeshProUGUI playerNameTextTMP;
+    public TextMeshProUGUI kdTextTMP;
+    public TextMeshProUGUI scoreTextTMP;
 
     [Header("Unity UI Text References (Optional)")]
-    public Text rankText;        // "#1", "#2", etc.
-    public Text playerNameText;  // "Player", "Bot_01", etc.
-    public Text kdText;          // "10/2" (kills/deaths)
-    public Text scoreText;       // "800"
+    public Text rankText;
+    public Text playerNameText;
+    public Text kdText;
+    public Text scoreText;
 
     [Header("Visual Feedback")]
-    public Color playerHighlightColor = new Color(1f, 0.84f, 0f, 0.3f); // Gold highlight for player
-    public UnityEngine.UI.Image backgroundImage; // Optional: background image to colorize
+    public Color playerHighlightColor = new Color(1f, 0.84f, 0f, 0.3f);
+    public UnityEngine.UI.Image backgroundImage;
 
-    /// <summary>
-    /// Populate this row with player stats
-    /// </summary>
+    // Populate this row with player stats
     public void SetData(int rank, PlayerStats stats)
     {
         if (stats == null)
@@ -64,9 +58,6 @@ public class LeaderboardRow : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Helper method to set text on either TextMeshPro or Unity UI Text
-    /// </summary>
     private void SetText(TextMeshProUGUI tmpText, Text uiText, string value)
     {
         if (tmpText != null)
@@ -83,9 +74,6 @@ public class LeaderboardRow : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Alternative: Set data with individual parameters (without PlayerStats object)
-    /// </summary>
     public void SetData(int rank, string playerName, int kills, int deaths, int score, bool isPlayer = false)
     {
         SetText(rankTextTMP, rankText, $"#{rank}");

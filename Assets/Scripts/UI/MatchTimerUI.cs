@@ -1,10 +1,6 @@
 using UnityEngine;
 using TMPro;
 
-/// <summary>
-/// Displays the match countdown timer on screen
-/// Connects to MatchManager to show remaining time
-/// </summary>
 public class MatchTimerUI : MonoBehaviour
 {
     [Header("UI References")]
@@ -39,7 +35,6 @@ public class MatchTimerUI : MonoBehaviour
     
     private void Awake()
     {
-        // Get normal color from the text component
         if (timerText != null)
         {
             normalColor = timerText.color;
@@ -48,7 +43,6 @@ public class MatchTimerUI : MonoBehaviour
     
     private void Start()
     {
-        // Find MatchManager instance
         matchManager = MatchManager.Instance;
         
         if (matchManager == null)

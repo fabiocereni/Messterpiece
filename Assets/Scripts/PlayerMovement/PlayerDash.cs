@@ -15,8 +15,8 @@ public class PlayerDash : MonoBehaviour
 
     private Rigidbody rb;
     private bool dashRequested;
-    private float nextDashTime = 0f;
-    private float dashEndTime;
+    private float nextDashTime = 0f; // Tempo del prossimo dash disponibile
+    private float dashEndTime; // Tempo di fine dash
 
     public bool IsDashing { get; private set; }
 

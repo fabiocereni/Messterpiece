@@ -2,10 +2,6 @@ using UnityEngine;
 using System.Collections;
 using TMPro;
 
-/// <summary>
-/// Sistema respawn migliorato per evitare game over alla morte del giocatore
-/// Gestisce respawn, spawn points e effetti visivi
-/// </summary>
 public class PlayerRespawn : MonoBehaviour
 {
     [Header("Spawn Points")]
@@ -75,7 +71,7 @@ public class PlayerRespawn : MonoBehaviour
     private bool isDead = false;
     private Transform originalSpawnPoint;
     
-    // METODO SOLO PER TESTARE IL RESPAWN
+    // solo per testing
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.K))
@@ -100,9 +96,7 @@ public class PlayerRespawn : MonoBehaviour
         }
     }
     
-    /// <summary>
-    /// Ottiene i componenti necessari
-    /// </summary>
+    // Ottiene i componenti necessari
     private void GetRequiredComponents()
     {
         playerHealth = GetComponent<PlayerHealth>();
@@ -161,10 +155,6 @@ public class PlayerRespawn : MonoBehaviour
             Debug.Log("[PlayerRespawn] Componenti ottenuti");
     }
     
-    /// <summary>
-    /// Metodo principale per respawnare il giocatore
-    /// </summary>
-    /// <param name="player">GameObject del giocatore da respawnare</param>
     public void RespawnPlayer(GameObject player)
     {
         if (isRespawning)
@@ -180,9 +170,6 @@ public class PlayerRespawn : MonoBehaviour
         StartCoroutine(RespawnCoroutine(player));
     }
     
-    /// <summary>
-    /// Coroutine per gestire il respawn con delay
-    /// </summary>
     private System.Collections.IEnumerator RespawnCoroutine(GameObject player)
     {
         isRespawning = true;
@@ -228,8 +215,6 @@ public class PlayerRespawn : MonoBehaviour
         // Effetti visivi e sonori
         PlayRespawnEffects();
         
-
-        
         // Riabilita controlli
         EnablePlayerControls(spawnPoint);
         
@@ -239,8 +224,6 @@ public class PlayerRespawn : MonoBehaviour
         if (showDebugLogs)
             Debug.Log($"[PlayerRespawn] Giocatore respawnato con successo a {spawnPoint.name}");
     }
-    
-
     
     private System.Collections.IEnumerator CompleteRespawnCoroutine()
     {
@@ -275,10 +258,7 @@ public class PlayerRespawn : MonoBehaviour
         if (showDebugLogs)
             Debug.Log($"[PlayerRespawn] Giocatore respawnato con successo a {spawnPoint.name}");
     }
-    
-    /// <summary>
-    /// Trova il miglior spawn point disponibile
-    /// </summary>
+
     private Transform GetBestSpawnPoint()
     {
         // Prima controlla se ci sono spawn point manuali
@@ -318,15 +298,11 @@ public class PlayerRespawn : MonoBehaviour
             return originalSpawnPoint;
         }
         
-        // Ultimo fallback: posizione corrente
         if (showDebugLogs)
             Debug.LogWarning("[PlayerRespawn] Nessuno spawn point trovato, uso posizione corrente");
         return transform;
     }
     
-    /// <summary>
-    /// Teletrasporta il giocatore allo spawn point
-    /// </summary>
     private void TeleportPlayerToSpawn(GameObject player, Transform spawnPoint)
     {
         // Resetta velocity del rigidbody
@@ -341,10 +317,7 @@ public class PlayerRespawn : MonoBehaviour
         player.transform.position = spawnPoint.position;
         player.transform.rotation = spawnPoint.rotation;
     }
-    
-    /// <summary>
-    /// Ripristina la salute del giocatore
-    /// </summary>
+
     private void RestorePlayerHealth()
     {
         if (playerHealth != null)
@@ -356,15 +329,11 @@ public class PlayerRespawn : MonoBehaviour
         }
     }
     
-    /// <summary>
-    /// Ripristina le munizioni del giocatore
-    /// </summary>
     private void RestorePlayerAmmo()
     {
         if (playerGun != null)
         {
             // Resetta direttamente le munizioni al massimo
-            // Poiché Reload() è privato, impostiamo direttamente currentAmmo
             var currentAmmoField = typeof(Gun).GetField("currentAmmo", 
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
             
@@ -384,13 +353,8 @@ public class PlayerRespawn : MonoBehaviour
             }
         }
         
-        // L'AmmoDisplay si aggiorna automaticamente nel suo Update()
-        // Non c'è bisogno di chiamare UpdateAmmoDisplay() perché non esiste
     }
     
-    /// <summary>
-    /// Disabilita i controlli del giocatore
-    /// </summary>
     private void DisablePlayerControls()
     {
         if (playerMovement != null)
@@ -406,9 +370,6 @@ public class PlayerRespawn : MonoBehaviour
         HidePlayerAndSwitchToDroneCamera();
     }
     
-    /// <summary>
-    /// Riabilita i controlli del giocatore
-    /// </summary>
     private void EnablePlayerControls(Transform spawnPoint)
     {
         // Mostra il player e cambia camera
@@ -428,9 +389,7 @@ public class PlayerRespawn : MonoBehaviour
             playerGun.enabled = true;
     }
     
-    /// <summary>
-    /// Riproduce effetti visivi e sonori del respawn
-    /// </summary>
+    // Riproduce effetti visivi e sonori del respawn
     private void PlayRespawnEffects()
     {
         // Effetto visivo
@@ -447,17 +406,13 @@ public class PlayerRespawn : MonoBehaviour
         }
     }
     
-    /// <summary>
-    /// Completa il respawn dopo che DeathScreenUI ha finito il countdown
-    /// </summary>
+    // Completa il respawn dopo che DeathScreenUI ha finito il countdown
     public void CompleteRespawn()
     {
         StartCoroutine(CompleteRespawnCoroutine());
     }
     
-    /// <summary>
-    /// Aggiunge uno spawn point alla lista
-    /// </summary>
+    // Aggiunge uno spawn point alla lista
     public void AddSpawnPoint(Transform spawnPoint)
     {
         if (spawnPoint == null) return;
@@ -478,9 +433,7 @@ public class PlayerRespawn : MonoBehaviour
             Debug.Log($"[PlayerRespawn] Aggiunto spawn point: {spawnPoint.name}");
     }
     
-    /// <summary>
-    /// Rimuovi uno spawn point dalla lista
-    /// </summary>
+    // Rimuovi uno spawn point dalla lista
     public void RemoveSpawnPoint(Transform spawnPoint)
     {
         if (spawnPoints == null || spawnPoint == null) return;
@@ -501,9 +454,7 @@ public class PlayerRespawn : MonoBehaviour
         }
     }
     
-    /// <summary>
-    /// Resetta la rotazione del giocatore e della camera per matchare lo spawn point
-    /// </summary>
+    // Resetta la rotazione del giocatore e della camera per matchare lo spawn point
     private void ResetPlayerRotation(Transform spawnPoint)
     {
         if (playerLook != null && spawnPoint != null)
@@ -513,25 +464,19 @@ public class PlayerRespawn : MonoBehaviour
         }
     }
     
-    /// <summary>
-    /// Controlla se il respawn è in corso
-    /// </summary>
+    // Controlla se il respawn è in corso
     public bool IsRespawning()
     {
         return isRespawning;
     }
     
-    /// <summary>
-    /// Controlla se il giocatore è morto
-    /// </summary>
+    // Controlla se il giocatore è morto
     public bool IsDead()
     {
         return isDead;
     }
     
-    /// <summary>
-    /// Mostra la schermata di morte
-    /// </summary>
+    // Mostra la schermata di morte
     private void ShowDeathScreen()
     {
         // Usa DeathScreenUI per gestire tutto
@@ -541,9 +486,7 @@ public class PlayerRespawn : MonoBehaviour
         }
     }
     
-    /// <summary>
-    /// Resetta la velocity del giocatore per evitare animazioni strane
-    /// </summary>
+    // Resetta la velocity del giocatore per evitare animazioni strane
     private IEnumerator ResetPlayerVelocity(GameObject player)
     {
         Rigidbody rb = player.GetComponent<Rigidbody>();
@@ -564,9 +507,7 @@ public class PlayerRespawn : MonoBehaviour
         }
     }
     
-    /// <summary>
-    /// Nasconde il player e attiva la DroneCamera
-    /// </summary>
+    // Nasconde il player e attiva la DroneCamera
     private void HidePlayerAndSwitchToDroneCamera()
     {
         // Nascondi PlayerVisuals
@@ -606,9 +547,7 @@ public class PlayerRespawn : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Mostra il player e riattiva la PlayerCamera
-    /// </summary>
+    // Mostra il player e riattiva la PlayerCamera
     private void ShowPlayerAndSwitchToPlayerCamera()
     {
         // Mostra PlayerVisuals

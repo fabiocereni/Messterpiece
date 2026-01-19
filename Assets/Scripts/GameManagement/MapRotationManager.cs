@@ -2,10 +2,8 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 
-/// <summary>
-/// Gestisce la rotazione e selezione delle mappe per il "Gioca Ancora"
-/// Supporta selezione casuale o sequenziale delle mappe
-/// </summary>
+// Gestisce la rotazione e selezione delle mappe per il "Gioca Ancora"
+// Supporta selezione casuale o sequenziale delle mappe
 public class MapRotationManager : MonoBehaviour
 {
     public static MapRotationManager Instance { get; private set; }
@@ -55,9 +53,7 @@ public class MapRotationManager : MonoBehaviour
             Debug.Log($"[MapRotationManager] Inizializzato con {playableMaps.Length} mappe");
     }
     
-    /// <summary>
-    /// Ottiene la prossima mappa da giocare
-    /// </summary>
+    // Ottiene la prossima mappa da giocare
     public string GetNextMap()
     {
         if (playableMaps.Length == 0)
@@ -93,9 +89,7 @@ public class MapRotationManager : MonoBehaviour
         return nextMap;
     }
     
-    /// <summary>
-    /// Seleziona una mappa casuale evitando la stessa mappa se richiesto
-    /// </summary>
+    // Seleziona una mappa casuale evitando la stessa mappa se richiesto
     private string GetRandomMap()
     {
         // Filtra la mappa se dobbiamo evitare la stessa
@@ -123,9 +117,7 @@ public class MapRotationManager : MonoBehaviour
         return candidateMaps[randomIndex];
     }
     
-    /// <summary>
-    /// Seleziona la prossima mappa in ordine sequenziale
-    /// </summary>
+    // Seleziona la prossima mappa in ordine sequenziale
     private string GetSequentialMap()
     {
         string nextMap = playableMaps[sequentialIndex];
@@ -136,9 +128,7 @@ public class MapRotationManager : MonoBehaviour
         return nextMap;
     }
     
-    /// <summary>
-    /// Resetta lo stato di rotazione mappe
-    /// </summary>
+    // Resetta lo stato di rotazione mappe
     public void ResetRotation()
     {
         lastPlayedMap = "";
@@ -149,9 +139,7 @@ public class MapRotationManager : MonoBehaviour
             Debug.Log("[MapRotationManager] Rotazione mappe resettata");
     }
     
-    /// <summary>
-    /// Aggiorna la lista delle mappe disponibili
-    /// </summary>
+    // Aggiorna la lista delle mappe disponibili
     private void RefreshAvailableMaps()
     {
         availableMaps = new List<string>(playableMaps);
@@ -160,25 +148,19 @@ public class MapRotationManager : MonoBehaviour
             Debug.Log($"[MapRotationManager] Mappe disponibili: {string.Join(", ", availableMaps)}");
     }
     
-    /// <summary>
-    /// Verifica se una mappa è valida e giocabile
-    /// </summary>
+    // Verifica se una mappa è valida e giocabile
     public bool IsValidMap(string mapName)
     {
         return playableMaps.Contains(mapName);
     }
     
-    /// <summary>
-    /// Ottiene tutte le mappe giocabili
-    /// </summary>
+    // Ottiene tutte le mappe giocabili
     public string[] GetAllMaps()
     {
         return (string[])playableMaps.Clone();
     }
     
-    /// <summary>
-    /// Imposta la mappa corrente (usato per sincronizzazione)
-    /// </summary>
+    // Imposta la mappa corrente (usato per sincronizzazione)
     public void SetCurrentMap(string mapName)
     {
         if (IsValidMap(mapName))

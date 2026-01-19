@@ -128,19 +128,12 @@ public class Gun : MonoBehaviour
 
     void Update()
     {
-        // ═══════════════════════════════════════════════════════
-        // WARMUP CHECK - Disable shooting during pre-match countdown
-        // ═══════════════════════════════════════════════════════
         if (MatchFlowManager.Instance != null && !MatchFlowManager.Instance.CanPlayerMove())
         {
-            // Still allow weapon shake recovery during warmup
             RecoverWeaponPosition();
             return;
         }
 
-        // ═══════════════════════════════════════════════════════
-        // DEATH CHECK - Disable shooting/reload when player is dead
-        // ═══════════════════════════════════════════════════════
         PlayerHealth playerHealth = ownerPlayer?.GetComponent<PlayerHealth>();
         if (playerHealth != null && playerHealth.IsDead())
         {
@@ -148,29 +141,17 @@ public class Gun : MonoBehaviour
             return;
         }
 
-        // ═══════════════════════════════════════════════════════
-        // MATCH END CHECK - Disable shooting/reload when match ended
-        // ═══════════════════════════════════════════════════════
         if (MatchManager.Instance != null && !MatchManager.Instance.IsMatchActive)
         {
             RecoverWeaponPosition();
             return;
         }
 
-        // ═══════════════════════════════════════════════════════
-        // RELOAD INPUT - Press R to reload manually
-        // ═══════════════════════════════════════════════════════
         if (Input.GetKeyDown(KeyCode.R) && !isReloading && currentAmmo < maxAmmo)
         {
             StartCoroutine(Reload());
         }
 
-        // ═══════════════════════════════════════════════════════
-        // SEMI-AUTO + FULL-AUTO INPUT
-        // GetButton (not GetButtonDown) → Allows hold for full-auto
-        // Fire rate cooldown prevents too-fast spam
-        // ADDED: Check ammo and reloading status
-        // ═══════════════════════════════════════════════════════
         if (Input.GetButton("Fire1") && Time.time >= nextTimeToFire && !isReloading)
         {
             if (currentAmmo > 0)
@@ -188,30 +169,18 @@ public class Gun : MonoBehaviour
             }
         }
 
-        // ═══════════════════════════════════════════════════════
-        // WEAPON SHAKE RECOVERY - Return weapon to original position
-        // ═══════════════════════════════════════════════════════
         RecoverWeaponPosition();
     }
 
     void Shoot()
     {
-        // ═══════════════════════════════════════════════════════
-        // AMMO CHECK - Decrease ammo count
-        // ═══════════════════════════════════════════════════════
         currentAmmo--;
 
-        // ═══════════════════════════════════════════════════════
-        // MUZZLE FLASH (Cyan Cloud)
-        // ═══════════════════════════════════════════════════════
         if (muzzleFlash != null)
         {
             muzzleFlash.Play();
         }
 
-        // ═══════════════════════════════════════════════════════
-        // WEAPON SHAKE - Vibrate gun on shot
-        // ═══════════════════════════════════════════════════════
         ApplyWeaponShake();
 
         // Crea un raggio dal centro esatto della telecamera
@@ -219,9 +188,6 @@ public class Gun : MonoBehaviour
         RaycastHit aimHit;
         Vector3 targetPoint;
 
-        // ═══════════════════════════════════════════════════════
-        // RAYCAST 1: AIMING (Ignora Enemy per evitare bug visuali)
-        // ═══════════════════════════════════════════════════════
         int aimLayerMask = ~aimingIgnoreMask.value;
 
         if (debugMode)
@@ -238,8 +204,6 @@ public class Gun : MonoBehaviour
                 Debug.Log($"[Gun] AIM Raycast HIT: {aimHit.collider.name} a distanza {aimHit.distance}m, layer: {LayerMask.LayerToName(aimHit.collider.gameObject.layer)}");
             }
 
-            // FAIL-SAFE: Se colpisce qualcosa troppo vicino (< minHitDistance),
-            // probabilmente è il proprio collider o un trigger, quindi IGNORA
             if (aimHit.distance >= minHitDistance)
             {
                 // Hit valido: usa il punto d'impatto
@@ -263,25 +227,14 @@ public class Gun : MonoBehaviour
                 Debug.Log($"[Gun] AIM Raycast NO HIT. Usando fallback targetPoint: {targetPoint}");
             }
         }
-        
-        // ═══════════════════════════════════════════════════════
-        // AUDIO: play sound effect
-        // ═══════════════════════════════════════════════════════
-        
+
         if (audioSource != null && fireSound != null)
         {
             audioSource.PlayOneShot(fireSound);
         }
         
-
-        // ═══════════════════════════════════════════════════════
-        // RAYCAST 2: DAMAGE (Include Enemy per applicare danno)
-        // IMPORTANT: Filter out SphereColliders (AI detection radius)
-        // Only hit CapsuleColliders (true hitbox)
-        // ═══════════════════════════════════════════════════════
         RaycastHit[] allHits = Physics.RaycastAll(ray, maxRaycastDistance, damageLayerMask);
 
-        // Filter: Find first valid hit (CapsuleCollider, not SphereCollider)
         RaycastHit validDamageHit = new RaycastHit();
         bool foundValidHit = false;
 
@@ -328,8 +281,6 @@ public class Gun : MonoBehaviour
         // Calcola la direzione dal "firePoint" (la canna) al "targetPoint"
         Vector3 direction = (targetPoint - firePoint.position).normalized;
 
-        // CRITICAL FIX: Se il targetPoint è DIETRO il firePoint o troppo laterale,
-        // usa la direzione della camera invece (previene proiettili all'indietro)
         float angleFromCameraForward = Vector3.Angle(fpsCam.transform.forward, direction);
 
         if (angleFromCameraForward > 90f)
@@ -347,22 +298,14 @@ public class Gun : MonoBehaviour
             Debug.DrawRay(firePoint.position, direction * 50f, Color.green, 2f);
         }
 
-        // SAFETY CHECK: Se la direzione è quasi zero (non dovrebbe mai succedere),
-        // usa la direzione forward della camera
         if (direction.sqrMagnitude < 0.01f)
         {
             direction = fpsCam.transform.forward;
             Debug.LogWarning("[Gun] Direzione invalida! Usando camera forward come fallback.");
         }
 
-        // Calcola la rotazione necessaria per far sì che il proiettile guardi in quella direzione
         Quaternion projectileRotation = Quaternion.LookRotation(direction);
 
-        // ═══════════════════════════════════════════════════════
-        // STEP 2: Visual Tracer (ENABLED)
-        // Spawn "fake bullet" that travels visually
-        // Damage is already applied by raycast above!
-        // ═══════════════════════════════════════════════════════
         if (projectilePrefab != null && firePoint != null)
         {
             GameObject projectile = Instantiate(
@@ -382,14 +325,9 @@ public class Gun : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Applies instant damage (Hitscan) to the hit target
-    /// </summary>
     private void ApplyDamage(RaycastHit hit)
     {
-        // ═══════════════════════════════════════════════════════
-        // PRIORITY 1: Check if target implements IDamagable (generic system)
-        // ═══════════════════════════════════════════════════════
+
         IDamagable damagable = hit.collider.GetComponent<IDamagable>();
         if (damagable != null)
         {
@@ -403,22 +341,18 @@ public class Gun : MonoBehaviour
                 Debug.Log($"[Gun] Applied {damagePerShot} damage to {hit.collider.name} via IDamagable");
             }
 
-            // Spawn VFX if available
             if (enemyHitVfxPrefab != null)
             {
                 GameObject hitVfx = Instantiate(enemyHitVfxPrefab, hit.point, Quaternion.identity);
                 Destroy(hitVfx, 2f);
             }
 
-            return; // Exit early - damage applied
+            return;
         }
 
-        // ═══════════════════════════════════════════════════════
-        // PRIORITY 2: Fallback to EnemyHealth (for backward compatibility)
-        // ═══════════════════════════════════════════════════════
         if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Enemy"))
         {
-            Debug.Log($"[Gun] 🎯 ENEMY HIT! Target: {hit.collider.name} at distance {hit.distance:F2}m");
+            Debug.Log($"[Gun] ENEMY HIT! Target: {hit.collider.name} at distance {hit.distance:F2}m");
 
             EnemyHealth enemyHealth = hit.collider.GetComponent<EnemyHealth>();
             if (enemyHealth != null)
@@ -450,7 +384,6 @@ public class Gun : MonoBehaviour
         }
         else
         {
-            // Hit something else (wall, obstacle)
             if (debugMode)
             {
                 Debug.Log($"[Gun] Hit surface: {hit.collider.name} (layer: {LayerMask.LayerToName(hit.collider.gameObject.layer)})");
@@ -458,10 +391,6 @@ public class Gun : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Apply weapon shake (vibration) on shot
-    /// Weapon "pumps" back and rotates slightly
-    /// </summary>
     private void ApplyWeaponShake()
     {
         if (weaponTransform == null) return;
@@ -469,7 +398,7 @@ public class Gun : MonoBehaviour
         // Random position offset (vibration effect)
         float randomX = Random.Range(-weaponShakeAmount, weaponShakeAmount);
         float randomY = Random.Range(-weaponShakeAmount, weaponShakeAmount);
-        float randomZ = Random.Range(-weaponShakeAmount * 2f, 0f); // Backward "pump"
+        float randomZ = Random.Range(-weaponShakeAmount * 2f, 0f);
 
         weaponCurrentOffset = new Vector3(randomX, randomY, randomZ);
 
@@ -486,10 +415,6 @@ public class Gun : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Smoothly return weapon to original position
-    /// Creates smooth "pump" animation
-    /// </summary>
     private void RecoverWeaponPosition()
     {
         if (weaponTransform == null) return;
@@ -503,10 +428,6 @@ public class Gun : MonoBehaviour
         weaponTransform.localRotation = weaponOriginalRotation * weaponCurrentRotationOffset;
     }
 
-    /// <summary>
-    /// Reload coroutine - refills ammo over time
-    /// Blocks shooting during reload animation
-    /// </summary>
     IEnumerator Reload()
     {
         isReloading = true;
@@ -547,17 +468,11 @@ public class Gun : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Public getter for UI - returns normalized ammo (0-1)
-    /// </summary>
     public float GetAmmoFillAmount()
     {
         return (float)currentAmmo / maxAmmo;
     }
 
-    /// <summary>
-    /// Public getter for UI - returns reload progress (0-1)
-    /// </summary>
     public bool IsReloading()
     {
         return isReloading;

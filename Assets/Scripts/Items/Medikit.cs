@@ -1,10 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-/// <summary>
-/// Medikit che cura il player al contatto e poi scompare
-/// Richiede un Collider con isTrigger = true
-/// </summary>
+// Medikit che cura il player al contatto e poi scompare
 public class Medikit : MonoBehaviour
 {
     [Header("Impostazioni")]
@@ -33,39 +30,41 @@ public class Medikit : MonoBehaviour
     
     private void Awake()
     {
-        renderers = GetComponentsInChildren<Renderer>(true);
-        lights = GetComponentsInChildren<Light>(true);
-        pickupCollider = GetComponent<Collider>();
+        renderers = GetComponentsInChildren<Renderer>(true); // cerca parti grafiche
+        lights = GetComponentsInChildren<Light>(true); // cerca luci
+        pickupCollider = GetComponent<Collider>(); // collider di raccolta
     }
 
+    // si attiva al contatto quando cammini sopra
     private void OnTriggerEnter(Collider other)
     {
-        // Evita raccolte multiple
+        // evita di raccogliere più volte
         if (isCollected) return;
 
-        // Controlla se è il player
+        // controlla se è un player
         if (other.CompareTag(playerTag))
         {
-            PlayerHealth playerHealth = other.GetComponentInParent<PlayerHealth>();
+            PlayerHealth playerHealth = other.GetComponentInParent<PlayerHealth>(); // ottengo la salute del player
             
             if (playerHealth != null)
             {
-                // Cura il player
+                // curo il player
                 playerHealth.Heal(healAmount);
                 
-                isCollected = true;
+                isCollected = true; // segna come raccolto
 
-                PlayEffects();
+                PlayEffects(); // suono e particelle
 
-                // Nascondi visivamente il medikit
+                // nascondi visivamente il medikit
                 SetMedikitActive(false);
 
-                // Avvia respawn
+                // avvio il respawn
                 StartCoroutine(RespawnCoroutine());
             }
         }
     }
     
+    // "spengo" il medikit solo a livello grafico
     private void SetMedikitActive(bool active)
     {
         foreach (var r in renderers)
@@ -80,13 +79,15 @@ public class Medikit : MonoBehaviour
 
     private void PlayEffects()
     {
-        // Suono
+        // suono
         if (pickupSound != null)
         {
-            AudioSource.PlayClipAtPoint(pickupSound, transform.position);
+            // uso PlayClipAtPoint per non dover gestire un audio source
+            // altrimenti con audio source il suono verrebbe troncato appena diventa invisibile
+            AudioSource.PlayClipAtPoint(pickupSound, transform.position); 
         }
 
-        // Particelle
+        // particelle
         if (pickupVFX != null)
         {
             GameObject vfx = Instantiate(pickupVFX, transform.position, Quaternion.identity);
@@ -98,7 +99,7 @@ public class Medikit : MonoBehaviour
     {
         yield return new WaitForSeconds(respawnTime);
 
-        isCollected = false;
-        SetMedikitActive(true);
+        isCollected = false; // resetto lo stato, quindi può essere raccolto di nuovo
+        SetMedikitActive(true); // riattivo visivamente il medikit
     }
 }

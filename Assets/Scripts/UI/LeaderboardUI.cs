@@ -2,11 +2,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
-/// <summary>
-/// Manages the in-game leaderboard UI.
-/// Press and HOLD TAB to show, release to hide.
-/// Displays all players/bots sorted by score with K/D ratio.
-/// </summary>
 public class LeaderboardUI : MonoBehaviour
 {
     [Header("UI References")]
@@ -30,7 +25,6 @@ public class LeaderboardUI : MonoBehaviour
     [Tooltip("Key to hold for showing leaderboard")]
     public KeyCode leaderboardKey = KeyCode.Tab;
 
-    // Internal state
     private List<LeaderboardRow> spawnedRows = new List<LeaderboardRow>();
     private float updateTimer = 0f;
     private bool isVisible = false;
@@ -39,38 +33,37 @@ public class LeaderboardUI : MonoBehaviour
     {
         Debug.Log("[LeaderboardUI] 🎬 LeaderboardUI Start() called");
 
-        // Validate references
         if (leaderboardPanel == null)
         {
-            Debug.LogError("[LeaderboardUI] ❌ Leaderboard Panel reference is missing! Assign it in the Inspector.");
+            Debug.LogError("[LeaderboardUI] Leaderboard Panel reference is missing! Assign it in the Inspector.");
         }
         else
         {
-            Debug.Log($"[LeaderboardUI] ✓ Leaderboard Panel found: {leaderboardPanel.name}");
+            Debug.Log($"[LeaderboardUI] Leaderboard Panel found: {leaderboardPanel.name}");
             // Hide leaderboard at start
             leaderboardPanel.SetActive(false);
-            Debug.Log("[LeaderboardUI] ✓ Leaderboard hidden at start");
+            Debug.Log("[LeaderboardUI] Leaderboard hidden at start");
         }
 
         if (rowContainer == null)
         {
-            Debug.LogError("[LeaderboardUI] ❌ Row Container reference is missing! Assign the 'Content' GameObject from the Scroll View.");
+            Debug.LogError("[LeaderboardUI] Row Container reference is missing! Assign the 'Content' GameObject from the Scroll View.");
         }
         else
         {
-            Debug.Log($"[LeaderboardUI] ✓ Row Container found: {rowContainer.name}");
+            Debug.Log($"[LeaderboardUI] Row Container found: {rowContainer.name}");
         }
 
         if (leaderboardRowPrefab == null)
         {
-            Debug.LogError("[LeaderboardUI] ❌ Leaderboard Row Prefab reference is missing! Assign the prefab in the Inspector.");
+            Debug.LogError("[LeaderboardUI] Leaderboard Row Prefab reference is missing! Assign the prefab in the Inspector.");
         }
         else
         {
-            Debug.Log($"[LeaderboardUI] ✓ Leaderboard Row Prefab found: {leaderboardRowPrefab.name}");
+            Debug.Log($"[LeaderboardUI] Leaderboard Row Prefab found: {leaderboardRowPrefab.name}");
         }
 
-        Debug.Log($"[LeaderboardUI] 🎮 Leaderboard Key configured: {leaderboardKey}");
+        Debug.Log($"[LeaderboardUI] Leaderboard Key configured: {leaderboardKey}");
     }
 
     private void Update()
@@ -97,59 +90,43 @@ public class LeaderboardUI : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Show the leaderboard panel and populate with current data
-    /// </summary>
+    // Show the leaderboard panel and populate with current data
     public void ShowLeaderboard()
     {
-        Debug.Log("[LeaderboardUI] 👁️ ShowLeaderboard() called");
+        Debug.Log("[LeaderboardUI] ShowLeaderboard() called");
 
         if (leaderboardPanel == null)
         {
-            Debug.LogError("[LeaderboardUI] ❌ Cannot show leaderboard - Panel reference is null!");
+            Debug.LogError("[LeaderboardUI] Cannot show leaderboard - Panel reference is null!");
             return;
         }
 
-        Debug.Log($"[LeaderboardUI] 📋 Activating panel: {leaderboardPanel.name}");
+        Debug.Log($"[LeaderboardUI] Activating panel: {leaderboardPanel.name}");
         leaderboardPanel.SetActive(true);
         isVisible = true;
 
-        Debug.Log("[LeaderboardUI] ✅ Leaderboard panel activated! IsVisible: " + isVisible);
+        Debug.Log("[LeaderboardUI] Leaderboard panel activated! IsVisible: " + isVisible);
 
         // Populate with latest data
         RefreshLeaderboard();
-
-        // Unlock cursor while viewing leaderboard (optional)
-        // Cursor.lockState = CursorLockMode.None;
-        // Cursor.visible = true;
     }
 
-    /// <summary>
-    /// Hide the leaderboard panel
-    /// </summary>
     public void HideLeaderboard()
     {
-        Debug.Log("[LeaderboardUI] 🙈 HideLeaderboard() called");
+        Debug.Log("[LeaderboardUI] HideLeaderboard() called");
 
         if (leaderboardPanel == null)
         {
-            Debug.LogError("[LeaderboardUI] ❌ Cannot hide leaderboard - Panel reference is null!");
+            Debug.LogError("[LeaderboardUI] Cannot hide leaderboard - Panel reference is null!");
             return;
         }
 
         leaderboardPanel.SetActive(false);
         isVisible = false;
 
-        Debug.Log("[LeaderboardUI] ✅ Leaderboard panel hidden! IsVisible: " + isVisible);
-
-        // Re-lock cursor for gameplay
-        // Cursor.lockState = CursorLockMode.Locked;
-        // Cursor.visible = false;
+        Debug.Log("[LeaderboardUI] Leaderboard panel hidden! IsVisible: " + isVisible);
     }
 
-    /// <summary>
-    /// Toggle leaderboard visibility (alternative to hold-to-show)
-    /// </summary>
     public void ToggleLeaderboard()
     {
         if (isVisible)
@@ -158,27 +135,23 @@ public class LeaderboardUI : MonoBehaviour
             ShowLeaderboard();
     }
 
-    /// <summary>
-    /// Refresh leaderboard data from MatchManager
-    /// Destroys old rows and creates new ones
-    /// </summary>
     public void RefreshLeaderboard()
     {
-        Debug.Log("[LeaderboardUI] 🔄 RefreshLeaderboard() called");
+        Debug.Log("[LeaderboardUI] RefreshLeaderboard() called");
 
         // Check if MatchManager exists
         if (MatchManager.Instance == null)
         {
-            Debug.LogWarning("[LeaderboardUI] ⚠️ MatchManager not found! Cannot refresh leaderboard.");
+            Debug.LogWarning("[LeaderboardUI] MatchManager not found! Cannot refresh leaderboard.");
             return;
         }
 
-        Debug.Log("[LeaderboardUI] ✓ MatchManager found");
+        Debug.Log("[LeaderboardUI] MatchManager found");
 
         // Get sorted leaderboard data
         List<PlayerStats> leaderboard = MatchManager.Instance.GetLeaderboard();
 
-        Debug.Log($"[LeaderboardUI] 📊 Retrieved {leaderboard.Count} entries from MatchManager");
+        Debug.Log($"[LeaderboardUI] Retrieved {leaderboard.Count} entries from MatchManager");
 
         // Clear old rows
         ClearRows();
@@ -187,17 +160,14 @@ public class LeaderboardUI : MonoBehaviour
         int rank = 1;
         foreach (PlayerStats stats in leaderboard)
         {
-            Debug.Log($"[LeaderboardUI] 📝 Spawning row #{rank}: {stats.entityName} ({stats.kills}/{stats.deaths})");
+            Debug.Log($"[LeaderboardUI] Spawning row #{rank}: {stats.entityName} ({stats.kills}/{stats.deaths})");
             SpawnRow(rank, stats);
             rank++;
         }
 
-        Debug.Log($"[LeaderboardUI] ✅ Leaderboard refreshed with {rank - 1} rows");
+        Debug.Log($"[LeaderboardUI] Leaderboard refreshed with {rank - 1} rows");
     }
 
-    /// <summary>
-    /// Spawn a single leaderboard row
-    /// </summary>
     private void SpawnRow(int rank, PlayerStats stats)
     {
         if (leaderboardRowPrefab == null || rowContainer == null)
@@ -219,9 +189,7 @@ public class LeaderboardUI : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Clear all spawned rows
-    /// </summary>
+    // Clear all spawned rows
     private void ClearRows()
     {
         foreach (LeaderboardRow row in spawnedRows)
@@ -232,9 +200,6 @@ public class LeaderboardUI : MonoBehaviour
         spawnedRows.Clear();
     }
 
-    /// <summary>
-    /// Force update leaderboard (call this after important events like kills)
-    /// </summary>
     public void ForceUpdate()
     {
         if (isVisible)
@@ -245,11 +210,9 @@ public class LeaderboardUI : MonoBehaviour
 
     private void OnDestroy()
     {
-        // Cleanup
         ClearRows();
     }
 
-    // Optional: Subscribe to MatchManager events for instant updates
     private void OnEnable()
     {
         if (MatchManager.Instance != null)
@@ -268,7 +231,6 @@ public class LeaderboardUI : MonoBehaviour
 
     private void OnKillHappened(PlayerStats killer, PlayerStats victim)
     {
-        // Instantly update leaderboard when a kill happens (if visible)
         if (isVisible)
         {
             RefreshLeaderboard();

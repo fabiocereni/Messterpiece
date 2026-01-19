@@ -47,7 +47,7 @@ public class PlayerMovement : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        rb.freezeRotation = true;
+        rb.freezeRotation = true; // Evita che il Rigidbody ruoti a causa delle forze fisiche
 
         readyToJump = true;
 
@@ -78,7 +78,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void MyInput()
     {
-        // Check if warmup is active - if so, disable all player input
+        // controlla se il giocatore può muoversi e warmup
         if (MatchFlowManager.Instance != null && !MatchFlowManager.Instance.CanPlayerMove())
         {
             horizontalInput = 0f;
@@ -139,7 +139,7 @@ public class PlayerMovement : MonoBehaviour
         // Se tocchi un muro e non sei a terra, applica meccaniche di slide
         if (touchingWall && !grounded)
         {
-            // 1. AZZERARE LA COMPONENTE DI VELOCITÀ CHE SPINGE CONTRO IL MURO
+            // rimuovi la componente della velocity verso il muro
             float velocityAgainstWall = Vector3.Dot(rb.linearVelocity, -wallNormal);
 
             if (velocityAgainstWall > 0)
@@ -148,10 +148,10 @@ public class PlayerMovement : MonoBehaviour
                 rb.linearVelocity -= velocityIntoWall;
             }
 
-            // 2. FORZA VERSO IL BASSO AUMENTATA (da 15f a 50f)
+            // applico una forza verso il basso per non scalare il muro
             rb.AddForce(Vector3.down * 50f, ForceMode.Force);
 
-            // 3. FORZA DI ALLONTANAMENTO DAL MURO
+            // forza per staccarsi dal muro
             rb.AddForce(wallNormal * 2f, ForceMode.Force);
         }
     }
@@ -252,7 +252,7 @@ public class PlayerMovement : MonoBehaviour
         return false;
     }
 
-    private void HandleMovementEffects() // ← Rinominato
+    private void HandleMovementEffects()
     {
         // Controlla se il player sta camminando
         bool isMoving = horizontalInput != 0 || verticalInput != 0;

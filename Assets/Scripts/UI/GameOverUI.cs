@@ -4,10 +4,7 @@ using TMPro;
 using System.Collections.Generic;
 using System.Linq;
 
-/// <summary>
-/// Controller principale per la schermata di fine partita
-/// Si iscrive a MatchManager.OnMatchEnd e gestisce UI game over
-/// </summary>
+// Controller principale per la schermata di fine partita
 public class GameOverUI : MonoBehaviour
 {
     public static GameOverUI Instance { get; private set; }
@@ -77,7 +74,6 @@ public class GameOverUI : MonoBehaviour
     
     private void Awake()
     {
-        // Singleton pattern
         if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
@@ -106,7 +102,7 @@ public class GameOverUI : MonoBehaviour
     
     private void OnEnable()
     {
-        // Iscriviti all'evento di cambio scena per ri-iscriversi a MatchManager
+        // Iscriviti all'evento di cambio scena per riscriversi a MatchManager
         UnityEngine.SceneManagement.SceneManager.sceneLoaded += OnSceneLoaded;
     }
     
@@ -115,18 +111,16 @@ public class GameOverUI : MonoBehaviour
         UnityEngine.SceneManagement.SceneManager.sceneLoaded -= OnSceneLoaded;
     }
     
-    /// <summary>
-    /// Chiamato quando una nuova scena viene caricata - ri-iscriviti a MatchManager e ri-trova UI
-    /// </summary>
+    // Chiamato quando una nuova scena viene caricata - riscriviti a MatchManager e ritrova UI
     private void OnSceneLoaded(UnityEngine.SceneManagement.Scene scene, UnityEngine.SceneManagement.LoadSceneMode mode)
     {
         if (showDebugLogs)
-            Debug.Log($"[GameOverUI] Scena caricata: {scene.name}, tentativo di ri-iscrizione a MatchManager");
+            Debug.Log($"[GameOverUI] Scena caricata: {scene.name}, tentativo di riscrizione a MatchManager");
 
         // Aspetta un frame per permettere a MatchManager di inizializzarsi
         StartCoroutine(ResubscribeAfterDelay());
 
-        // Ri-trova i riferimenti UI nella nuova scena
+        // Ritrova i riferimenti UI nella nuova scena
         RefreshUIReferences();
     }
     
@@ -138,9 +132,7 @@ public class GameOverUI : MonoBehaviour
         SubscribeToEvents();
     }
     
-    /// <summary>
-    /// Inizializza gli elementi UI
-    /// </summary>
+    // Inizializza gli elementi UI
     private void InitializeUI()
     {
         // Nascondi pannello game over all'avvio
@@ -192,15 +184,13 @@ public class GameOverUI : MonoBehaviour
             Debug.Log("[GameOverUI] Elementi UI inizializzati");
     }
     
-    /// <summary>
-    /// Si iscrive agli eventi rilevanti
-    /// </summary>
+    // Si iscrive agli eventi rilevanti
     private void SubscribeToEvents()
     {
         // Iscriviti all'evento di fine partita
         if (MatchManager.Instance != null)
         {
-            // Rimuovi prima per evitare duplicati (importante per ri-iscrizione dopo cambio scena)
+            // Rimuovi prima per evitare duplicati (importante per riscrizione dopo cambio scena)
             MatchManager.Instance.OnMatchEnd -= OnMatchEnded;
             MatchManager.Instance.OnMatchEnd += OnMatchEnded;
             
@@ -214,9 +204,7 @@ public class GameOverUI : MonoBehaviour
         }
     }
     
-    /// <summary>
-    /// Handler per l'evento di fine partita
-    /// </summary>
+    // Handler per l'evento di fine partita
     private void OnMatchEnded()
     {
         if (showDebugLogs)
@@ -225,9 +213,7 @@ public class GameOverUI : MonoBehaviour
         ShowGameOver();
     }
     
-    /// <summary>
-    /// Mostra la schermata di game over con le statistiche finali
-    /// </summary>
+    // Mostra la schermata di game over con le statistiche finali
     public void ShowGameOver()
     {
         if (isGameOverActive)
@@ -262,10 +248,7 @@ public class GameOverUI : MonoBehaviour
             Debug.Log("[GameOverUI] Schermata game over mostrata");
     }
     
-    /// <summary>
-    /// Nasconde la schermata di game over
-    /// NOTA: Non gestisce il cursore - i singoli handler lo gestiscono
-    /// </summary>
+    // Nasconde la schermata di game over
     public void HideGameOver()
     {
         if (!isGameOverActive)
@@ -275,9 +258,6 @@ public class GameOverUI : MonoBehaviour
 
         // Riavvia il gioco
         Time.timeScale = 1f;
-
-        // NOTA: Il cursore viene gestito dai singoli handler (Menu vs Gioca Ancora)
-        // perché hanno bisogno di comportamenti diversi
 
         // Ripristina le UI di gameplay
         ShowGameplayUI();
@@ -295,9 +275,7 @@ public class GameOverUI : MonoBehaviour
             Debug.Log("[GameOverUI] Schermata game over nascosta");
     }
     
-    /// <summary>
-    /// Popola la leaderboard finale con le statistiche
-    /// </summary>
+    // Popola la leaderboard finale con le statistiche
     private void PopulateFinalLeaderboard()
     {
         if (MatchManager.Instance == null)
@@ -324,9 +302,7 @@ public class GameOverUI : MonoBehaviour
             Debug.Log($"[GameOverUI] Leaderboard popolata con {leaderboard.Count} giocatori");
     }
     
-    /// <summary>
-    /// Ottiene la leaderboard ordinata secondo il metodo selezionato
-    /// </summary>
+    // Ottiene la leaderboard ordinata secondo il metodo selezionato
     private List<PlayerStats> GetSortedLeaderboard()
     {
         var leaderboard = MatchManager.Instance.GetLeaderboard();
@@ -344,9 +320,7 @@ public class GameOverUI : MonoBehaviour
         }
     }
     
-    /// <summary>
-    /// Crea una riga della leaderboard
-    /// </summary>
+    // Crea una riga della leaderboard
     private void CreateLeaderboardRow(int rank, PlayerStats stats)
     {
         if (leaderboardContainer == null || leaderboardRowPrefab == null)
@@ -373,9 +347,7 @@ public class GameOverUI : MonoBehaviour
         spawnedRows.Add(rowObj);
     }
     
-    /// <summary>
-    /// Crea una riga leaderboard fallback se LeaderboardRow non è disponibile
-    /// </summary>
+    // Crea una riga leaderboard fallback se LeaderboardRow non è disponibile
     private void CreateFallbackLeaderboardRow(GameObject rowObj, int rank, PlayerStats stats)
     {
         TextMeshProUGUI textComponent = rowObj.GetComponentInChildren<TextMeshProUGUI>();
@@ -386,9 +358,7 @@ public class GameOverUI : MonoBehaviour
         }
     }
     
-    /// <summary>
-    /// Pulisce tutte le righe della leaderboard
-    /// </summary>
+    // Pulisce tutte le righe della leaderboard
     private void ClearLeaderboardRows()
     {
         foreach (var row in spawnedRows)
@@ -399,9 +369,7 @@ public class GameOverUI : MonoBehaviour
         spawnedRows.Clear();
     }
 
-    /// <summary>
-    /// Nasconde le UI di gameplay durante il game over
-    /// </summary>
+    // Nasconde le UI di gameplay durante il game over
     private void HideGameplayUI()
     {
         // Salva stato originale e disattiva barra vita
@@ -441,9 +409,7 @@ public class GameOverUI : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Ripristina le UI di gameplay dopo il game over
-    /// </summary>
+    // Ripristina le UI di gameplay dopo il game over
     private void ShowGameplayUI()
     {
         // Ripristina barra vita
@@ -479,13 +445,11 @@ public class GameOverUI : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Ri-trova i riferimenti UI nella nuova scena dopo un cambio scena
-    /// </summary>
+    // Ritrova i riferimenti UI nella nuova scena dopo un cambio scena
     private void RefreshUIReferences()
     {
         if (showDebugLogs)
-            Debug.Log("[GameOverUI] Tentativo di ri-trovare i riferimenti UI nella nuova scena...");
+            Debug.Log("[GameOverUI] Tentativo di ritrovare i riferimenti UI nella nuova scena...");
 
         // Cerca HealthBarUI
         HealthBarUI healthBar = FindObjectOfType<HealthBarUI>();
@@ -543,15 +507,13 @@ public class GameOverUI : MonoBehaviour
             Debug.Log("[GameOverUI] Refresh UI completato");
     }
 
-    /// <summary>
-    /// Handler per il click sul pulsante "Gioca Ancora"
-    /// </summary>
+    // Handler per il click sul pulsante "Gioca Ancora"
     private void OnPlayAgainClicked()
     {
         if (showDebugLogs)
             Debug.Log("[GameOverUI] Click su 'Gioca Ancora'");
         
-        // SEMPRE nascondere il game over prima di tutto per ripristinare Time.timeScale
+        //nascondere il game over prima di tutto per ripristinare Time.timeScale
         HideGameOver();
         
         // Blocca il cursore per il gameplay
@@ -593,9 +555,7 @@ public class GameOverUI : MonoBehaviour
         }
     }
     
-    /// <summary>
-    /// Handler per il click sul pulsante "Menu"
-    /// </summary>
+    // Handler per il click sul pulsante "Menu"
     private void OnMenuClicked()
     {
         if (showDebugLogs)

@@ -23,9 +23,7 @@ public class EnemyRespawn : MonoBehaviour
         animator = GetComponent<Animator>();
     }
 
-    /// <summary>
-    /// Avvia la sequenza di respawn dell'NPC
-    /// </summary>
+    // Avvio la sequenza di respawn dell'NPC
     public void RespawnEnemy()
     {
         StartCoroutine(RespawnRoutine());
@@ -33,15 +31,14 @@ public class EnemyRespawn : MonoBehaviour
 
     private IEnumerator RespawnRoutine()
     {
-        // Aspetta il tempo stabilito (mentre il bot è "invisibile")
+        // Aspetta il tempo di respawn
         yield return new WaitForSeconds(respawnDelay);
 
-        // 1. Trova uno spawn point casuale
         if (spawnPoints != null && spawnPoints.Length > 0)
         {
             Transform sp = spawnPoints[Random.Range(0, spawnPoints.Length)];
             
-            // Disabilita l'agente per teletrasportarlo correttamente
+            // disabilito la navmesh per teletrasportare l'NPC senza problemi
             if (agent != null) agent.enabled = false;
             
             transform.position = sp.position;
@@ -50,32 +47,30 @@ public class EnemyRespawn : MonoBehaviour
             if (agent != null) agent.enabled = true;
         }
 
-        // 2. Ripristina i componenti e la visibilità
+        // ripristino i componenti e la visibilità
         ResetComponents();
-
-        Debug.Log($"[EnemyRespawn] {gameObject.name} è tornato in gioco!");
     }
 
     private void ResetComponents()
     {
-        // Ripristina la salute
+        // ripristino la salute
         if (enemyHealth != null)
         {
             enemyHealth.RestoreHealth(enemyHealth.maxHealth);
         }
 
-        // Riattiva l'IA
+        // riattivo l'IA
         if (aiScript != null) aiScript.enabled = true;
 
-        // Riabilita il collider
+        // riabilito il collider
         var col = GetComponent<CapsuleCollider>();
         if (col != null) col.enabled = true;
 
-        // Mostra di nuovo il modello (SkinnedMesh e MeshRenderer)
+        // riattivo tutti i pezzi del corpo, figlio per figlio
         foreach (var smr in GetComponentsInChildren<SkinnedMeshRenderer>()) smr.enabled = true;
         foreach (var mr in GetComponentsInChildren<MeshRenderer>()) mr.enabled = true;
 
-        // Reset Animator
+        // resetto Animator
         if (animator != null)
         {
             animator.enabled = true;

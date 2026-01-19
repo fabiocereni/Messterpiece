@@ -1,10 +1,6 @@
 using UnityEngine;
 using System.Collections;
 
-/// <summary>
-/// Automatically registers all enemies in the scene with MatchManager at the start.
-/// This ensures all entities appear in the leaderboard from the beginning with 0 kills/deaths.
-/// </summary>
 public class EntityRegistrar : MonoBehaviour
 {
     [Header("Settings")]
@@ -22,9 +18,6 @@ public class EntityRegistrar : MonoBehaviour
         StartCoroutine(RegisterAllEntitiesDelayed());
     }
 
-    /// <summary>
-    /// Wait a moment for MatchManager to initialize, then register all entities
-    /// </summary>
     private IEnumerator RegisterAllEntitiesDelayed()
     {
         yield return new WaitForSeconds(registrationDelay);
@@ -38,9 +31,6 @@ public class EntityRegistrar : MonoBehaviour
         RegisterAllEnemies();
     }
 
-    /// <summary>
-    /// Find and register all enemies in the scene
-    /// </summary>
     private void RegisterAllEnemies()
     {
         GameObject[] enemies = GameObject.FindGameObjectsWithTag(enemyTag);
@@ -65,9 +55,6 @@ public class EntityRegistrar : MonoBehaviour
         Debug.Log($"[EntityRegistrar] Successfully registered {enemies.Length} enemies!");
     }
 
-    /// <summary>
-    /// Manually trigger entity registration (useful for debugging)
-    /// </summary>
     [ContextMenu("Force Register All Enemies")]
     public void ForceRegisterAllEnemies()
     {

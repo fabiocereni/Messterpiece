@@ -2,10 +2,6 @@ using UnityEngine;
 using TMPro;
 using System.Collections;
 
-/// <summary>
-/// Enhanced countdown system for match start and game timer
-/// Handles both warmup countdown and match timer display
-/// </summary>
 public class GameCountdownManager : MonoBehaviour
 {
     public static GameCountdownManager Instance { get; private set; }
@@ -90,9 +86,6 @@ public class GameCountdownManager : MonoBehaviour
         }
     }
     
-    /// <summary>
-    /// Start the warmup countdown sequence
-    /// </summary>
     public void StartWarmupCountdown()
     {
         if (isCountingDown)
@@ -104,9 +97,6 @@ public class GameCountdownManager : MonoBehaviour
         StartCoroutine(WarmupSequence());
     }
     
-    /// <summary>
-    /// Start the match timer (call after warmup completes)
-    /// </summary>
     public void StartMatchTimer()
     {
         if (matchDuration <= 0)
@@ -126,9 +116,6 @@ public class GameCountdownManager : MonoBehaviour
         Debug.Log($"[GameCountdownManager] Match timer started: {matchDuration} seconds");
     }
     
-    /// <summary>
-    /// Stop all countdowns and timers
-    /// </summary>
     public void StopCountdown()
     {
         isCountingDown = false;
@@ -199,7 +186,6 @@ public class GameCountdownManager : MonoBehaviour
     
     private void UpdateWarmupCountdown()
     {
-        // Warmup is handled by coroutine, but we keep this for consistency
     }
     
     private void UpdateMatchTimer()
@@ -251,25 +237,16 @@ public class GameCountdownManager : MonoBehaviour
         }
     }
     
-    /// <summary>
-    /// Get remaining match time
-    /// </summary>
     public float GetRemainingTime()
     {
         return Mathf.Max(0f, currentTime);
     }
-    
-    /// <summary>
-    /// Check if match is currently active
-    /// </summary>
+
     public bool IsMatchActive()
     {
         return currentState == CountdownState.Playing && isCountingDown;
     }
     
-    /// <summary>
-    /// Check if warmup is currently active
-    /// </summary>
     public bool IsWarmupActive()
     {
         return currentState == CountdownState.Warmup && isCountingDown;

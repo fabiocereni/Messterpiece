@@ -6,8 +6,6 @@ public class PlayerLook : MonoBehaviour
     public float sensX = 200f;
     public float sensY = 200f;
     public Transform cam;
-
-    // Un valore più basso = più fluido.
     public float smoothSpeed = 0.1f;
 
     private float xRot;
@@ -15,13 +13,11 @@ public class PlayerLook : MonoBehaviour
 
     private float sensitivityMult = 1.0f;
 
-    // Camera Controller integration
+    // Camera Controller
     private CameraController cameraController;
     private CameraMode currentCameraMode;
 
-    /// <summary>
-    /// Resetta la rotazione del giocatore per guardare in una direzione specifica
-    /// </summary>
+    // Resetta la rotazione del giocatore per guardare in una direzione specifica
     public void ResetRotation(Vector3 forwardDirection)
     {
         // Calcola la rotazione Y dall'forward direction
@@ -36,10 +32,8 @@ public class PlayerLook : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Imposta la modalità camera corrente
-    /// Chiamato da CameraController quando cambia modalità
-    /// </summary>
+    // Imposta la modalità camera corrente
+    // Chiamato da CameraController quando cambia modalità
     public void SetCameraMode(CameraMode mode)
     {
         currentCameraMode = mode;
@@ -52,18 +46,14 @@ public class PlayerLook : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Ottiene la rotazione verticale corrente (pitch)
-    /// Usato da ThirdPersonCamera per sapere dove guardare
-    /// </summary>
+    // Ottiene la rotazione verticale corrente (pitch)
+    // Usato da ThirdPersonCamera per sapere dove guardare
     public float GetVerticalRotation()
     {
         return xRot;
     }
 
-    /// <summary>
-    /// Ottiene la rotazione orizzontale corrente (yaw)
-    /// </summary>
+    // Ottiene la rotazione orizzontale corrente (yaw)
     public float GetHorizontalRotation()
     {
         return yRot;
@@ -71,6 +61,7 @@ public class PlayerLook : MonoBehaviour
 
     void Start()
     {
+        // Blocca il cursore al centro dello schermo e nascondilo
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
@@ -87,7 +78,6 @@ public class PlayerLook : MonoBehaviour
 
     void LateUpdate()
     {
-        // Disable camera movement during warmup
         if (MatchFlowManager.Instance != null && !MatchFlowManager.Instance.CanPlayerMove())
         {
             return;
@@ -99,24 +89,21 @@ public class PlayerLook : MonoBehaviour
             currentCameraMode = cameraController.GetCurrentMode();
         }
 
-        // In TPS mode, ThirdPersonCamera gestisce tutto (mouse input + rotazione)
-        // PlayerLook non deve fare nulla per evitare conflitti
         if (currentCameraMode == CameraMode.ThirdPerson)
         {
             return;
         }
 
-        // Solo in FPS mode: processa input e applica rotazione
-        // Mouse input
+        // solo in FPS Mouse input
         float mouseX = Input.GetAxis("Mouse X") * sensX * sensitivityMult * Time.deltaTime;
         float mouseY = Input.GetAxis("Mouse Y") * sensY * sensitivityMult * Time.deltaTime;
 
-        // Update rotations
+        // aggiorno rotazione
         yRot += mouseX;
         xRot -= mouseY;
         xRot = Mathf.Clamp(xRot, -90f, 90f);
 
-        // Applica rotazione FPS
+        // applica rotazione FPS
         ApplyFirstPersonRotation();
     }
 
@@ -158,9 +145,6 @@ public class PlayerLook : MonoBehaviour
 
     private void ApplyThirdPersonRotation()
     {
-        // In TPS: il player ruota in base al movimento della camera
-        // Ma la rotazione verticale (xRot) viene gestita dalla ThirdPersonCamera
-
         // Rotazione player (Y axis)
         Quaternion targetPlayerRotation = Quaternion.Euler(0, yRot, 0);
         transform.rotation = Quaternion.Lerp(
@@ -168,8 +152,5 @@ public class PlayerLook : MonoBehaviour
             targetPlayerRotation,
             smoothSpeed
         );
-
-        // In TPS la camera gestisce la propria rotazione
-        // Ma dobbiamo comunque tracciare xRot per quando si torna in FPS
     }
 }

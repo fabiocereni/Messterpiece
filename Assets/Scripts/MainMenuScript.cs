@@ -24,9 +24,7 @@ public class MainMenuScript : MonoBehaviour
         mapSelectionPanel.SetActive(true);
     }
     
-    /// <summary>
-    /// Apre il menu delle opzioni
-    /// </summary>
+    // Apre il menu delle opzioni
     public void OpenOptions()
     {
         if (optionsMenu != null)

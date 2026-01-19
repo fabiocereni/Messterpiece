@@ -15,15 +15,14 @@ public class FirstPersonCamera : MonoBehaviour
 
     [Header("Head Bob (Optional)")]
     [Tooltip("Abilita head bobbing durante il movimento")]
-    public bool enableHeadBob = false;
+    public bool enableHeadBob = false; // false: la testa rimane ferma
     
     [Tooltip("Intensità del bobbing")]
-    public float bobAmount = 0.05f;
+    public float bobAmount = 0.05f; // intensità del bobbing
     
     [Tooltip("Velocità del bobbing")]
-    public float bobSpeed = 14f;
+    public float bobSpeed = 14f; // velocità del bobbing
 
-    // References
     private CameraController cameraController;
     private Camera mainCamera;
     private Transform cameraHolder;
@@ -32,19 +31,16 @@ public class FirstPersonCamera : MonoBehaviour
     private float bobTimer = 0f;
     private Vector3 targetCameraPosition;
 
-    // Original position
+    // posizione originale della camera
     private Vector3 originalLocalPosition;
 
-    /// <summary>
-    /// Inizializza il componente FPS Camera
-    /// </summary>
     public void Initialize(CameraController controller, Camera camera, Transform holder)
     {
         cameraController = controller;
-        mainCamera = camera;
-        cameraHolder = holder;
+        mainCamera = camera; // telecamera principale
+        cameraHolder = holder; // oggetto che contiene la camera
 
-        // Salva posizione originale del CameraHolder
+        // salva posizione originale del CameraHolder
         if (cameraHolder != null)
         {
             originalLocalPosition = cameraHolder.localPosition;
@@ -60,15 +56,16 @@ public class FirstPersonCamera : MonoBehaviour
         }
     }
 
+    // lateUpdate viene chiamato dopo tutti gli Update, quindi prima esegue i movimenti del player, poi aggiorna la camera
     private void LateUpdate()
     {
         if (!enabled || cameraHolder == null)
             return;
 
-        // Update camera position
+        // posiziono la camera al posto giusto
         UpdateCameraPosition();
 
-        // Head bob (optional)
+        // applico head bobbing se abilitato
         if (enableHeadBob)
         {
             ApplyHeadBob();
@@ -77,15 +74,14 @@ public class FirstPersonCamera : MonoBehaviour
 
     private void UpdateCameraPosition()
     {
-        // In FPS la camera mantiene X e Z originali, modifica solo Y
-        // Usa l'originalLocalPosition salvato + offset Y dal cameraOffset
+        // mantiene X e Z originali, imposta Y da cameraOffset
         targetCameraPosition = new Vector3(
             originalLocalPosition.x,
             cameraOffset.y,
             originalLocalPosition.z
         );
 
-        // Smooth lerp (opzionale, per transizione fluida)
+        // linear interpolation permette di rendere il movimento fluido
         cameraHolder.localPosition = Vector3.Lerp(
             cameraHolder.localPosition,
             targetCameraPosition,
@@ -95,7 +91,7 @@ public class FirstPersonCamera : MonoBehaviour
 
     private void ApplyHeadBob()
     {
-        // Controlla se il player si sta muovendo
+        // controlla se il player si sta muovendo
         PlayerMovement movement = GetComponent<PlayerMovement>();
         if (movement == null)
             return;
@@ -106,31 +102,29 @@ public class FirstPersonCamera : MonoBehaviour
 
         if (isMoving)
         {
-            // Incrementa timer
+            // frequenza dei passi, quindi piu' alto, piu' veloce farà su e giu la testa
             bobTimer += Time.deltaTime * bobSpeed;
 
-            // Calcola bobbing (seno per movimento verticale)
+            // calcolo bobbing (seno per movimento verticale)
             float bobOffset = Mathf.Sin(bobTimer) * bobAmount;
 
-            // Applica offset
+            // applichiamo offset
             Vector3 bobPosition = targetCameraPosition + new Vector3(0f, bobOffset, 0f);
             cameraHolder.localPosition = bobPosition;
         }
         else
         {
-            // Reset bobbing
+            // resetto il bobbing
             bobTimer = 0f;
         }
     }
 
-    /// <summary>
-    /// Resetta la posizione della camera FPS
-    /// </summary>
+    /// resetto la posizione della camera FPS
     public void ResetPosition()
     {
         if (cameraHolder != null)
         {
-            // Mantiene X e Z originali, imposta Y da cameraOffset
+            // mantiene X e Z originali, imposta Y da cameraOffset
             targetCameraPosition = new Vector3(
                 originalLocalPosition.x,
                 cameraOffset.y,

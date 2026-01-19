@@ -43,39 +43,35 @@ public class PlayerHealth : MonoBehaviour
             healthBarUI.UpdateHealthBar(currentHealth, maxHealth);
         }
 
-        // Se esiste il MatchFlowManager → aspetta il warmup
+        // Se esiste il MatchFlowManager, aspetta il warmup
         if (MatchFlowManager.Instance != null)
         {
             MatchFlowManager.Instance.OnWarmupComplete += OnMatchStarted;
         }
         else
         {
-            // Nessun warmup → match già iniziato
+            // Nessun warmup, match già iniziato
             OnMatchStarted();
         }
     }
 
 
-    /// <summary>
-    /// Applica danno al player
-    /// </summary>
+    // applica danno al player
     public void TakeDamage(float damage, Vector3 hitPoint, GameObject attacker = null)
     {
-        // PROTEZIONE: Se è già morto o invincibile, ignora il danno
+        // se è già morto o invincibile, ignora il danno
         if (isDead || isInvincible) return;
 
         currentHealth -= damage;
-        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
+        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth); // assicura che non scenda sotto 0 la vita
 
-        Debug.Log($"[PlayerHealth] Player took {damage} damage. Health: {currentHealth}/{maxHealth}");
-
-        // Aggiorna la UI
+        // aggiorna la UI
         if (healthBarUI != null)
         {
             healthBarUI.UpdateHealthBar(currentHealth, maxHealth);
         }
         
-        // Crea la freccia (rossa) che indica la direzione del danno
+        // creo la freccia che indica la direzione del danno
         if (myDamageIndicator != null)
         {
             myDamageIndicator.DamageLocation = hitPoint;
@@ -94,26 +90,20 @@ public class PlayerHealth : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Cura il player
-    /// </summary>
+    // cura il player
     public void Heal(float amount)
     {
         currentHealth += amount;
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
 
-        Debug.Log($"[PlayerHealth] Player healed {amount}. Health: {currentHealth}/{maxHealth}");
-
-        // Aggiorna la UI
+        // aggiorna la UI
         if (healthBarUI != null)
         {
             healthBarUI.UpdateHealthBar(currentHealth, maxHealth);
         }
     }
 
-    /// <summary>
-    /// Coroutine per gestire l'invincibilità temporanea
-    /// </summary>
+    // Coroutine per gestire l'invincibilità temporanea
     private IEnumerator InvincibilityCoroutine()
     {
         isInvincible = true;
@@ -121,15 +111,11 @@ public class PlayerHealth : MonoBehaviour
         isInvincible = false;
     }
 
-    /// <summary>
-    /// Player muore - ora usa respawn invece di game over
-    /// </summary>
+    // Player muore - respawna
     private void Die()
     {
         if (isDead) return;
         isDead = true;
-
-        Debug.Log("[PlayerHealth] Player DIED!");
 
         if (crosshairUI != null)
         {
@@ -150,44 +136,32 @@ public class PlayerHealth : MonoBehaviour
             RestoreHealth(maxHealth);
         }
     }
-    
-    
 
-    /// <summary>
-    /// Getter per checking se morto (usa il flag isDead invece di solo currentHealth)
-    /// </summary>
+    // Controlla se il giocatore è morto
     public bool IsDead()
     {
         return isDead;
     }
 
-    /// <summary>
-    /// Getter health corrente
-    /// </summary>
+    // Getter health corrente
     public float GetCurrentHealth()
     {
         return currentHealth;
     }
 
-    /// <summary>
-    /// Getter health massima
-    /// </summary>
+    // Getter health massima
     public float GetMaxHealth()
     {
         return maxHealth;
     }
     
-    /// <summary>
-    /// Ripristina la salute del giocatore (usato dal respawn)
-    /// </summary>
+    // Ripristina la salute del giocatore (usato dal respawn)
     public void RestoreHealth(float amount)
     {
         isDead = false;
 
         currentHealth = amount;
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
-
-        Debug.Log($"[PlayerHealth] Salute ripristinata a {currentHealth}/{maxHealth}");
 
         if (healthBarUI != null)
         {
@@ -205,8 +179,9 @@ public class PlayerHealth : MonoBehaviour
     
     private void OnMatchStarted()
     {
-        hasMatchStarted = true;
+        hasMatchStarted = true; // Il match è iniziato
 
+        // se sono vivo, mostra il mirino
         if (!isDead && crosshairUI != null)
         {
             crosshairUI.SetActive(true);
@@ -220,7 +195,5 @@ public class PlayerHealth : MonoBehaviour
             MatchFlowManager.Instance.OnWarmupComplete -= OnMatchStarted;
         }
     }
-
-    
     
 }

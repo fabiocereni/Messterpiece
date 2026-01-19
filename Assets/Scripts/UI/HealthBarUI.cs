@@ -47,9 +47,7 @@ public class HealthBarUI : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Aggiorna la barra della vita
-    /// </summary>
+    // Aggiorna la barra della vita
     public void UpdateHealthBar(float currentHealth, float maxHealth)
     {
         // Calcola la percentuale di vita rimanente

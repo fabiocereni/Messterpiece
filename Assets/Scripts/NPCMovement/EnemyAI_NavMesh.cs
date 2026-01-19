@@ -4,17 +4,17 @@ using UnityEngine.AI;
 [RequireComponent(typeof(NavMeshAgent))]
 public class EnemyAI_NavMesh : MonoBehaviour
 {
-    private Transform currentTarget; 
-    private NavMeshAgent agent;
-    private Animator animator;
+    private Transform currentTarget; // target che l'NPC sta inseguendo
+    private NavMeshAgent agent; // il movimento dell'NPC
+    private Animator animator; // per le animazioni
 
     [Header("Riferimenti")]
-    public EnemyGun enemyGun;
+    public EnemyGun enemyGun; // arma dell'NPC
 
     [Header("Impostazioni Movimento")]
     public float walkSpeed = 2.0f;
     public float runSpeed = 5.0f;
-    public float rotationSpeed = 10f; // Velocità di rotazione su se stesso
+    public float rotationSpeed = 10f;
 
     [Header("Rilevamento")]
     [Tooltip("Layer che l'enemy deve attaccare (es. Player e Enemy)")]
@@ -35,9 +35,9 @@ public class EnemyAI_NavMesh : MonoBehaviour
     private float nextFireTime = 0f;
     
     // Logica di Allerta
-    private Transform alertTarget;
+    private Transform alertTarget; // chi ha colpito l'NPC
     private float alertTimer = 0f;
-    private float alertDuration = 5f;
+    private float alertDuration = 5f; // per quanti secondi l'NPC rimane allertato, quindi insegue il player
 
     [Header("Pattugliamento")]
     public Transform[] patrolPoints;
@@ -52,7 +52,7 @@ public class EnemyAI_NavMesh : MonoBehaviour
         agent.updateRotation = true;
         agent.stoppingDistance = 0.5f;
 
-        // Inizializza con un punto di pattuglia casuale
+        // inizializza con un punto di pattuglia casuale
         if (patrolPoints.Length > 0)
         {
             currentPatrolIndex = Random.Range(0, patrolPoints.Length);
@@ -62,7 +62,7 @@ public class EnemyAI_NavMesh : MonoBehaviour
 
     void Update()
     {
-        FindClosestTarget();
+        FindClosestTarget(); // scansiono l'area e controllo se c'è un player da inseguire
     
         if (currentTarget != null && IsEntityDead(currentTarget.gameObject))
         {
@@ -127,7 +127,7 @@ public class EnemyAI_NavMesh : MonoBehaviour
 
     private void HandlePatrol()
     {
-        // Assicuriamoci che l'agente possa muoversi dopo un combattimento
+        // l'NPC puo' muoversi dopo un combattimento
         agent.isStopped = false; 
         agent.speed = walkSpeed;
         if (animator != null) animator.SetBool("isRunning", false);
@@ -138,11 +138,12 @@ public class EnemyAI_NavMesh : MonoBehaviour
         }
     }
     
+    // metodo che permette all'NPC di essere avvisato che è stato colpito
     public void ReportHit(GameObject attacker)
     {
         if (attacker == null) return;
-        alertTarget = attacker.transform;
-        alertTimer = alertDuration; 
+        alertTarget = attacker.transform; // salvo la posizione di chi ha sparato l'NPC
+        alertTimer = alertDuration; // per un certo timer l'NPC è in allerta
     }
     
     bool IsEntityDead(GameObject obj)
@@ -193,6 +194,7 @@ public class EnemyAI_NavMesh : MonoBehaviour
         currentTarget = bestTarget;
     }
 
+    // va al prossimo patrol point
     void GotoNextPatrolPoint()
     {
         if (patrolPoints.Length == 0) return;
@@ -202,7 +204,7 @@ public class EnemyAI_NavMesh : MonoBehaviour
             return;
         }
 
-        // Scegliamo un indice casuale differente dal precedente
+        // scelgo un indice casuale differente dal precedente
         int newIndex = currentPatrolIndex;
         while (newIndex == currentPatrolIndex)
         {
@@ -213,6 +215,20 @@ public class EnemyAI_NavMesh : MonoBehaviour
         agent.SetDestination(patrolPoints[currentPatrolIndex].position);
     }
 
+    // fa girare l'NPC verso una posizione target
+    void FaceTarget(Vector3 targetPosition)
+    {
+        Vector3 direction = (targetPosition - transform.position).normalized;
+        direction.y = 0; 
+    
+        if (direction != Vector3.zero)
+        {
+            Quaternion lookRotation = Quaternion.LookRotation(direction); // calcola la rotazione verso il target
+            transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * rotationSpeed); // rotazione graduale
+        }
+    }
+
+    // serve solo per debug in scena
     private void OnDrawGizmosSelected()
     {
         // Raggio di rilevamento
@@ -222,16 +238,5 @@ public class EnemyAI_NavMesh : MonoBehaviour
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, attackStoppingDistance);
     }
-    
-    void FaceTarget(Vector3 targetPosition)
-    {
-        Vector3 direction = (targetPosition - transform.position).normalized;
-        direction.y = 0; 
-    
-        if (direction != Vector3.zero)
-        {
-            Quaternion lookRotation = Quaternion.LookRotation(direction);
-            transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * rotationSpeed);
-        }
-    }
+
 }

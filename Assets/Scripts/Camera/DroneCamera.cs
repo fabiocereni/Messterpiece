@@ -1,9 +1,5 @@
 using UnityEngine;
 
-/// <summary>
-/// Script per la DroneCamera che segue il player dall'alto quando è morto
-/// Può essere una camera statica o che segue il player da lontano
-/// </summary>
 public class DroneCamera : MonoBehaviour
 {
     [Header("Follow Settings")]
@@ -11,7 +7,7 @@ public class DroneCamera : MonoBehaviour
     public bool followPlayer = true;
 
     [Tooltip("Riferimento al transform del player (auto-find se null)")]
-    public Transform playerTransform;
+    public Transform playerTransform; // il player da seguire
 
     [Tooltip("Offset Y dalla posizione del player")]
     public float heightOffset = 15f;
@@ -35,7 +31,7 @@ public class DroneCamera : MonoBehaviour
     {
         droneCamera = GetComponent<Camera>();
 
-        // La DroneCamera parte disattivata
+        // la DroneCamera parte disattivata
         if (droneCamera != null)
         {
             droneCamera.enabled = false;
@@ -44,7 +40,6 @@ public class DroneCamera : MonoBehaviour
 
     private void Start()
     {
-        // Auto-find player se non assegnato
         if (playerTransform == null)
         {
             GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
@@ -66,25 +61,25 @@ public class DroneCamera : MonoBehaviour
         if (droneCamera == null || !droneCamera.enabled || !followPlayer || playerTransform == null)
             return;
 
-        // Calcola posizione target sopra e dietro il player
+        // calcolo posizione target sopra e dietro il player
         Vector3 targetPosition = playerTransform.position
             - playerTransform.forward * distanceOffset
             + Vector3.up * heightOffset;
 
-        // Smooth follow
+        // smooth follow
         transform.position = Vector3.Lerp(
             transform.position,
             targetPosition,
             smoothSpeed * Time.deltaTime
         );
 
-        // Guarda verso il player
+        // guarda verso il player
         if (lookAtPlayer)
         {
             Vector3 lookDirection = playerTransform.position - transform.position;
             Quaternion targetRotation = Quaternion.LookRotation(lookDirection);
 
-            // Applica pitch angle
+            // applica pitch angle
             targetRotation *= Quaternion.Euler(pitchAngle, 0, 0);
 
             transform.rotation = Quaternion.Lerp(
@@ -95,17 +90,13 @@ public class DroneCamera : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Imposta il transform del player da seguire
-    /// </summary>
+    // imposta il transform del player da seguire
     public void SetPlayerTransform(Transform player)
     {
         playerTransform = player;
     }
 
-    /// <summary>
-    /// Resetta la posizione della camera sopra il player
-    /// </summary>
+    /// resetta la posizione della camera sopra il player
     public void ResetPosition()
     {
         if (playerTransform == null) return;

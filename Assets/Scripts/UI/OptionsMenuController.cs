@@ -3,10 +3,7 @@ using UnityEngine.Audio;
 using UnityEngine.UI;
 using TMPro;
 
-/// <summary>
-/// Controller unificato per il menu opzioni
-/// Gestisce Volume, Difficoltà, Sensibilità e navigazione pannelli
-/// </summary>
+// Controller unificato per il menu opzioni
 public class OptionsMenuController : MonoBehaviour
 {
     [Header("Audio")]
@@ -50,9 +47,7 @@ public class OptionsMenuController : MonoBehaviour
         SetupListeners();
     }
 
-    /// <summary>
-    /// Crea GameSettings se non esiste
-    /// </summary>
+    // Crea GameSettings se non esiste
     private void EnsureGameSettingsExists()
     {
         if (GameSettings.Instance == null)
@@ -65,9 +60,7 @@ public class OptionsMenuController : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Inizializza la UI con i valori salvati
-    /// </summary>
+    // Inizializza la UI con i valori salvati
     private void InitializeUI()
     {
         // Volume
@@ -105,9 +98,7 @@ public class OptionsMenuController : MonoBehaviour
             Debug.Log("[OptionsMenu] UI inizializzata");
     }
 
-    /// <summary>
-    /// Configura i listeners per gli eventi UI
-    /// </summary>
+    // Configura i listeners per gli eventi UI
     private void SetupListeners()
     {
         if (volumeSlider != null)
@@ -193,9 +184,7 @@ public class OptionsMenuController : MonoBehaviour
             Debug.Log("[OptionsMenu] Ritorno al menu principale");
     }
 
-    /// <summary>
-    /// Mostra il pannello opzioni (chiamato da MainMenuScript)
-    /// </summary>
+    // Mostra il pannello opzioni (chiamato da MainMenuScript)
     public void ShowOptions()
     {
         EnsureGameSettingsExists();

@@ -34,7 +34,7 @@ public class ThirdPersonCamera : MonoBehaviour
 
     [Header("Collision Settings")]
     [Tooltip("LayerMask per collision detection")]
-    public LayerMask collisionLayers = -1;
+    public LayerMask collisionLayers = -1; // usato per non far entrare la camera dentro il muro, includo tutti tranne il player
     
     [Tooltip("Raggio della sfera per SphereCast")]
     public float collisionRadius = 0.3f;
@@ -47,7 +47,7 @@ public class ThirdPersonCamera : MonoBehaviour
 
     [Header("Camera Pivot")]
     [Tooltip("Punto di pivot della camera (occhi del player)")]
-    public Vector3 pivotOffset = new Vector3(0f, 1.6f, 0f);
+    public Vector3 pivotOffset = new Vector3(0f, 1.6f, 0f); // punto di rotazione della camera
 
     [Header("Debug")]
     [Tooltip("Mostra gizmo di collision detection")]
@@ -67,16 +67,13 @@ public class ThirdPersonCamera : MonoBehaviour
     private float yaw;   // Rotazione orizzontale
     private float pitch; // Rotazione verticale
 
-    // Collision
+    // collisioni
     private bool isColliding = false;
     private float targetCollisionDistance;
 
-    // Sensitivity multiplier from settings
+    // moltiplicatore di sensibilità
     private float sensitivityMult = 1.0f;
 
-    /// <summary>
-    /// Inizializza il componente TPS Camera
-    /// </summary>
     public void Initialize(CameraController controller, Camera camera, Transform player)
     {
         cameraController = controller;
@@ -87,13 +84,13 @@ public class ThirdPersonCamera : MonoBehaviour
         currentDistance = targetDistance;
         targetCollisionDistance = targetDistance;
 
-        // Carica sensitivity dalle impostazioni
+        // carico sensitivity dalle impostazioni
         sensitivityMult = PlayerPrefs.GetFloat("Sensitivity", 1.0f);
     }
 
     private void OnEnable()
     {
-        // Quando viene attivato TPS, sincronizza con la rotazione attuale del player
+        // quanto viene attivato TPS, sincronizza con la rotazione attuale del player
         if (tpsCamera != null && playerTransform != null)
         {
             // Inizializza yaw dalla rotazione attuale del player
@@ -107,33 +104,34 @@ public class ThirdPersonCamera : MonoBehaviour
 
     private void LateUpdate()
     {
+        // controlla se script abilitato, camera e player validi
         if (!enabled || tpsCamera == null || playerTransform == null)
             return;
 
-        // Processa input del mouse per rotazione
+        // legge input mouse
         HandleMouseInput();
 
-        // Update camera position e collision
+        // aggiorna la posizione della camera
         UpdateCameraPosition();
 
-        // Sincronizza la rotazione del player con la direzione della camera
+        // sincronizza la rotazione del player con la direzione della camera
         SyncPlayerRotation();
 
-        // Sincronizza il CameraHolder (arma) con il pitch della camera
+        // sincronizza il CameraHolder (arma) con il pitch della camera
         SyncCameraHolderRotation();
     }
 
     private void HandleMouseInput()
     {
-        // Disabilita durante warmup o morte
+        // prendo lo stato del gioco, se il player non può muoversi non aggiorno la camera
         if (MatchFlowManager.Instance != null && !MatchFlowManager.Instance.CanPlayerMove())
             return;
 
-        // Mouse input
+        // input del mouse
         float mouseX = Input.GetAxis("Mouse X") * sensX * sensitivityMult * Time.deltaTime;
         float mouseY = Input.GetAxis("Mouse Y") * sensY * sensitivityMult * Time.deltaTime;
 
-        // Aggiorna rotazioni
+        // aggiorno rotazioni
         yaw += mouseX;
         pitch -= mouseY;
         
@@ -143,38 +141,36 @@ public class ThirdPersonCamera : MonoBehaviour
 
     private void UpdateCameraPosition()
     {
-        // 1. Calcola pivot position (punto di rotazione della camera - occhi del player)
+        // punto di rotazione della camera - occhi del player
         pivotPosition = playerTransform.position + pivotOffset;
 
-        // 2. Calcola la direzione della camera basata su yaw e pitch
+        // calcolo la direzione della camera basata su yaw e pitch
         Quaternion cameraRotation = Quaternion.Euler(pitch, yaw, 0f);
         Vector3 cameraDirection = cameraRotation * Vector3.forward;
 
-        // 3. Calcola offset laterale in world space
+        // calcolo lo spostamento laterale
         Vector3 rightOffset = cameraRotation * Vector3.right * shoulderOffset;
 
-        // 4. Posizione target: dietro il player + offset laterale
-        // La camera è DIETRO (opposta alla direzione forward) rispetto al pivot
+        // posizione finale
         Vector3 targetPosition = pivotPosition - (cameraDirection * targetDistance) + rightOffset;
 
-        // 5. Collision detection (usa la direzione dal pivot alla camera target)
         Vector3 collisionDirection = (targetPosition - pivotPosition).normalized;
-        float adjustedDistance = CheckCameraCollision(pivotPosition, collisionDirection);
+        float adjustedDistance = CheckCameraCollision(pivotPosition, collisionDirection); // controlla collisioni
         
-        // Ricalcola posizione con distanza aggiustata
+        // ricalcolo posizione con distanza aggiustata
         targetPosition = pivotPosition + (collisionDirection * adjustedDistance);
 
-        // 6. Smooth movement
+        // rendo il moviemnto fluido
         currentCameraPosition = Vector3.Lerp(
             currentCameraPosition,
             targetPosition,
             Time.deltaTime * positionSmoothSpeed
         );
 
-        // 7. Applica posizione alla TPS Camera
+        // applico la posizione calcolata
         tpsCamera.transform.position = currentCameraPosition;
 
-        // 8. La camera guarda nella direzione calcolata
+        // camera guarda nella direzione calcolata
         Quaternion targetRotation = Quaternion.Euler(pitch, yaw, 0f);
         tpsCamera.transform.rotation = Quaternion.Slerp(
             tpsCamera.transform.rotation,
@@ -185,8 +181,8 @@ public class ThirdPersonCamera : MonoBehaviour
 
     private void SyncPlayerRotation()
     {
-        // Il player ruota solo su Y per seguire la direzione della camera
-        // Questo mantiene il player allineato con dove sta guardando la camera
+        // player ruota solo su Y per seguire la direzione della camera
+        // questo mantiene il player allineato con dove sta guardando la camera
         Quaternion targetPlayerRotation = Quaternion.Euler(0f, yaw, 0f);
         playerTransform.rotation = Quaternion.Slerp(
             playerTransform.rotation,
@@ -197,8 +193,8 @@ public class ThirdPersonCamera : MonoBehaviour
 
     private void SyncCameraHolderRotation()
     {
-        // Sincronizza il CameraHolder (che contiene l'arma) con il pitch della camera TPS
-        // Così l'arma punta dove la camera sta guardando
+        // sincronizza il CameraHolder (che contiene l'arma) con il pitch della camera TPS
+        // così l'arma punta dove la camera sta guardando
         if (cameraController == null)
             return;
 
@@ -206,8 +202,8 @@ public class ThirdPersonCamera : MonoBehaviour
         if (cameraHolder == null)
             return;
 
-        // Il CameraHolder ruota solo su X (pitch) in local space
-        // La rotazione Y è già gestita dal player stesso
+        // il CameraHolder ruota solo su X (pitch)
+        // rotazione Y è già gestita dal player stesso
         Quaternion targetRotation = Quaternion.Euler(pitch, 0f, 0f);
         cameraHolder.localRotation = Quaternion.Slerp(
             cameraHolder.localRotation,
@@ -223,7 +219,8 @@ public class ThirdPersonCamera : MonoBehaviour
         
         float checkDistance = targetDistance + collisionRadius;
         
-        // Esegui SphereCast (direzione invertita perché andiamo verso la camera, non verso il player)
+        // eseguo SphereCast, parte dalla testa del player (origin) e va indietro verso dove 
+        // la camera dovrebbe essere, controlla solo alcuni layer
         if (Physics.SphereCast(
             origin,
             collisionRadius,
@@ -233,14 +230,14 @@ public class ThirdPersonCamera : MonoBehaviour
             collisionLayers,
             QueryTriggerInteraction.Ignore))
         {
-            // Collisione rilevata
+            // collisione rilevata
             isColliding = true;
 
-            // Calcola distanza sicura dal muro
+            // calcola distanza sicura dal muro
             float safeDistance = hit.distance - collisionRadius - minDistanceFromWall;
             safeDistance = Mathf.Max(safeDistance, minDistanceFromWall);
 
-            // Smooth zoom
+            // effettua uno zoom-in fluido
             targetCollisionDistance = Mathf.Lerp(
                 targetCollisionDistance,
                 safeDistance,
@@ -256,10 +253,10 @@ public class ThirdPersonCamera : MonoBehaviour
         }
         else
         {
-            // Nessuna collisione
+            // nessuna collisione
             isColliding = false;
 
-            // Ritorna gradualmente alla distanza target
+            // ritona in modo fluido alla distanza target
             targetCollisionDistance = Mathf.Lerp(
                 targetCollisionDistance,
                 targetDistance,
@@ -275,33 +272,25 @@ public class ThirdPersonCamera : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Imposta la distanza della camera
-    /// </summary>
+    // imposto la distanza della camera
     public void SetDistance(float distance)
     {
         targetDistance = Mathf.Max(distance, 1f);
     }
 
-    /// <summary>
-    /// Ottiene la distanza corrente
-    /// </summary>
+    // ottengo la distanza corrente
     public float GetCurrentDistance()
     {
         return currentDistance;
     }
 
-    /// <summary>
-    /// Check se la camera sta collidendo
-    /// </summary>
+    // controllo se la camera sta collidendo
     public bool IsColliding()
     {
         return isColliding;
     }
 
-    /// <summary>
-    /// Resetta la posizione TPS
-    /// </summary>
+    // resetto la posizione TPS
     public void ResetPosition()
     {
         currentDistance = targetDistance;

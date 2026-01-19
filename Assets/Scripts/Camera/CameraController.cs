@@ -1,10 +1,8 @@
 using UnityEngine;
 using CameraSystem;
 
-/// <summary>
-/// Controller principale per gestire il sistema camera FPS/TPS
-/// Gestisce lo switching tra modalità e coordina i componenti
-/// </summary>
+// Controller principale per gestire il sistema camera FPS/TPS
+// Gestisce lo switching tra modalità e coordina i componenti
 [RequireComponent(typeof(FirstPersonCamera))]
 [RequireComponent(typeof(ThirdPersonCamera))]
 public class CameraController : MonoBehaviour
@@ -63,7 +61,7 @@ public class CameraController : MonoBehaviour
 
     private void Awake()
     {
-        // Ottieni componenti
+        // ottieni componenti
         fpsCamera = GetComponent<FirstPersonCamera>();
         tpsCamera = GetComponent<ThirdPersonCamera>();
         playerLook = GetComponent<PlayerLook>();
@@ -71,7 +69,7 @@ public class CameraController : MonoBehaviour
         // Auto-find references se non assegnate
         AutoFindReferences();
 
-        // Salva posizioni originali
+        // salva posizioni originali
         if (cameraHolder != null)
         {
             originalCameraPosition = cameraHolder.localPosition;
@@ -83,16 +81,16 @@ public class CameraController : MonoBehaviour
 
     private void Start()
     {
-        // Imposta modalità iniziale
+        // imposta modalità iniziale
         SetCameraMode(startingMode, instant: true);
     }
 
     private void Update()
     {
-        // Toggle camera con input
+        // toggle camera con input
         HandleCameraToggle();
 
-        // Update camera corrente
+        // update camera corrente
         UpdateCurrentCamera();
     }
 
@@ -202,9 +200,7 @@ public class CameraController : MonoBehaviour
 
     #region Camera Mode Management
 
-    /// <summary>
-    /// Imposta la modalità camera
-    /// </summary>
+    // imposto la modalità camera
     public void SetCameraMode(CameraMode mode, bool instant = false)
     {
         if (currentMode == mode && !instant)
@@ -212,46 +208,44 @@ public class CameraController : MonoBehaviour
 
         currentMode = mode;
 
-        // Aggiorna visibilità player
+        // aggiorno visibilità player
         UpdatePlayerVisibility();
 
-        // Notifica PlayerLook
+        // notifica PlayerLook
         if (playerLook != null)
         {
             playerLook.SetCameraMode(mode);
         }
 
-        // Attiva/disattiva componenti camera
+        // attiva/disattiva componenti camera
         if (fpsCamera != null)
             fpsCamera.enabled = (mode == CameraMode.FirstPerson);
 
         if (tpsCamera != null)
             tpsCamera.enabled = (mode == CameraMode.ThirdPerson);
 
-        // Attiva/disattiva le camere stesse
+        // attiva/disattiva le camere stesse
         if (fpsMainCamera != null)
             fpsMainCamera.enabled = (mode == CameraMode.FirstPerson);
 
         if (tpsMainCamera != null)
             tpsMainCamera.enabled = (mode == CameraMode.ThirdPerson);
 
-        // Quando si passa a TPS, resetta la rotazione del CameraHolder
-        // Questo evita che l'arma resti puntata nella direzione FPS precedente
+        // quando si passa a TPS, resetta la rotazione del CameraHolder
+        // questo evita che l'arma resti puntata nella direzione FPS precedente
         if (mode == CameraMode.ThirdPerson && cameraHolder != null)
         {
             cameraHolder.localRotation = Quaternion.identity;
         }
 
-        // Aggiorna Gun.cs per usare la camera attiva
+        // aggiorno Gun.cs per usare la camera attiva
         UpdateGunCameraReference();
 
         if (showDebugLogs)
             Debug.Log($"[CameraController] Camera mode changed to: {mode}");
     }
 
-    /// <summary>
-    /// Toggle tra FPS e TPS
-    /// </summary>
+    // toggle tra FPS e TPS
     public void ToggleCameraMode()
     {
         CameraMode newMode = (currentMode == CameraMode.FirstPerson) 
@@ -261,25 +255,19 @@ public class CameraController : MonoBehaviour
         SetCameraMode(newMode);
     }
 
-    /// <summary>
-    /// Ottiene la modalità corrente
-    /// </summary>
+    // ottiene la modalità corrente
     public CameraMode GetCurrentMode()
     {
         return currentMode;
     }
 
-    /// <summary>
-    /// Check se è in prima persona
-    /// </summary>
+    // controllo se è in prima persona
     public bool IsFirstPerson()
     {
         return currentMode == CameraMode.FirstPerson;
     }
 
-    /// <summary>
-    /// Check se è in terza persona
-    /// </summary>
+    // controllo se è in terza persona
     public bool IsThirdPerson()
     {
         return currentMode == CameraMode.ThirdPerson;
@@ -308,14 +296,12 @@ public class CameraController : MonoBehaviour
 
     private void UpdateCurrentCamera()
     {
-        // Gli update specifici sono gestiti dai componenti
-        // Questo metodo può essere usato per logica condivisa
+ 
     }
 
     private void UpdateCameraPosition()
     {
-        // LateUpdate per camera position
-        // Gestito dai componenti FirstPersonCamera e ThirdPersonCamera
+  
     }
 
 
@@ -323,7 +309,7 @@ public class CameraController : MonoBehaviour
     {
         bool showPlayer = (currentMode == CameraMode.ThirdPerson);
 
-        // Aggiorna i renderer nell'array hideInFPS (metodo legacy)
+        // aggiorna i renderer nell'array hideInFPS (metodo legacy)
         if (hideInFPS != null && hideInFPS.Length > 0)
         {
             foreach (Renderer renderer in hideInFPS)
@@ -335,7 +321,7 @@ public class CameraController : MonoBehaviour
             }
         }
 
-        // Aggiorna PlayerBodyVisibility (gestisce anche ShadowsOnly mode)
+        // aggiorna PlayerBodyVisibility (gestisce anche ShadowsOnly mode)
         PlayerBodyVisibility bodyVisibility = GetComponent<PlayerBodyVisibility>();
         if (bodyVisibility != null)
         {
@@ -351,9 +337,7 @@ public class CameraController : MonoBehaviour
 
     #region Public API
 
-    /// <summary>
-    /// Ottiene la camera attiva corrente
-    /// </summary>
+    // ottiene la camera attiva corrente
     public Camera GetMainCamera()
     {
         if (currentMode == CameraMode.FirstPerson)
@@ -362,9 +346,7 @@ public class CameraController : MonoBehaviour
             return tpsMainCamera;
     }
 
-    /// <summary>
-    /// Aggiorna il reference della camera in Gun.cs
-    /// </summary>
+    // Aggiorna il reference della camera in Gun.cs
     private void UpdateGunCameraReference()
     {
         Gun gun = GetComponent<Gun>();
@@ -381,17 +363,13 @@ public class CameraController : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Ottiene il CameraHolder
-    /// </summary>
+    // Ottiene il CameraHolder
     public Transform GetCameraHolder()
     {
         return cameraHolder;
     }
 
-    /// <summary>
-    /// Resetta la camera alla posizione di default
-    /// </summary>
+    // resetta la camera alla posizione di default
     public void ResetCamera()
     {
         if (cameraHolder != null)

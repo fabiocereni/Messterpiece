@@ -2,14 +2,8 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-/// <summary>
-/// Scene-based Match Manager (NOT DontDestroyOnLoad!)
-/// Handles match-specific logic: kills, deaths, leaderboard tracking.
-/// Dies with the scene to ensure clean state for each new match.
-/// </summary>
 public class MatchManager : MonoBehaviour
 {
-    // Singleton pattern (within this scene only - NOT DontDestroyOnLoad)
     public static MatchManager Instance { get; private set; }
 
     [Header("Match Settings")]
@@ -20,10 +14,8 @@ public class MatchManager : MonoBehaviour
     [Tooltip("Drag the Player GameObject here to track player stats separately")]
     public GameObject playerObject;
 
-    // Stats storage: Dictionary for fast lookup by GameObject
     private Dictionary<GameObject, PlayerStats> statsTable = new Dictionary<GameObject, PlayerStats>();
 
-    // Events that other systems can subscribe to
     public event System.Action<PlayerStats, PlayerStats> OnKillRegistered; // (killer, victim)
     public event System.Action OnMatchEnd;
 
@@ -37,7 +29,6 @@ public class MatchManager : MonoBehaviour
 
     private void Awake()
     {
-        // Singleton pattern (scene-local, NOT persistent)
         if (Instance != null && Instance != this)
         {
             Debug.LogError("[MatchManager] Multiple MatchManagers detected! Destroying duplicate.");
@@ -46,20 +37,17 @@ public class MatchManager : MonoBehaviour
         }
         Instance = this;
 
-        // DO NOT use DontDestroyOnLoad - we WANT this to die with the scene
-        Debug.Log("[MatchManager] ✅ MatchManager initialized (scene-based)");
+        Debug.Log("[MatchManager] MatchManager initialized (scene-based)");
     }
 
     private void Start()
     {
-        // Subscribe to warmup complete event
         if (MatchFlowManager.Instance != null)
         {
             MatchFlowManager.Instance.OnWarmupComplete += StartMatch;
         }
         else
         {
-            // If no warmup, start immediately
             StartMatch();
         }
 
@@ -86,25 +74,21 @@ public class MatchManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Start the match (called after warmup completes)
-    /// </summary>
+    // Start the match (called after warmup completes)
     public void StartMatch()
     {
         matchActive = true;
         matchTimer = 0f;
-        Debug.Log("[MatchManager] 🎮 Match started!");
+        Debug.Log("[MatchManager] Match started!");
     }
 
-    /// <summary>
-    /// End the match and trigger leaderboard
-    /// </summary>
+    // End the match and trigger leaderboard
     public void EndMatch()
     {
         if (!matchActive) return;
 
         matchActive = false;
-        Debug.Log("[MatchManager] 🏁 Match ended!");
+        Debug.Log("[MatchManager] Match ended!");
 
         // Print final leaderboard
         PrintLeaderboard();
@@ -112,13 +96,10 @@ public class MatchManager : MonoBehaviour
         // Fire event for UI to show end screen
         OnMatchEnd?.Invoke();
 
-        // TODO: Show end screen UI with stats
     }
 
-    /// <summary>
-    /// Register a new entity (player or bot) for stats tracking
-    /// Call this when spawning enemies or at scene start for player
-    /// </summary>
+    // Register a new entity (player or bot) for stats tracking
+    // Call this when spawning enemies or at scene start for player
     public void RegisterEntity(GameObject entity, string displayName, bool isPlayer = false)
     {
         if (entity == null)
@@ -136,15 +117,9 @@ public class MatchManager : MonoBehaviour
         PlayerStats stats = new PlayerStats(displayName, entity, isPlayer);
         statsTable.Add(entity, stats);
 
-        Debug.Log($"[MatchManager] ✅ Registered: {displayName} (IsPlayer: {isPlayer})");
+        Debug.Log($"[MatchManager] Registered: {displayName} (IsPlayer: {isPlayer})");
     }
 
-    /// <summary>
-    /// Main method: Register a kill event
-    /// Call this when an entity kills another entity
-    /// </summary>
-    /// <param name="killer">The GameObject that performed the kill (can be null for suicide/environment)</param>
-    /// <param name="victim">The GameObject that died</param>
     public void RegisterKill(GameObject killer, GameObject victim)
     {
         if (victim == null)
@@ -178,26 +153,24 @@ public class MatchManager : MonoBehaviour
             killerStats = statsTable[killer];
             killerStats.kills++;
 
-            Debug.Log($"[MatchManager] 💀 KILL: {killerStats.entityName} killed {victimStats.entityName} | K/D: {killerStats.kills}/{killerStats.deaths}");
+            Debug.Log($"[MatchManager] KILL: {killerStats.entityName} killed {victimStats.entityName} | K/D: {killerStats.kills}/{killerStats.deaths}");
         }
         else if (killer == victim)
         {
             // Suicide
-            Debug.Log($"[MatchManager] 💀 SUICIDE: {victimStats.entityName} killed themselves");
+            Debug.Log($"[MatchManager] SUICIDE: {victimStats.entityName} killed themselves");
         }
         else
         {
             // Environment kill (fell off map, etc.)
-            Debug.Log($"[MatchManager] 💀 ENVIRONMENT: {victimStats.entityName} died to environment");
+            Debug.Log($"[MatchManager] ENVIRONMENT: {victimStats.entityName} died to environment");
         }
 
         // Fire event for UI updates, achievements, etc.
         OnKillRegistered?.Invoke(killerStats, victimStats);
     }
 
-    /// <summary>
-    /// Get stats for a specific entity
-    /// </summary>
+    // Get stats for a specific entity
     public PlayerStats GetStats(GameObject entity)
     {
         if (statsTable.ContainsKey(entity))
@@ -207,9 +180,7 @@ public class MatchManager : MonoBehaviour
         return null;
     }
 
-    /// <summary>
-    /// Get all stats sorted by score (descending)
-    /// </summary>
+    // Get all stats sorted by score (descending)
     public List<PlayerStats> GetLeaderboard()
     {
         return statsTable.Values
@@ -217,9 +188,7 @@ public class MatchManager : MonoBehaviour
             .ToList();
     }
 
-    /// <summary>
-    /// Get player stats specifically
-    /// </summary>
+    // Get player stats specifically
     public PlayerStats GetPlayerStats()
     {
         if (playerObject != null && statsTable.ContainsKey(playerObject))
@@ -229,9 +198,7 @@ public class MatchManager : MonoBehaviour
         return null;
     }
 
-    /// <summary>
-    /// Print leaderboard to console (for debugging)
-    /// </summary>
+    // Print leaderboard to console (for debugging)
     public void PrintLeaderboard()
     {
         Debug.Log("═══════════════════════════════════════");
@@ -251,9 +218,6 @@ public class MatchManager : MonoBehaviour
         Debug.Log("═══════════════════════════════════════");
     }
 
-    /// <summary>
-    /// Reset all stats (useful for restarting match without reloading scene)
-    /// </summary>
     public void ResetStats()
     {
         foreach (var stats in statsTable.Values)
@@ -263,20 +227,18 @@ public class MatchManager : MonoBehaviour
         }
 
         matchTimer = 0f;
-        Debug.Log("[MatchManager] 🔄 Stats reset");
+        Debug.Log("[MatchManager] Stats reset");
     }
 
     private void OnDestroy()
     {
-        // Cleanup singleton reference when scene unloads
         if (Instance == this)
         {
             Instance = null;
-            Debug.Log("[MatchManager] 🗑️ MatchManager destroyed (scene unloaded)");
+            Debug.Log("[MatchManager] MatchManager destroyed (scene unloaded)");
         }
     }
 
-    // Debug method to manually trigger match end (for testing)
     [ContextMenu("End Match Now")]
     public void DebugEndMatch()
     {

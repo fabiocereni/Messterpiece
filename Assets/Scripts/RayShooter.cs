@@ -30,7 +30,6 @@ public class RayShooter : MonoBehaviour
             RaycastHit hit;
             if (Physics.Raycast(ray, out hit))
             {
-                //Debug.Log("We have a hit!");
                 GameObject hitObject = hit.transform.gameObject;
                 Renderer targetRenderer = hitObject.GetComponent<MeshRenderer>();
                 if (targetRenderer == null)

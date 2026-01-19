@@ -1,10 +1,8 @@
 using UnityEngine;
 using TMPro;
 
-/// <summary>
-/// Gestisce l'animazione del numero danno floating
-/// Move up + fade out + destroy
-/// </summary>
+// Gestisce l'animazione del numero danno floating
+// Move up + fade out + destroy
 public class DamageNumber : MonoBehaviour
 {
     [Header("Animation Settings")]
@@ -18,8 +16,8 @@ public class DamageNumber : MonoBehaviour
     public float fadeStartPercent = 0.5f;
 
     [Header("References")]
-    public TextMeshProUGUI damageText; // Se usi Canvas UI
-    public TextMeshPro damageText3D;   // Se usi TextMeshPro 3D
+    public TextMeshProUGUI damageText;
+    public TextMeshPro damageText3D;
 
     private float timer = 0f;
     private Color originalColor;
@@ -82,10 +80,8 @@ public class DamageNumber : MonoBehaviour
             }
         }
 
-        // Billboard (sempre guarda camera) - Metodo semplificato
         if (mainCamera != null)
         {
-            // Fai guardare il canvas direttamente alla camera
             transform.LookAt(mainCamera.transform);
 
             // Ruota di 180° sull'asse Y per evitare che il testo sia al contrario
@@ -93,9 +89,7 @@ public class DamageNumber : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Imposta il valore del danno da mostrare
-    /// </summary>
+    // Imposta il valore del danno da mostrare
     public void SetDamage(float damage)
     {
         string damageString = Mathf.RoundToInt(damage).ToString();

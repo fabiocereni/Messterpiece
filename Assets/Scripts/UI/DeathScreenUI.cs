@@ -4,10 +4,8 @@ using TMPro;
 using UnityEngine.SceneManagement;
 using System.Collections;
 
-/// <summary>
-/// Gestisce la schermata di morte con countdown e opzioni
-/// Si collega automaticamente al PlayerRespawn
-/// </summary>
+// Gestisce la schermata di morte con countdown e opzioni
+// Si collega automaticamente al PlayerRespawn
 public class DeathScreenUI : MonoBehaviour
 {
     public static DeathScreenUI Instance { get; private set; }
@@ -56,7 +54,6 @@ public class DeathScreenUI : MonoBehaviour
     
     private void Awake()
     {
-        // Singleton pattern
         if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
@@ -80,17 +77,13 @@ public class DeathScreenUI : MonoBehaviour
         HideDeathScreen();
     }
     
-    /// <summary>
-    /// Fa partire il respawn dopo il countdown
-    /// </summary>
+    // Fa partire il respawn dopo il countdown
     private void StartRespawnProcess()
     {
         StartCoroutine(RespawnCountdown());
     }
     
-    /// <summary>
-    /// Ottiene i componenti necessari
-    /// </summary>
+    // Ottiene i componenti necessari
     private void GetRequiredComponents()
     {
         // Canvas group per effetti fade
@@ -115,9 +108,7 @@ public class DeathScreenUI : MonoBehaviour
         }
     }
     
-    /// <summary>
-    /// Inizializza la schermata di morte
-    /// </summary>
+    // Inizializza la schermata di morte
     private void InitializeDeathScreen()
     {
         // Configura pulsante menu se presente
@@ -128,9 +119,7 @@ public class DeathScreenUI : MonoBehaviour
         }
     }
     
-    /// <summary>
-    /// Trova il PlayerRespawn nella scena
-    /// </summary>
+    // Trova il PlayerRespawn nella scena
     private void FindPlayerRespawn()
     {
         playerRespawn = FindObjectOfType<PlayerRespawn>();
@@ -145,17 +134,13 @@ public class DeathScreenUI : MonoBehaviour
         }
     }
     
-    /// <summary>
-    /// Mostra la schermata di morte con countdown
-    /// </summary>
+    // Mostra la schermata di morte con countdown
     public void ShowDeathScreen()
     {
         ShowDeathScreen(respawnDelay);
     }
     
-    /// <summary>
-    /// Mostra la schermata di morte con countdown personalizzato
-    /// </summary>
+    // Mostra la schermata di morte con countdown personalizzato
     public void ShowDeathScreen(float customRespawnDelay)
     {
         if (isShowingDeathScreen) return;
@@ -201,9 +186,7 @@ public class DeathScreenUI : MonoBehaviour
         StartRespawnProcess();
     }
     
-    /// <summary>
-    /// Nasconde la schermata di morte
-    /// </summary>
+    // Nasconde la schermata di morte
     public void HideDeathScreen()
     {
         if (!isShowingDeathScreen) return;
@@ -236,9 +219,7 @@ public class DeathScreenUI : MonoBehaviour
         Cursor.visible = false;
     }
     
-    /// <summary>
-    /// Coroutine per il respawn countdown
-    /// </summary>
+    // Coroutine per il respawn countdown
     private IEnumerator RespawnCountdown()
     {
         while (currentCountdown > 0 && isShowingDeathScreen)
@@ -266,9 +247,7 @@ public class DeathScreenUI : MonoBehaviour
         }
     }
     
-    /// <summary>
-    /// Aggiorna il display del countdown
-    /// </summary>
+    // Aggiorna il display del countdown
     private void UpdateCountdownDisplay(float countdown)
     {
         if (respawnCountdownText != null)
@@ -292,17 +271,13 @@ public class DeathScreenUI : MonoBehaviour
         }
     }
     
-    /// <summary>
-    /// Permette a PlayerRespawn di aggiornare il countdown
-    /// </summary>
+    // Permette a PlayerRespawn di aggiornare il countdown
     public void SetCountdown(float countdown)
     {
         currentCountdown = countdown;
     }
     
-    /// <summary>
-    /// Coroutine per fade-in
-    /// </summary>
+    // Coroutine per fade-in
     private IEnumerator FadeIn()
     {
         if (canvasGroup == null) yield break;
@@ -320,9 +295,7 @@ public class DeathScreenUI : MonoBehaviour
         canvasGroup.alpha = 1f;
     }
     
-    /// <summary>
-    /// Mostra pulsante menu con delay
-    /// </summary>
+    // Mostra pulsante menu con delay
     private IEnumerator ShowMenuButtonWithDelay()
     {
         yield return new WaitForSeconds(showMenuButtonAfter);
@@ -333,9 +306,7 @@ public class DeathScreenUI : MonoBehaviour
         }
     }
     
-    /// <summary>
-    /// Ritorna al menu principale
-    /// </summary>
+    // Ritorna al menu principale
     public void ReturnToMainMenu()
     {
         Debug.Log("[DeathScreenUI] Ritorno al menu principale");
@@ -352,9 +323,7 @@ public class DeathScreenUI : MonoBehaviour
         }
     }
     
-    /// <summary>
-    /// Forza respawn immediato
-    /// </summary>
+    // Forza respawn immediato
     public void ForceRespawn()
     {
         if (playerRespawn != null && isShowingDeathScreen)
@@ -364,9 +333,7 @@ public class DeathScreenUI : MonoBehaviour
         }
     }
     
-    /// <summary>
-    /// Imposta il testo di morte personalizzato
-    /// </summary>
+    // Imposta il testo di morte personalizzato
     public void SetDeathMessage(string message)
     {
         if (deathTitleText != null)
@@ -382,7 +349,6 @@ public class DeathScreenUI : MonoBehaviour
             Instance = null;
         }
         
-        // Cleanup eventi
         if (returnToMenuButton != null)
         {
             returnToMenuButton.onClick.RemoveAllListeners();

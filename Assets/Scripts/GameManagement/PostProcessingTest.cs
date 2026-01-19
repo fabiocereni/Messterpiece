@@ -2,10 +2,6 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
-/// <summary>
-/// Simple test script to verify URP Post-Processing is working
-/// Press T in Play Mode to toggle grayscale on/off
-/// </summary>
 public class PostProcessingTest : MonoBehaviour
 {
     public Volume testVolume;
@@ -16,13 +12,13 @@ public class PostProcessingTest : MonoBehaviour
     {
         if (testVolume == null)
         {
-            Debug.LogError("[PostProcessingTest] ❌ Volume reference missing!");
+            Debug.LogError("[PostProcessingTest] Volume reference missing!");
             return;
         }
 
         if (!testVolume.profile.TryGet(out colorAdjustments))
         {
-            Debug.LogError("[PostProcessingTest] ❌ Color Adjustments not found in Volume!");
+            Debug.LogError("[PostProcessingTest] Color Adjustments not found in Volume!");
             return;
         }
 
@@ -30,7 +26,7 @@ public class PostProcessingTest : MonoBehaviour
         colorAdjustments.saturation.overrideState = true;
         colorAdjustments.saturation.value = 0f;
 
-        Debug.Log("[PostProcessingTest] ✅ Test ready! Press T to toggle grayscale.");
+        Debug.Log("[PostProcessingTest] Test ready! Press T to toggle grayscale.");
     }
 
     void Update()
@@ -44,7 +40,7 @@ public class PostProcessingTest : MonoBehaviour
                 float targetSaturation = isGrayscale ? -100f : 0f;
                 colorAdjustments.saturation.value = targetSaturation;
 
-                Debug.Log($"[PostProcessingTest] 🎨 Saturation set to: {targetSaturation} (Grayscale: {isGrayscale})");
+                Debug.Log($"[PostProcessingTest] Saturation set to: {targetSaturation} (Grayscale: {isGrayscale})");
             }
         }
     }

@@ -3,10 +3,6 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using TMPro;
 
-/// <summary>
-/// Manages the pre-match warmup sequence with countdown and grayscale-to-color transition.
-/// This script handles the first 5 seconds of the match before gameplay begins.
-/// </summary>
 public class MatchFlowManager : MonoBehaviour
 {
     public static MatchFlowManager Instance { get; private set; }
@@ -25,8 +21,6 @@ public class MatchFlowManager : MonoBehaviour
 
     // Public property to check if the warmup is in progress
     public bool IsWarmupActive { get; private set; } = true;
-
-    // Event that fires when the warmup completes
     public event System.Action OnWarmupComplete;
 
     private VolumeProfile volumeProfile;
@@ -34,7 +28,6 @@ public class MatchFlowManager : MonoBehaviour
 
     private void Awake()
     {
-        // Singleton pattern
         if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
@@ -45,59 +38,56 @@ public class MatchFlowManager : MonoBehaviour
 
     private void Start()
     {
-        // Validate references
         if (globalVolume == null)
         {
-            Debug.LogError("[MatchFlowManager] ❌ Global Volume reference is missing! Assign it in the Inspector.");
+            Debug.LogError("[MatchFlowManager] Global Volume reference is missing! Assign it in the Inspector.");
             return;
         }
 
-        Debug.Log("[MatchFlowManager] ✓ Global Volume found: " + globalVolume.name);
+        Debug.Log("[MatchFlowManager] Global Volume found: " + globalVolume.name);
 
         if (countdownText == null)
         {
-            Debug.LogError("[MatchFlowManager] ❌ Countdown Text reference is missing! Assign it in the Inspector.");
+            Debug.LogError("[MatchFlowManager] Countdown Text reference is missing! Assign it in the Inspector.");
             return;
         }
 
-        Debug.Log("[MatchFlowManager] ✓ Countdown Text found: " + countdownText.name);
+        Debug.Log("[MatchFlowManager] Countdown Text found: " + countdownText.name);
 
         // Get the Volume Profile and Color Adjustments component
         volumeProfile = globalVolume.profile;
 
         if (volumeProfile == null)
         {
-            Debug.LogError("[MatchFlowManager] ❌ Volume Profile is NULL! Create a new profile in the Global Volume component.");
+            Debug.LogError("[MatchFlowManager] Volume Profile is NULL! Create a new profile in the Global Volume component.");
             return;
         }
 
-        Debug.Log("[MatchFlowManager] ✓ Volume Profile found: " + volumeProfile.name);
+        Debug.Log("[MatchFlowManager] Volume Profile found: " + volumeProfile.name);
 
         if (!volumeProfile.TryGet(out colorAdjustments))
         {
-            Debug.LogError("[MatchFlowManager] ❌ Color Adjustments override not found in Volume Profile! Add it via: Volume component → Add Override → Post-processing → Color Adjustments");
+            Debug.LogError("[MatchFlowManager] Color Adjustments override not found in Volume Profile! Add it via: Volume component → Add Override → Post-processing → Color Adjustments");
             return;
         }
 
-        Debug.Log("[MatchFlowManager] ✓ Color Adjustments found");
+        Debug.Log("[MatchFlowManager] Color Adjustments found");
 
         // Check if saturation is overridden (enabled)
         if (!colorAdjustments.saturation.overrideState)
         {
-            Debug.LogWarning("[MatchFlowManager] ⚠️ Saturation is NOT overridden! Enabling it automatically...");
+            Debug.LogWarning("[MatchFlowManager] Saturation is NOT overridden! Enabling it automatically...");
             colorAdjustments.saturation.overrideState = true;
         }
 
-        Debug.Log($"[MatchFlowManager] ✓ Saturation override enabled. Current value: {colorAdjustments.saturation.value}");
+        Debug.Log($"[MatchFlowManager] Saturation override enabled. Current value: {colorAdjustments.saturation.value}");
 
         // Start the warmup sequence
-        Debug.Log("[MatchFlowManager] 🎬 Starting warmup sequence...");
+        Debug.Log("[MatchFlowManager] Starting warmup sequence...");
         StartCoroutine(WarmupSequence());
     }
 
-    /// <summary>
-    /// Main coroutine that handles the countdown and visual transition
-    /// </summary>
+    // Main coroutine that handles the countdown and visual transition
     private IEnumerator WarmupSequence()
     {
         IsWarmupActive = true;
@@ -166,9 +156,7 @@ public class MatchFlowManager : MonoBehaviour
         Debug.Log("[MatchFlowManager] ✅ Warmup sequence complete! Game started.");
     }
 
-    /// <summary>
-    /// Public method to check if players should be able to move
-    /// </summary>
+    // Public method to check if players should be able to move
     public bool CanPlayerMove()
     {
         return !IsWarmupActive;

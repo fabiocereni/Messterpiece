@@ -1,10 +1,8 @@
 using UnityEngine;
 using TMPro;
 
-/// <summary>
-/// Semplice UI per mostrare il timer della partita
-/// Da collegare al MatchManager esistente
-/// </summary>
+// Semplice UI per mostrare il timer della partita
+// Da collegare al MatchManager esistente
 public class TimerUI : MonoBehaviour
 {
     [Header("UI")]

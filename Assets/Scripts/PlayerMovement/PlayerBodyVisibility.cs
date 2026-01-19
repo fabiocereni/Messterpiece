@@ -3,11 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-/// <summary>
-/// Questo script gestisce la visibilità delle mesh del player in base alla modalità camera.
-/// In FPS: le mesh sono invisibili (o ShadowsOnly per le ombre)
-/// In TPS: le mesh sono visibili normalmente
-/// </summary>
 public class PlayerBodyVisibility : MonoBehaviour
 {
     [Header("Visibility Settings")]
@@ -34,15 +29,10 @@ public class PlayerBodyVisibility : MonoBehaviour
 
     void Start()
     {
-        // Di default, inizia in FPS mode (nascosto)
+        // default, inizia in FPS mode (nascosto)
         SetVisible(false);
     }
 
-    /// <summary>
-    /// Imposta la visibilità delle mesh.
-    /// Chiamato da CameraController quando cambia modalità.
-    /// </summary>
-    /// <param name="visible">True per TPS (visibile), False per FPS (nascosto)</param>
     public void SetVisible(bool visible)
     {
         foreach (Renderer meshRenderer in meshesToHide)
@@ -82,9 +72,6 @@ public class PlayerBodyVisibility : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Metodo legacy per retrocompatibilità
-    /// </summary>
     public void UpdateVisibility()
     {
         // Assume FPS mode per retrocompatibilità

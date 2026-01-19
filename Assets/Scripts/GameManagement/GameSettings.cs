@@ -1,9 +1,7 @@
 using UnityEngine;
 
-/// <summary>
-/// Gestisce le impostazioni di gioco (volume, difficoltà)
-/// Singleton persistente che salva le impostazioni in PlayerPrefs
-/// </summary>
+// Gestisce le impostazioni di gioco (volume, difficoltà)
+// Singleton persistente che salva le impostazioni in PlayerPrefs
 public class GameSettings : MonoBehaviour
 {
     public static GameSettings Instance { get; private set; }
@@ -111,9 +109,7 @@ public class GameSettings : MonoBehaviour
         Debug.Log($"[GameSettings] Inizializzato - Volume: {masterVolume}, Difficoltà: {currentDifficulty}");
     }
     
-    /// <summary>
-    /// Carica le impostazioni da PlayerPrefs
-    /// </summary>
+    // Carica le impostazioni da PlayerPrefs
     private void LoadSettings()
     {
         masterVolume = PlayerPrefs.GetFloat(VOLUME_KEY, DEFAULT_VOLUME);
@@ -123,9 +119,7 @@ public class GameSettings : MonoBehaviour
         ApplyVolume();
     }
     
-    /// <summary>
-    /// Salva le impostazioni in PlayerPrefs
-    /// </summary>
+    // Salva le impostazioni in PlayerPrefs
     private void SaveSettings()
     {
         PlayerPrefs.SetFloat(VOLUME_KEY, masterVolume);
@@ -133,17 +127,13 @@ public class GameSettings : MonoBehaviour
         PlayerPrefs.Save();
     }
     
-    /// <summary>
-    /// Applica il volume al sistema audio
-    /// </summary>
+    // Applica il volume al sistema audio
     private void ApplyVolume()
     {
         AudioListener.volume = masterVolume;
     }
     
-    /// <summary>
-    /// Resetta tutte le impostazioni ai valori di default
-    /// </summary>
+    // Resetta tutte le impostazioni ai valori di default
     public void ResetToDefaults()
     {
         MasterVolume = DEFAULT_VOLUME;

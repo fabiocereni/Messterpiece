@@ -24,20 +24,12 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        Debug.Log("GameManager Start() invoked");
-        // All'avvio mostra il menu
-        // UIManager.Instance.ShowMainMenu();
-
-        // PER ADESSO VADO AD ISTANZIARE SUBITO LA SCENA CHE VOGLIO IO PER PROVARE
-        // QUANDO AVREMO IL CANVA CON IL PULSANTE PER STARTARE FARA' TUTTO QUELLO
         StartGame();
     }
 
     public void StartGame()
     {
         currentState = GameState.Playing;
-        // QUA CARICO LA MAPPA, che è presente in una scena
-        // magari abbiamo una lista di mappe e randomicamente ne viene scelta una
         SceneManager.LoadSceneAsync("PlayerMovementTestScene");
     }
 
@@ -49,7 +41,6 @@ public class GameManager : MonoBehaviour
     public void QuitGame()
     {
         Application.Quit();
-        Debug.Log("Gioco chiuso.");
     }
 
     public void AddKill()
@@ -58,9 +49,7 @@ public class GameManager : MonoBehaviour
         Debug.Log($"Uccisioni totali: {killCount}");
     }
     
-    /// <summary>
-    /// Carica una nuova mappa (usato da "Gioca Ancora")
-    /// </summary>
+    // Carica una nuova mappa (usato da "Gioca Ancora")
     public void LoadNewMap(string mapName)
     {
         if (string.IsNullOrEmpty(mapName))
@@ -81,9 +70,7 @@ public class GameManager : MonoBehaviour
         SceneManager.LoadSceneAsync(mapName);
     }
     
-    /// <summary>
-    /// Ritorna al menu principale (usato dal pulsante "Menu")
-    /// </summary>
+    // Ritorna al menu principale (usato dal pulsante "Menu")
     public void ReturnToMainMenu()
     {
         Debug.Log("[GameManager] Ritorno al menu principale");

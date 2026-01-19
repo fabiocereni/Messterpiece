@@ -8,7 +8,7 @@ public class PauseMenuLogic : MonoBehaviour
     public GameObject commandsPanel;
     
     [Header("Interfaccia Giocatore")]
-    public GameObject playerHUD; // NUOVO: Trascina qui il Canvas con Vita, Mirino, ecc.
+    public GameObject playerHUD;
 
     public bool isPaused = false;
 
@@ -43,7 +43,6 @@ public class PauseMenuLogic : MonoBehaviour
         pausePanel.SetActive(true);
         commandsPanel.SetActive(false);
         
-        // NUOVO: Nascondi l'interfaccia di gioco (vita, mirino...)
         if (playerHUD != null) playerHUD.SetActive(false);
 
         Time.timeScale = 0f; 
@@ -58,7 +57,6 @@ public class PauseMenuLogic : MonoBehaviour
         pausePanel.SetActive(false);
         commandsPanel.SetActive(false);
         
-        // NUOVO: Riaccendi l'interfaccia di gioco
         if (playerHUD != null) playerHUD.SetActive(true);
 
         Time.timeScale = 1f;
@@ -72,7 +70,6 @@ public class PauseMenuLogic : MonoBehaviour
     {
         pausePanel.SetActive(false);   
         commandsPanel.SetActive(true); 
-        // L'HUD è già spento perché siamo in pausa, quindi non serve fare nulla qui
     }
 
     public void CloseCommands()
