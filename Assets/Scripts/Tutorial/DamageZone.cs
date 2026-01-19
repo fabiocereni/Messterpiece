@@ -108,6 +108,7 @@ public class DamageZone : MonoBehaviour
             // Usa il metodo TakeDamage che accetta hitPoint e attacker opzionali
             ph.TakeDamage(damageAmount, transform.position, gameObject);
             Debug.Log($"[DamageZone] Inflitto {damageAmount} danno al player");
+            Destroy(this.gameObject); // Distruggi la zona dopo aver inflitto danno
         }
     }
 
